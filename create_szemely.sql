@@ -3,7 +3,8 @@ DROP TABLE IF EXISTS "Személy";
 DROP TABLE IF EXISTS "Nem";
 DROP TABLE IF EXISTS "Köszöntés";
 DROP TABLE IF EXISTS "Megszólítás";
-DROP TABLE IF EXISTS "Elérhetőség";
+DROP TABLE IF EXISTS "Telefon";
+DROP TABLE IF EXISTS "Email";
 DROP TABLE IF EXISTS "Cím";
 DROP TABLE IF EXISTS "NÜJ";
 DROP TABLE IF EXISTS "FMV";
@@ -15,44 +16,39 @@ CREATE TABLE IF NOT EXISTS "Személy" (
     "előtag" TEXT(10),
     "vezetéknév" TEXT(30),
     "keresztnév" TEXT(30),
-    "becenév" TEXT(30) DEFAULT NULL,
-    "közvetlen" BOOLEAN DEFAULT NULL,
-    "nem" TEXT(5),
+    "tegező" BOOLEAN DEFAULT NULL,
+    "nem" INTEGER REFERENCES "Nem"("rowid"),
     "megjegyzés" TEXT(50),
-    "törlendő" DATE, -- ha eléri a dátumot, törli a személyt
-    CONSTRAINT ELL_SZEM_NEM CHECK("nem" in ('férfi', 'nő'))
+    "törlendő" DATE -- ha eléri a dátumot, törli a személyt
 );
 
 CREATE TABLE IF NOT EXISTS "Nem" (
-    "nem" TEXT(5);
+    "nem" TEXT(5)
 );
 INSERT INTO "Nem"("nem") VALUES ('férfi');
 INSERT INTO "Nem"("nem") VALUES ('nő');
 
 CREATE TABLE IF NOT EXISTS "Köszöntés" (
-    "köszöntés" TEXT(8);
+    "köszöntés" TEXT(8)
 );
-INSERT INTO "Köszöntés"("köszöntés") VALUES ('Szia');
 INSERT INTO "Köszöntés"("köszöntés") VALUES ('Kedves');
 INSERT INTO "Köszöntés"("köszöntés") VALUES ('Tisztelt');
 
 CREATE TABLE IF NOT EXISTS "Megszólítás" (
-    "megszólitás" TEXT(7);
+    "megszólítás" TEXT(7)
 );
 INSERT INTO "Megszólítás"("megszólítás") VALUES ('Hölgyem');
 INSERT INTO "Megszólítás"("megszólítás") VALUES ('Uram');
 
-/*
-Köszöntés és megszólítás
-- ha van becenév, akkor Szia + " " + becenév, ha nincs becenév megadva, akkor keresztnévvel
-- ha közvetlen, akkor 'Kedves' + ' ' + keresztnév + '!'
-- ha egyik sem, akkor Tisztelt + " " Hölgyem VAGY Uram + '!'
-*/
-
 -- gdpr-érzékeny
-CREATE TABLE IF NOT EXISTS "Elérhetőség" (
+CREATE TABLE IF NOT EXISTS "Telefon" (
     "személy" INTEGER NOT NULL REFERENCES "Személy"("rowid") ON DELETE CASCADE ON UPDATE CASCADE,
     "telefonszám" TEXT(20),
+    "megjegyzés" TEXT(50)
+);
+-- gdpr-érzékeny
+CREATE TABLE IF NOT EXISTS "Email" (
+    "személy" INTEGER NOT NULL REFERENCES "Személy"("rowid") ON DELETE CASCADE ON UPDATE CASCADE,
     "email-cím" TEXT(50),
     "megjegyzés" TEXT(50)
 );
@@ -88,5 +84,5 @@ CREATE TABLE IF NOT EXISTS "Munkavállaló" (
     "születési idő" DATE,
     "édesanyja neve" TEXT(60),
     "taj-szám" TEXT(20),
-    "adóazonosító jel" TEXT(20),
+    "adóazonosító jel" TEXT(20)
 );
