@@ -20,11 +20,6 @@ CREATE TABLE IF NOT EXISTS "Cím" (
 
 CREATE TABLE IF NOT EXISTS "Munkarész" (
     "munka" INTEGER NOT NULL REFERENCES "Munka"("rowid"),
-    "megnevezés" TEXT NOT NULL DEFAULT 'hőszigetelés',
-    "mennyiség" REAL,
-    "egység" TEXT DEFAULT 'm3',
-    "anyag" TEXT DEFAULT 'zc',
-    "megjegyzés" TEXT,
-    CONSTRAINT ELL_MNK_EGS CHECK("egység" in ('m2', 'm3', 'db', 'kg', "szett"))
-    CONSTRAINT ELL_MNK_ANG CHECK("anyag" in ('zc', 'nyc', 'fa', 'komponens', 'alkatrész', 'gép'))
+    "megnevezés" TEXT NOT NULL DEFAULT 'hőszigetelés'
+    "megjegyzés" TEXT
 );
