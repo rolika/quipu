@@ -1,8 +1,10 @@
 -- Syntax: SQLite3
 
+PRAGMA foreign_keys = ON;
+
 -- gdpr-érzékeny
 CREATE TABLE IF NOT EXISTS "Személy" (
-    "előtag" TEXT,
+    "előtag" TEXT DEFAULT '',
     "vezetéknév" TEXT NOT NULL,
     "keresztnév" TEXT NOT NULL,
     "nem" TEXT,
@@ -15,13 +17,13 @@ CREATE TABLE IF NOT EXISTS "Személy" (
 CREATE TABLE IF NOT EXISTS "Telefon" (
     "személy" INTEGER NOT NULL REFERENCES "Személy"("rowid") ON DELETE CASCADE ON UPDATE CASCADE,
     "telefonszám" TEXT NOT NULL,
-    "megjegyzés" TEXT
+    "megjegyzés" TEXT DEFAULT 'elsődleges'
 );
 -- gdpr-érzékeny
 CREATE TABLE IF NOT EXISTS "Email" (
     "személy" INTEGER NOT NULL REFERENCES "Személy"("rowid") ON DELETE CASCADE ON UPDATE CASCADE,
     "email-cím" TEXT NOT NULL,
-    "megjegyzés" TEXT
+    "megjegyzés" TEXT DEFAULT 'elsődleges'
 );
 
 -- gdpr-érzékeny
@@ -31,5 +33,5 @@ CREATE TABLE IF NOT EXISTS "Cím" (
     "irányítószám" TEXT,
     "helység" TEXT NOT NULL,
     "utca" TEXT, -- házszám is
-    "megjegyzés" TEXT
+    "megjegyzés" TEXT DEFAULT 'elsődleges'
 );
