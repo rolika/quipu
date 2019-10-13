@@ -35,3 +35,27 @@ CREATE TABLE IF NOT EXISTS "Cím" (
     "utca" TEXT, -- házszám is
     "megjegyzés" TEXT DEFAULT 'elsődleges'
 );
+
+CREATE TABLE IF NOT EXISTS "Megszólítás" (
+    "nem" TEXT PRIMARY KEY,
+    "megszólítás" TEXT
+);
+INSERT INTO "Megszólítás" VALUES ("nő", "Hölgyem");
+INSERT INTO "Megszólítás" VALUES ("férfi", "Uram");
+
+CREATE VIEW IF NOT EXISTS "Név"("személy", "név") AS
+    SELECT "rowid", ltrim(printf('%s %s %s', "előtag", "vezetéknév", "keresztnév")) FROM "Személy";
+
+CREATE VIEW IF NOT EXISTS "Teljes cím"("személy", "cím") AS
+    SELECT "személy", printf('%s-%s, %s (%s)', "irányítószám", "helység", "utca", "ország") FROM "Cím";
+
+CREATE VIEW IF NOT EXISTS "Elérhetőség"("személy", "elérhetőség") AS
+    SELECT "személy", printf('%s: %s, %s', "név", "telefonszám", "email-cím") FROM "Név", "Telefon", "Email"
+        WHERE "személy"="Telefon"."személy"
+            AND "személy"="Email"."személy"
+            AND "Telefon"."megjegyzés"='elsődleges'
+            AND "Email"."megjegyzés"='elsődleges';
+
+CREATE VIEW IF NOT EXISTS "Köszöntés"("személy", "köszöntés") AS
+    SELECT "Személy"."rowid", printf('Tisztelt %s!', "megszólítás") FROM "Személy", "Megszólítás"
+        WHERE "Személy"."nem"="Megszólítás"."nem";
