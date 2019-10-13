@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS "Cím" (
 );
 
 CREATE TABLE IF NOT EXISTS "Megszólítás" (
-    "nem" TEXT PRIMARY KEY,
+    "nem" TEXT PRIMARY KEY REFERENCES "Személy"("nem"),
     "megszólítás" TEXT
 );
 INSERT INTO "Megszólítás" VALUES ("nő", "Hölgyem");
