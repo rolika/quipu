@@ -1,5 +1,7 @@
 -- Syntax: SQLite3
 
+PRAGMA foreign_keys = ON;
+
 CREATE TABLE IF NOT EXISTS "Szervezet" (
     "rövid név" TEXT NOT NULL,
     "teljes név" TEXT NOT NULL,
@@ -9,13 +11,13 @@ CREATE TABLE IF NOT EXISTS "Szervezet" (
 CREATE TABLE IF NOT EXISTS "Telefon" (
     "szervezet" INTEGER NOT NULL REFERENCES "Szervezet"("rowid"),
     "telefonszám" TEXT NOT NULL,
-    "megjegyzés" TEXT
+    "megjegyzés" TEXT DEFAULT 'elsődleges'
 );
 
 CREATE TABLE IF NOT EXISTS "Email" (
     "szervezet" INTEGER NOT NULL REFERENCES "Szervezet"("rowid"),
     "email-cím" TEXT NOT NULL,
-    "megjegyzés" TEXT
+    "megjegyzés" TEXT DEFAULT 'elsődleges'
 );
 
 CREATE TABLE IF NOT EXISTS "Cím" (
@@ -24,5 +26,5 @@ CREATE TABLE IF NOT EXISTS "Cím" (
     "irányítószám" TEXT,
     "helység" TEXT NOT NULL,
     "utca" TEXT, -- házszám is
-    "megjegyzés" TEXT
+    "megjegyzés" TEXT DEFAULT 'elsődleges'
 );
