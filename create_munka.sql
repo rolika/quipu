@@ -1,5 +1,7 @@
 -- Syntax: SQLite
 
+PRAGMA foreign_keys = ON;
+
 CREATE TABLE IF NOT EXISTS "Munka" (
     "megnevezés" TEXT NOT NULL,
     "jelleg" TEXT NOT NULL DEFAULT 'új',
@@ -11,6 +13,7 @@ CREATE TABLE IF NOT EXISTS "Munka" (
 CREATE TABLE IF NOT EXISTS "Cím" (
     "munka" INTEGER NOT NULL REFERENCES "Munka"("rowid"),
     "ország" TEXT NOT NULL DEFAULT 'Magyarország',
+    "megye" TEXT,
     "irányítószám" TEXT,
     "helység" TEXT NOT NULL,
     "utca" TEXT, -- házszám is
