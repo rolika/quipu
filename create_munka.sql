@@ -4,6 +4,12 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS "Munka" (
     "megnevezés" TEXT NOT NULL,
+    "megjegyzés" TEXT
+    
+);
+
+CREATE TABLE IF NOT EXISTS "Jelleg" (
+    "munka" INTEGER NOT NULL REFERENCES "Munka"("rowid"),
     "jelleg" TEXT NOT NULL DEFAULT 'új',
     "megjegyzés" TEXT,
     CONSTRAINT ELL_MNK_JLG CHECK("jelleg" in ('új', 'felújítás', 'bővítés', 'átalakítás', 'bérbeadás', 'eladás'))
