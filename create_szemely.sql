@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS megszolitas (
     nem TEXT PRIMARY KEY,
     megszolitas TEXT
 );
-INSERT INTO Megszolitas VALUES ("nő", "Hölgyem");
-INSERT INTO Megszolitas VALUES ("férfi", "Uram");
+INSERT INTO megszolitas VALUES ("nő", "Hölgyem");
+INSERT INTO megszolitas VALUES ("férfi", "Uram");
 
 
 CREATE TABLE IF NOT EXISTS szemely (
