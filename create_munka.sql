@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS projekt (
 
 
 CREATE TABLE IF NOT EXISTS munkaresz (
+    azonosito INTEGER PRIMARY KEY,
     projekt INTEGER NOT NULL REFERENCES projekt,
     megnevezes TEXT NOT NULL DEFAULT 'szigetelés',
     megjegyzes TEXT DEFAULT ''
