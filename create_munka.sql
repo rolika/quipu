@@ -36,3 +36,10 @@ CREATE TABLE IF NOT EXISTS jelleg (
     megjegyzes TEXT DEFAULT '',
     CONSTRAINT ELL_JLG CHECK(megnevezes in ('új', 'felújítás', 'bővítés', 'átalakítás', 'bérbeadás', 'értékesítés'))
 );
+
+
+CREATE VIEW nev(projekt, nev) AS
+    SELECT projekt.azonosito, printf('%s, %s, %s', projekt.megnevezes, helyseg, lower(munkaresz.megnevezes))
+        FROM projekt, cim, munkaresz
+            WHERE projekt.azonosito=cim.projekt
+                AND projekt.azonosito=munkaresz.projekt;
