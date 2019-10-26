@@ -2,6 +2,8 @@
 
 PRAGMA foreign_keys = ON;
 
+ATTACH DATABASE "szervezet.db" AS szervezet;
+
 
 CREATE TABLE IF NOT EXISTS megszolitas (
     nem TEXT PRIMARY KEY,
@@ -45,6 +47,14 @@ CREATE TABLE IF NOT EXISTS cim (
 );
 
 
+CREATE TABLE IF NOT EXISTS kontakt (
+    azonosito INTEGER PRIMARY KEY,
+    szemely INTEGER NOT NULL REFERENCES szemely,
+    szervezet INTEGER REFERENCES szervezet(szervezet),
+    megjegyzes TEXT DEFAULT ''
+);
+
+
 CREATE VIEW IF NOT EXISTS nev(szemely, nev) AS
     SELECT azonosito, ltrim(printf('%s %s %s', elotag, vezeteknev, keresztnev))
         FROM szemely;
@@ -68,3 +78,10 @@ CREATE VIEW IF NOT EXISTS koszontes(szemely, koszontes) AS
     SELECT szemely.azonosito, printf('Tisztelt %s!', megszolitas)
         FROM szemely, megszolitas
             WHERE szemely.nem=megszolitas.nem;
+
+
+-- automatikusan add hozzá a kontaktszemélyhez is
+CREATE TRIGGER IF NOT EXISTS kntkt AFTER INSERT ON szemely
+    BEGIN
+        INSERT INTO kontakt(szemely) VALUES(last_insert_rowid());
+    END;
