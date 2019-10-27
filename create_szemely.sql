@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS cim (
 CREATE TABLE IF NOT EXISTS kontakt (
     azonosito INTEGER PRIMARY KEY,
     szemely INTEGER NOT NULL REFERENCES szemely,
-    szervezet INTEGER REFERENCES szervezet(szervezet),
+    szervezet INTEGER,
     megjegyzes TEXT DEFAULT ''
 );
 
