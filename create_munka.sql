@@ -6,6 +6,7 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS projekt (
     azonosito INTEGER PRIMARY KEY,
     megnevezes TEXT NOT NULL,
+    rovidnev TEXT DEFAULT '',
     megjegyzes TEXT DEFAULT ''
 );
 
