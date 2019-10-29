@@ -9,29 +9,28 @@ ATTACH DATABASE "munka.db" AS munka;
 CREATE TABLE IF NOT EXISTS ajanlatkeres (
     azonosito INTEGER PRIMARY KEY,
     ajanlatkero INTEGER NOT NULL, -- szemely.kontakt
-    munkaresz INTEGER NOT NULL, -- munka.munkaresz
     erkezett DATE DEFAULT (date('now')),
     hatarido DATE DEFAULT (date('now', '+7 day')),
-    megjegyzes TEXT DEFAULT ''
+    temafelelos INTEGER, -- szemely.kontakt
+    megjegyzes TEXT
 );
 
 
 CREATE TABLE IF NOT EXISTS ajanlat (
     ev INTEGER DEFAULT 19, --a biztonság kedvéért, ha a trigger mégsem fut le
     szam INTEGER DEFAULT 0, --első érték a triggerben lévő max()-hoz
-    temafelelos INTEGER, -- szemely.kontakt
     ajanlatkeres INTEGER NOT NULL REFERENCES ajanlatkeres,
-    leadva DATE,
-    ervenyes DATE,
-    ar INTEGER DEFAULT 0,
+    leadva DATE DEFAULT (date('now')),
+    ervenyes DATE DEFAULT (date('now', '+30 day')),
+    ar INTEGER NOT NULL,
     esely INTEGER DEFAULT 5, -- <100%: esély, 100%: nyert
-    megjegyzes TEXT DEFAULT '',
+    megjegyzes TEXT,
     PRIMARY KEY(ev, szam) ON CONFLICT REPLACE
 );
 
 
 /*
-Ajánlat számának előállítása.
+Következő projektszám előállítása.
 Formátum: éé/szám, pl. 19/3
 */
 CREATE TRIGGER PRSZAM AFTER INSERT ON ajanlat
