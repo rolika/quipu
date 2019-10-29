@@ -9,6 +9,7 @@ ATTACH DATABASE "munka.db" AS munka;
 CREATE TABLE IF NOT EXISTS ajanlatkeres (
     azonosito INTEGER PRIMARY KEY,
     ajanlatkero INTEGER NOT NULL, -- szemely.kontakt
+    munkaresz INTEGER NOT NULL, -- munka.munkaresz
     erkezett DATE DEFAULT (date('now')),
     hatarido DATE DEFAULT (date('now', '+7 day')),
     temafelelos INTEGER, -- szemely.kontakt
