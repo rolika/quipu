@@ -2,29 +2,39 @@
 
 PRAGMA foreign_keys = ON;
 
-CREATE TABLE IF NOT EXISTS "Szervezet" (
-    "rövid név" TEXT NOT NULL,
-    "teljes név" TEXT NOT NULL,
-    "megjegyzés" TEXT
+
+CREATE TABLE IF NOT EXISTS szervezet (
+    azonosito INTEGER PRIMARY KEY,
+    rovidnev TEXT NOT NULL,
+    teljesnev TEXT NOT NULL,
+    megjegyzes TEXT
 );
 
-CREATE TABLE IF NOT EXISTS "Telefon" (
-    "szervezet" INTEGER NOT NULL REFERENCES "Szervezet"("rowid"),
-    "telefonszám" TEXT NOT NULL,
-    "megjegyzés" TEXT DEFAULT 'elsődleges'
+
+CREATE TABLE IF NOT EXISTS telefon (
+    szervezet INTEGER NOT NULL REFERENCES szervezet,
+    telefonszam TEXT NOT NULL,
+    megjegyzes TEXT DEFAULT 'elsődleges'
 );
 
-CREATE TABLE IF NOT EXISTS "Email" (
-    "szervezet" INTEGER NOT NULL REFERENCES "Szervezet"("rowid"),
-    "email-cím" TEXT NOT NULL,
-    "megjegyzés" TEXT DEFAULT 'elsődleges'
+
+CREATE TABLE IF NOT EXISTS email (
+    szervezet INTEGER NOT NULL REFERENCES szervezet,
+    emailcim TEXT NOT NULL,
+    megjegyzes TEXT DEFAULT 'elsődleges'
 );
 
-CREATE TABLE IF NOT EXISTS "Cím" (
-    "szervezet" INTEGER NOT NULL REFERENCES "Szervezet"("rowid"),
-    "ország" TEXT NOT NULL DEFAULT 'Magyarország',
-    "irányítószám" TEXT,
-    "helység" TEXT NOT NULL,
-    "utca" TEXT, -- házszám is
-    "megjegyzés" TEXT DEFAULT 'elsődleges'
+
+CREATE TABLE IF NOT EXISTS cim (
+    szervezet INTEGER NOT NULL REFERENCES szervezet ON DELETE CASCADE,
+    orszag TEXT NOT NULL DEFAULT 'H',
+    iranyitoszam TEXT DEFAULT '',
+    helyseg TEXT NOT NULL,
+    utca TEXT DEFAULT '', -- házszám is
+    megjegyzes TEXT DEFAULT 'székhely'
 );
+
+
+CREATE VIEW IF NOT EXISTS teljescim(szervezet, cim) AS
+    SELECT szervezet, printf('%s-%s %s, %s', orszag, iranyitoszam, helyseg, utca)
+        FROM cim;

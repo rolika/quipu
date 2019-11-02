@@ -2,28 +2,44 @@
 
 PRAGMA foreign_keys = ON;
 
-ATTACH DATABASE "szemely.db" AS "Személy";
-ATTACH DATABASE "szervezet.db" AS "Szervezet";
-ATTACH DATABASE "munka.db" AS "Munka";
+ATTACH DATABASE "szemely.db" AS szemely;
+ATTACH DATABASE "munka.db" AS munka;
 
--- gdpr-érzékeny
-CREATE TABLE IF NOT EXISTS "KontaktSzemély" (
-    "személy" INTEGER NOT NULL REFERENCES "Személy"."Személy"("rowid") ON DELETE SET NULL ON UPDATE CASCADE,
-    "szervezet" INTEGER REFERENCES "Szervezet"."Szervezet"("rowid") ON DELETE SET NULL ON UPDATE CASCADE,
-    "megjegyzés" TEXT
+
+CREATE TABLE IF NOT EXISTS ajanlatkeres (
+    azonosito INTEGER PRIMARY KEY,
+    ajanlatkero INTEGER NOT NULL, -- szemely.kontakt
+    munkaresz INTEGER NOT NULL, -- munka.munkaresz
+    erkezett DATE DEFAULT (date('now')),
+    hatarido DATE DEFAULT (date('now', '+7 day')),
+    temafelelos INTEGER, -- szemely.kontakt
+    megjegyzes TEXT
 );
 
--- évente új táblázat készül az ajánlatoknak
-CREATE TABLE IF NOT EXISTS "Árajánlat2019" (
-    "szám" TEXT PRIMARY KEY,
-    "munkarész" INTEGER NOT NULL REFERENCES "Munka"."Munkarész"("rowid") ON DELETE RESTRICT ON UPDATE RESTRICT,
-    "kontaktszemély" INTEGER REFERENCES "Kontaktszemély"("rowid") ON DELETE SET NULL ON UPDATE CASCADE,
-    "témafelelős" INTEGER REFERENCES "Kontaktszemély"("rowid") ON DELETE RESTRICT ON UPDATE CASCADE,
-    "érkezett" DATE DEFAULT (date('now')),
-    "leadási határidő" DATE DEFAULT (date('now', '+1 week')),
-    "leadva" DATE,
-    "érvényes" DATE,
-    "ajánlati ár" INTEGER,
-    "esély" INTEGER DEFAULT 5, -- <100%: esély, 100%: nyert,
-    "megjegyzés" TEXT
+
+CREATE TABLE IF NOT EXISTS ajanlat (
+    ev INTEGER DEFAULT 19, --a biztonság kedvéért, ha a trigger mégsem fut le
+    szam INTEGER DEFAULT 0, --első érték a triggerben lévő max()-hoz
+    ajanlatkeres INTEGER NOT NULL REFERENCES ajanlatkeres,
+    leadva DATE DEFAULT (date('now')),
+    ervenyes DATE DEFAULT (date('now', '+30 day')),
+    ar INTEGER NOT NULL,
+    esely INTEGER DEFAULT 5, -- <100%: esély, 100%: nyert
+    megjegyzes TEXT,
+    PRIMARY KEY(ev, szam) ON CONFLICT REPLACE
 );
+
+
+/*
+Következő projektszám előállítása.
+Formátum: éé/szám, pl. 19/3
+*/
+CREATE TRIGGER PRSZAM AFTER INSERT ON ajanlat
+    BEGIN
+        UPDATE ajanlat SET ev=substr(date('now'),3,2) WHERE rowid=last_insert_rowid();
+        UPDATE ajanlat SET szam=(
+            SELECT max(szam)+1 FROM ajanlat WHERE ev=substr(date('now'),3,2)
+        /* Ha az első update szilveszter éjfél előtt fut le, a második pedig éjfél
+        után, akkor NULL lesz a szám (+1-gyel együtt is). Vállalható kockázat :-) */
+        ) WHERE rowid=last_insert_rowid();
+    END;
