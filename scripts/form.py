@@ -6,31 +6,42 @@ class SzemelyForm(Frame):
     def __init__(self, master=None, **kw):
         super().__init__(master=master, **kw)
 
+        self.elotag = StringVar()
+        self.vezeteknev = StringVar()
+        self.keresztnev = StringVar()
+        self.nem = StringVar()
+        self.megjegyzes = StringVar()
+
+        # módosítás esetén kewyword argumentokkal előre megadott értékek
+        try:
+            self.elotag.set(elotag)
+            self.vezeteknev.set(vezeteknev)
+            self.keresztnev.set(keresztnev)
+            self.nem.set(nem)
+            self.megjegyzes.set(megjegyzes)
+        except NameError:
+            pass  # ha nincs megadva, figyelmen kívül hagyjuk
+
         Label(self, text="személy").grid(row=0, column=0, columnspan=3, padx=2, pady=2)
 
         Label(self, text="előtag").grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        self.elotag = StringVar()
         Entry(self, textvariable=self.elotag, width=8).grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
         Label(self, text="vezetéknév").grid(row=2, column=0, sticky=W, padx=2, pady=2)
-        self.vezeteknev = StringVar()
         Entry(self, textvariable=self.vezeteknev, width=32)\
             .grid(row=2, column=1, columnspan=2, sticky=W, padx=2, pady=2)
 
         Label(self, text="keresztnév").grid(row=3, column=0, sticky=W, padx=2, pady=2)
-        self.keresztnev = StringVar()
         Entry(self, textvariable=self.keresztnev, width=32)\
             .grid(row=3, column=1, columnspan=2, sticky=W, padx=2, pady=2)
 
         Label(self, text="nem").grid(row=4, column=0, sticky=W, padx=2, pady=2)
-        self.nem = StringVar()
         Radiobutton(self, text="nő", value="nő", variable=self.nem)\
             .grid(row=4, column=1, sticky=W, padx=2, pady=2)
         Radiobutton(self, text="férfi", value="férfi", variable=self.nem)\
             .grid(row=4, column=2, sticky=W, padx=2, pady=2)
 
         Label(self, text="megjegyzés").grid(row=5, column=0, sticky=W, padx=2, pady=2)
-        self.megjegyzes = StringVar()
         Entry(self, textvariable=self.megjegyzes, width=32)\
             .grid(row=5, column=1, columnspan=2, sticky=W, padx=2, pady=2)
 
@@ -140,4 +151,4 @@ if __name__ == "__main__":
     s = Style()
     s.theme_use("alt")
     s.configure(".", font=("Liberation Mono", 10))
-    CimForm().mainloop()
+    ElerhetosegForm().mainloop()
