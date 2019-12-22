@@ -91,33 +91,27 @@ class Quipu:
                 END;
         """)
 
-    def uj_szemely(self):
-        ablak = szemelyform.SzemelyForm()
-        ablak.mainloop()
-        if ablak.valasztas == "mentés":
-            return self.szemely_kon.insert("szemely", **ablak.export())
-        return None
-    
-    def szemely_modositasa(self, azonosito):      
+    def kezel_szemely(self, azonosito=None):
         urlap = szemelyform.SzemelyForm()
-        szemely = self.szemely_kon.select("szemely", azonosito=azonosito)
-        szemely = szemely.fetchone()
-        if szemely:
-            szemely = {mezo: szemely[mezo] for mezo in urlap.mezo if szemely[mezo]}
-        urlap.felulir(**szemely)
+        if azonosito:
+            szemely = self.szemely_kon.select("szemely", azonosito=azonosito)
+            szemely = szemely.fetchone()
+            if szemely:
+                szemely = {mezo: szemely[mezo] for mezo in urlap.mezo if szemely[mezo]}
+            urlap.felulir(**szemely)
         urlap.mainloop()
         if urlap.valasztas == "mentés":
-            return self.szemely_kon.update("szemely", urlap.export(), azonosito=azonosito)
+            if azonosito:
+                return self.szemely_kon.update("szemely", urlap.export(), azonosito=azonosito)
+            else:
+                return self.szemely_kon.insert("szemely", **urlap.export())
         elif urlap.valasztas == "törlés":
             return self.szemely_kon.delete("szemely", azonosito=azonosito)
         return None
-    
-    def szemely_email(self):
-        pass
 
 
 if __name__ == "__main__":
     app = Quipu()
-    if app.szemely_modositasa(18):
+    if app.kezel_szemely():
         print("bejegyzés módosítva")
     app.szemely_kon.close()
