@@ -27,7 +27,7 @@ SOFTWARE.
 
 import tamer
 import sqlite3
-import szemelyform
+import szemelyurlap
 
 
 class Quipu:
@@ -92,7 +92,7 @@ class Quipu:
         """)
 
     def kezel_szemely(self, azonosito=None):
-        urlap = szemelyform.SzemelyForm()
+        urlap = szemelyurlap.SzemelyUrlap()
         if azonosito:
             szemely = self.szemely_kon.select("szemely", azonosito=azonosito)
             szemely = szemely.fetchone()
@@ -112,6 +112,6 @@ class Quipu:
 
 if __name__ == "__main__":
     app = Quipu()
-    if app.kezel_szemely():
+    if app.kezel_szemely(21):
         print("bejegyzés módosítva")
     app.szemely_kon.close()

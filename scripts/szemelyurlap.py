@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter.ttk import *
 
 
-class SzemelyForm(Frame):
+class SzemelyUrlap(Frame):
     def __init__(self, master=None, **kw):
         super().__init__(master=master, **kw)
 
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     s = Style()
     s.theme_use("alt")
     s.configure(".", font=("Liberation Mono", 10))
-    form = SzemelyForm()
+    form = SzemelyUrlap()
     form.felulir(elotag="mr.", vezeteknev="Weisz", keresztnev="Roland", nem="férfi", megjegyzes="nagyfőnök")
     form.mainloop()
     print(form.export())
