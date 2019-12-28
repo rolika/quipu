@@ -6,35 +6,46 @@ class Szemely(LabelFrame):
     def __init__(self, master=None, **kw):
         super().__init__(master=master, text="személy", **kw)
 
-        self.mezo = {
-            "elotag": StringVar(),
-            "vezeteknev": StringVar(),
-            "keresztnev": StringVar(),
-            "nem": StringVar(),
-            "megjegyzes": StringVar()
-        }
+        self.elotag = StringVar()
+        self.vezeteknev = StringVar()
+        self.keresztnev = StringVar()
+        self.nem = StringVar()
+        self.megjegyzes = StringVar()
 
         Label(self, text="előtag").grid(row=0, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.mezo["elotag"], width=8).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self.elotag, width=8).grid(row=0, column=1, sticky=W, padx=2, pady=2)
 
         Label(self, text="vezetéknév").grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.mezo["vezeteknev"], width=32)\
+        Entry(self, textvariable=self.vezeteknev, width=32)\
             .grid(row=1, column=1, columnspan=2, sticky=W, padx=2, pady=2)
 
         Label(self, text="keresztnév").grid(row=2, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.mezo["keresztnev"], width=32)\
+        Entry(self, textvariable=self.keresztnev, width=32)\
             .grid(row=2, column=1, columnspan=2, sticky=W, padx=2, pady=2)
 
-        self.mezo["nem"].set("férfi")
         Label(self, text="nem").grid(row=3, column=0, sticky=W, padx=2, pady=2)
-        Radiobutton(self, text="nő", value="nő", variable=self.mezo["nem"])\
+        Radiobutton(self, text="nő", value="nő", variable=self.nem)\
             .grid(row=3, column=1, sticky=W, padx=2, pady=2)
-        Radiobutton(self, text="férfi", value="férfi", variable=self.mezo["nem"])\
+        Radiobutton(self, text="férfi", value="férfi", variable=self.nem)\
             .grid(row=3, column=2, sticky=W, padx=2, pady=2)
 
         Label(self, text="megjegyzés").grid(row=4, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.mezo["megjegyzes"], width=32)\
+        Entry(self, textvariable=self.megjegyzes, width=32)\
             .grid(row=4, column=1, columnspan=2, sticky=W, padx=2, pady=2)
+    
+    def beallit(self, **adatok):
+        self.elotag.set(adatok.get("elotag", ""))
+        self.vezeteknev.set(adatok.get("vezeteknev", ""))
+        self.keresztnev.set(adatok.get("keresztnev", ""))
+        self.nem.set(adatok.get("nem", "férfi"))
+        self.megjegyzes.set(adatok.get("megjegyzes", ""))
+    
+    def export(self):
+        return {"elotag": self.elotag.get(),
+                "vezeteknev": self.vezeteknev.get(),
+                "keresztnev": self.keresztnev.get(),
+                "nem": self.nem.get(),
+                "megjegyzes": self.megjegyzes.get()}
 
 
 class Telefon(LabelFrame):
@@ -88,62 +99,45 @@ class SzemelyUrlap(Frame):
         super().__init__(master=master, **kw)
 
         self.szemely = Szemely()
-        self.telefon = Telefon()
-        self.email = Email()
         self.kezelogomb = KezeloGomb()
 
         self.szemely.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.telefon.grid(row=1, column=0, ipadx=2, ipady=2)
-        self.email.grid(row=2, column=0, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=3, column=0, ipadx=2, ipady=2)
+        self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
+        self.kezelogomb.mentes["command"] = self.ment
+        self.kezelogomb.torles["command"] = self.torol
 
         self.kon = kon
         self.azonosito = azonosito
-        if azonosito:
-            self.felulir()
 
-    def felulir(self):
-        # személy beírása
+        self.szemely.beallit(**self.kivalaszt())
+    
+    def kivalaszt(self):
         szemely = self.kon.select("szemely", azonosito=self.azonosito)
-        szemely = szemely.fetchone()
-        if szemely:
-            szemely = {mezo: szemely[mezo] for mezo in self.szemely.mezo if szemely[mezo]}
-            for adat in szemely:
-                if self.szemely.mezo.get(adat, None):
-                    self.szemely.mezo[adat].set(szemely[adat])
-        # telefon beírása
-        telefon = self.kon.select("telefon", szemely=self.azonosito)
-        telefon = telefon.fetchone()
-        if telefon:
-            telefon = {mezo: telefon[mezo] for mezo in self.telefon.mezo if telefon[mezo]}
-            for adat in telefon:
-                if self.telefon.mezo.get(adat, None):
-                    self.telefon.mezo[adat].set(telefon[adat])
-        # email beírása
-        email = self.kon.select("email", szemely=self.azonosito)
-        email = email.fetchone()
-        if email:
-            email = {mezo: email[mezo] for mezo in self.email.mezo if email[mezo]}
-            for adat in email:
-                if self.email.mezo.get(adat, None):
-                    self.email.mezo[adat].set(email[adat])
+        return szemely.fetchone() or {}
 
     def ment(self):
-        self.valasztas = "mentés"
+        szemely = self.kivalaszt()
+        if szemely:
+            if self.kon.update("szemely", self.szemely.export(), azonosito=self.azonosito):
+                print("Bejegyzés módosítva.")
+        else:
+            self.azonosito = self.kon.insert("szemely", **self.szemely.export())
+            if self.azonosito:
+                print("Új bejegyzés mentve.")
         self.quit()
 
     def torol(self):
-        self.valasztas = "törlés"
+        # TODO: adatbázisban: azonosito INTEGER PRIMARY KEY ON DELETE CASCADE !!!?
+        self.kon.delete("telefon", szemely=self.azonosito)
+        self.kon.delete("email", szemely=self.azonosito)
+        self.kon.delete("cim", szemely=self.azonosito)
+        self.kon.delete("kontakt", szemely=self.azonosito)
+        if self.kon.delete("szemely", azonosito=self.azonosito):
+            print("Bejegyzés törölve.")
         self.quit()
 
 
 if __name__ == "__main__":
     import tamer
-    szemelyurlap = SzemelyUrlap(kon = tamer.Tamer("szemely.db"), azonosito=17)
-    """ kon = tamer.Tamer("szemely.db")
-    szemely = kon.select("szemely", azonosito=20)
-    szemely = szemely.fetchone()
-    if szemely:
-        szemely = {mezo: szemely[mezo] for mezo in szemelyurlap.mezo if szemely[mezo]}
-        szemelyurlap.felulir(**szemely) """
+    szemelyurlap = SzemelyUrlap(kon = tamer.Tamer("szemely.db"), azonosito=22)
     szemelyurlap.mainloop()
