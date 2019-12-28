@@ -87,11 +87,13 @@ class KezeloGomb(Frame):
         super().__init__(master=master, **kw)
     
         self.torles = Button(self, text="törlés", width=8)
-        Button(self, text="mégsem", width=8, command = self.quit).grid(row=0, column=1, padx=2, pady=2)
+        self.reszlet = Button(self, text="részlet", width=8)
+        Button(self, text="mégsem", width=8, command=self.quit).grid(row=0, column=2, padx=2, pady=2)
         self.mentes = Button(self, text="mentés", width=8)
 
         self.torles.grid(row=0, column=0, padx=2, pady=2)
-        self.mentes.grid(row=0, column=2, padx=2, pady=2)
+        self.reszlet.grid(row=0, column=1, padx=2, pady=2)
+        self.mentes.grid(row=0, column=3, padx=2, pady=2)
 
 
 class SzemelyUrlap(Frame):
@@ -105,6 +107,7 @@ class SzemelyUrlap(Frame):
         self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
         self.kezelogomb.mentes["command"] = self.ment
         self.kezelogomb.torles["command"] = self.torol
+        self.kezelogomb.reszlet["command"] = self.mutat
 
         self.kon = kon
         self.azonosito = azonosito
@@ -135,9 +138,15 @@ class SzemelyUrlap(Frame):
         if self.kon.delete("szemely", azonosito=self.azonosito):
             print("Bejegyzés törölve.")
         self.quit()
+    
+    def mutat(self):
+        szemely = self.kon.select("elerhetoseg", "elerhetoseg", szemely=self.azonosito)
+        szemely = szemely.fetchone()
+        if szemely:            
+            print(szemely["elerhetoseg"])
 
 
 if __name__ == "__main__":
     import tamer
-    szemelyurlap = SzemelyUrlap(kon = tamer.Tamer("szemely.db"), azonosito=22)
+    szemelyurlap = SzemelyUrlap(kon = tamer.Tamer("szemely.db"), azonosito=1)
     szemelyurlap.mainloop()
