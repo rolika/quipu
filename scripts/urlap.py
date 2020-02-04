@@ -26,6 +26,7 @@ class Szemely(LabelFrame):
         Label(self, text="nem").grid(row=3, column=0, sticky=W, padx=2, pady=2)
         Radiobutton(self, text="nő", value="nő", variable=self.nem).grid(row=3, column=1, sticky=W, padx=2, pady=2)
         Radiobutton(self, text="férfi", value="férfi", variable=self.nem).grid(row=3, column=2, sticky=W, padx=2, pady=2)
+        self.nem.set("férfi")
 
         Label(self, text="megjegyzés").grid(row=4, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self.megjegyzes, width=32)\
@@ -118,12 +119,15 @@ class SzemelyUrlap(Frame):
 
     def ment(self):
         uj = self.szemely.export()
-        if self.kon.select("szemely", logic="AND", **uj).fetchone():
-            Figyelmeztetes("Ez a név már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
-            return
-        self.azonosito = self.kon.insert("szemely", **uj)
-        if self.azonosito:
-            print("Új bejegyzés mentve.")
+        if uj["vezeteknev"] or uj["keresztnev"]:
+            if self.kon.select("szemely", logic="AND", **uj).fetchone():
+                Figyelmeztetes("Ez a név már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
+                return
+            self.azonosito = self.kon.insert("szemely", **uj)
+            if self.azonosito:
+                print("Új bejegyzés mentve.")
+        else:
+                Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
 
     def torol(self):
         # TODO: adatbázisban: azonosito INTEGER PRIMARY KEY ON DELETE CASCADE !!!?
