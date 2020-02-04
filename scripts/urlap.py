@@ -85,11 +85,12 @@ class KezeloGomb(Frame):
 
         self.torles = Button(self, text="törlés", width=8)
         self.reszlet = Button(self, text="részlet", width=8)
-        Button(self, text="mégsem", width=8, command=self.quit).grid(row=0, column=2, padx=2, pady=2)
+        self.megsem = Button(self, text="mégsem", width=8)
         self.mentes = Button(self, text="mentés", width=8)
 
         self.torles.grid(row=0, column=0, padx=2, pady=2)
         self.reszlet.grid(row=0, column=1, padx=2, pady=2)
+        self.megsem.grid(row=0, column=2, padx=2, pady=2)
         self.mentes.grid(row=0, column=3, padx=2, pady=2)
 
 
@@ -100,16 +101,15 @@ class SzemelyUrlap(Frame):
         self.kon = kon
         self.azonosito = azonosito
 
-        self.szemely = Szemely()
-        self.kezelogomb = KezeloGomb()
+        self.szemely = Szemely(self)
+        self.kezelogomb = KezeloGomb(self)
 
         self.szemely.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
         self.kezelogomb.mentes["command"] = self.ment
         self.kezelogomb.torles["command"] = self.torol
         self.kezelogomb.reszlet["command"] = self.mutat
-
-        self.szemely.beallit(**self.kivalaszt())
+        self.kezelogomb.megsem["command"] = master.destroy
 
     def kivalaszt(self):
         szemely = self.kon.select("szemely", azonosito=self.azonosito)
@@ -160,7 +160,7 @@ class TelefonUrlap(Frame):
 
         self.szemely.valaszto.bind("<<ComboboxSelected>>", self.mutat_meglevo_telefon)
 
-        nevsor = [nev["nev"] for nev in kon.select("nev").fetchall()]
+        nevsor = [nev["nev"] for nev in kon.select("nev", orderby="nev").fetchall()]
         self.szemely.valaszto["values"] = nevsor
         if nevsor:
             self.szemely.valaszto.current(0)

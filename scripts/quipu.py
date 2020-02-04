@@ -24,16 +24,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-
+from tkinter import *
+from tkinter.ttk import *
 import tamer
 import sqlite3
-import szemelyurlap
+import urlap
 
 
-class Quipu:
+class Quipu(Frame):
     """ Fő alkalmazás """
-    def __init__(self):
-        self.szemely_init()
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master=master, **kwargs)
+
+        szemelymb = Menubutton(self, text="Személy")
+        szemelymenu = Menu(self, tearoff=0)
+        szemelymenu.add_command(label="új", command=self.ujszemely)
+        szemelymb["menu"] = szemelymenu
+
+        szervezetmb = Menubutton(self, text="Szervezet")
+
+        szemelymb.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+        szervezetmb.grid(row=0, column=1, sticky=W, ipadx=2, ipady=2)
+
+        self.grid()
+        self.mainloop()
+    
+    def ujszemely(self):
+        ujablak = Toplevel()
+        szemelyurlap = urlap.SzemelyUrlap(ujablak)
+        szemelyurlap.grid()
 
     def szemely_init(self):
         """ Személy adatbázis inicializálása  """
@@ -48,14 +67,13 @@ class Quipu:
             megjegyzes="TEXT")
 
         self.szemely_kon.create("telefon", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            telefonszam="TEXT NOT NULL", megjegyzes="TEXT DEFAULT 'elsődleges'")
+            telefonszam="TEXT NOT NULL", megjegyzes="TEXT")
 
         self.szemely_kon.create("email", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            emailcim="TEXT NOT NULL", megjegyzes="TEXT DEFAULT 'elsődleges'")
+            emailcim="TEXT NOT NULL", megjegyzes="TEXT")
 
         self.szemely_kon.create("cim", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            orszag="TEXT DEFAULT 'H'", iranyitoszam="TEXT", helyseg="TEXT", utca="TEXT",
-            megjegyzes="TEXT DEFAULT 'elsődleges'")
+            orszag="TEXT DEFAULT 'H'", iranyitoszam="TEXT", helyseg="TEXT", utca="TEXT", megjegyzes="TEXT")
 
         self.szemely_kon.create("kontakt", azonosito="INTEGER PRIMARY KEY",
             szemely="INTEGER NOT NULL REFERENCES szemely", szervezet="INTEGER", megjegyzes="TEXT")
@@ -90,6 +108,9 @@ class Quipu:
                     INSERT INTO kontakt(szemely) VALUES(last_insert_rowid());
                 END;
         """)
+    
+    def init_menu(self):
+        pass
 
     def kezel_szemely(self, azonosito=None):
         urlap = szemelyurlap.SzemelyUrlap()
@@ -112,6 +133,4 @@ class Quipu:
 
 if __name__ == "__main__":
     app = Quipu()
-    if app.kezel_szemely(21):
-        print("bejegyzés módosítva")
-    app.szemely_kon.close()
+    
