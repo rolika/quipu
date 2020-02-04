@@ -36,6 +36,8 @@ class Quipu(Frame):
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
 
+        self.init_szemely_db()
+
         szemelymb = Menubutton(self, text="Személy")
         szemelymenu = Menu(self, tearoff=0)
         szemelymenu.add_command(label="új", command=self.ujszemely)
@@ -50,11 +52,10 @@ class Quipu(Frame):
         self.mainloop()
     
     def ujszemely(self):
-        ujablak = Toplevel()
-        szemelyurlap = urlap.SzemelyUrlap(ujablak)
+        szemelyurlap = urlap.SzemelyUrlap(Toplevel(), self.szemely_kon)
         szemelyurlap.grid()
 
-    def szemely_init(self):
+    def init_szemely_db(self):
         """ Személy adatbázis inicializálása  """
         self.szemely_kon = tamer.Tamer("szemely.db")
 

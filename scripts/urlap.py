@@ -98,6 +98,7 @@ class SzemelyUrlap(Frame):
     def __init__(self, master=None, kon=None, azonosito=None, **kw):
         super().__init__(master=master, **kw)
 
+        self.master = master
         self.kon = kon
         self.azonosito = azonosito
 
@@ -116,15 +117,13 @@ class SzemelyUrlap(Frame):
         return szemely.fetchone() or {}
 
     def ment(self):
-        szemely = self.kivalaszt()
-        if szemely:
-            if self.kon.update("szemely", self.szemely.export(), azonosito=self.azonosito):
-                print("Bejegyzés módosítva.")
-        else:
-            self.azonosito = self.kon.insert("szemely", **self.szemely.export())
-            if self.azonosito:
-                print("Új bejegyzés mentve.")
-        self.quit()
+        uj = self.szemely.export()
+        if self.kon.select("szemely", logic="AND", **uj).fetchone():
+            Figyelmeztetes("Ez a név már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
+            return
+        self.azonosito = self.kon.insert("szemely", **uj)
+        if self.azonosito:
+            print("Új bejegyzés mentve.")
 
     def torol(self):
         # TODO: adatbázisban: azonosito INTEGER PRIMARY KEY ON DELETE CASCADE !!!?
@@ -211,12 +210,21 @@ class TelefonUrlap(Frame):
             print(szemely["elerhetoseg"])
 
 
+class Figyelmeztetes(Frame):
+    def __init__(self, szoveg, master=None, **kw):
+        super().__init__(master=master, **kw)
+
+        Message(self, text=szoveg, aspect=200).grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+        Button(self, text="OK", width=8, command=master.destroy).grid(row=1, column=0, ipadx=2, ipady=2)
+        
+        self.grid()
+
 if __name__ == "__main__":
     import tamer
     #szemelyurlap = SzemelyUrlap(kon = tamer.Tamer("szemely.db"), azonosito=1)
     #szemelyurlap.mainloop()
-    telefonurlap = TelefonUrlap(tamer.Tamer("szemely.db"))
-    telefonurlap.mainloop()
+    #telefonurlap = TelefonUrlap(tamer.Tamer("szemely.db"))
+    #telefonurlap.mainloop()
     """nevsor = kon.select("nev").fetchall()
     nevek = {nev["nev"]: nev["szemely"] for nev in nevsor}
     nevsor = [nev["nev"] for nev in nevsor]
@@ -224,3 +232,6 @@ if __name__ == "__main__":
     v = Valaszto("személy", nevsor, ablak)
     ablak.mainloop()
     print(nevek[v.valasztas.get()])"""
+
+    Figyelmeztetes("Ez a név már szerepel az adatbázisban.", Tk()).mainloop()
+
