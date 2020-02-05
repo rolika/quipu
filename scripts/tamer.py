@@ -144,7 +144,6 @@ class Tamer(sqlite3.Connection):
 
         if orderby:
             orderby = " ORDER BY " + orderby + " " + ordering
-            print(orderby)
 
         try:
             if kwargs:
