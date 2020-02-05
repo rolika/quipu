@@ -75,13 +75,19 @@ class KetMezo(LabelFrame):
 class Valaszto(LabelFrame):
     def __init__(self, cimke, valasztek, master=None, **kw):
         super().__init__(master=master, text=cimke, **kw)
-        
-        self.valaszto = Combobox(self, values=self.valasztek(valasztek), width=32)
+
+        self.valaszto = Combobox(self, width=32)
+        self.beallit(valasztek)
         self.valaszto.grid()
-    
-    def valasztek(self, valasztek):
+
+    def beallit(self, valasztek):
         self.rowid = [elem[0] for elem in valasztek]
-        return [elem[1] for elem in valasztek]
+        self.valaszto["values"] = [elem[1] for elem in valasztek]
+        try:
+            self.valaszto.current(0)
+        except TclError:
+            self.valaszto.set("")
+
 
 
 class KezeloGomb(Frame):
@@ -90,7 +96,7 @@ class KezeloGomb(Frame):
 
         self.megse = Button(self, text="mégse", width=8)
         self.ok = Button(self, text="OK", width=8)
-        
+
         self.megse.grid(row=0, column=0, padx=2, pady=2)
         self.ok.grid(row=0, column=1, padx=2, pady=2)
 
@@ -132,7 +138,7 @@ class SzemelyTorloUrlap(Frame):
         super().__init__(master=master, **kw)
 
         self.kon = kon
-        
+
         self.lista = Valaszto("Személy törlése", self.nevsor(), self)
 
         self.kezelogomb = KezeloGomb(self)
@@ -141,20 +147,23 @@ class SzemelyTorloUrlap(Frame):
 
         self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
-    
+
     def nevsor(self):
         szemelyek = self.kon.select("nev", "szemely", "nev", orderby="nev").fetchall()
         return [(szemely["szemely"], szemely["nev"]) for szemely in szemelyek]
 
     def torol(self):
-        azonosito = self.lista.rowid[self.lista.valaszto.current()]
+        try:
+            azonosito = self.lista.rowid[self.lista.valaszto.current()]
+        except IndexError:
+            return
         self.kon.delete("telefon", szemely=azonosito)
         self.kon.delete("email", szemely=azonosito)
         self.kon.delete("cim", szemely=azonosito)
         self.kon.delete("kontakt", szemely=azonosito)
         if self.kon.delete("szemely", azonosito=azonosito):
             print("Bejegyzés törölve.")
-        self.lista.valaszto["values"] = self.lista.valasztek(self.nevsor())
+        self.lista.beallit(self.nevsor())
 
 
 class TelefonUrlap(Frame):
@@ -231,7 +240,7 @@ class Figyelmeztetes(Frame):
 
         Message(self, text=szoveg, aspect=200).grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         Button(self, text="OK", width=8, command=master.destroy).grid(row=1, column=0, ipadx=2, ipady=2)
-        
+
         self.grid()
 
 if __name__ == "__main__":
