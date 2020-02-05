@@ -40,7 +40,8 @@ class Quipu(Frame):
 
         szemelymb = Menubutton(self, text="Személy")
         szemelymenu = Menu(self, tearoff=0)
-        szemelymenu.add_command(label="új", command=self.ujszemely)
+        szemelymenu.add_command(label="új", command=self.uj_szemely)
+        szemelymenu.add_command(label="töröl", command=self.torol_szemely)
         szemelymb["menu"] = szemelymenu
 
         szervezetmb = Menubutton(self, text="Szervezet")
@@ -51,9 +52,16 @@ class Quipu(Frame):
         self.grid()
         self.mainloop()
     
-    def ujszemely(self):
-        szemelyurlap = urlap.SzemelyUrlap(Toplevel(), self.szemely_kon)
+    def uj_szemely(self):
+        szemelyurlap = urlap.UjSzemelyUrlap(Toplevel(), self.szemely_kon)
+        szemelyurlap.kezelogomb.ok["text"] = "mentés"
         szemelyurlap.grid()
+    
+    def torol_szemely(self):        
+        szemelytorlo_urlap = urlap.SzemelyTorloUrlap(Toplevel(), self.szemely_kon)
+        szemelytorlo_urlap.kezelogomb.megse["text"] = "vissza"
+        szemelytorlo_urlap.kezelogomb.ok["text"] = "törlés"
+        szemelytorlo_urlap.grid()
 
     def init_szemely_db(self):
         """ Személy adatbázis inicializálása  """
@@ -83,7 +91,7 @@ class Quipu(Frame):
             PRAGMA foreign_keys = ON;
 
             CREATE VIEW IF NOT EXISTS nev(szemely, nev) AS
-                SELECT azonosito, ltrim(printf('%s %s %s', elotag, vezeteknev, keresztnev))
+                SELECT azonosito, ltrim(printf('%s %s, %s', vezeteknev, keresztnev, elotag))
                     FROM szemely;
 
             CREATE VIEW IF NOT EXISTS teljescim(szemely, cim) AS

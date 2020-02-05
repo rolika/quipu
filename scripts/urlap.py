@@ -73,45 +73,42 @@ class KetMezo(LabelFrame):
 
 
 class Valaszto(LabelFrame):
-    def __init__(self, text, master=None, **kw):
-        super().__init__(master=master, text=text, **kw)
-
-        self.valaszto = Combobox(self, width=32)
+    def __init__(self, cimke, valasztek, master=None, **kw):
+        super().__init__(master=master, text=cimke, **kw)
+        
+        self.valaszto = Combobox(self, values=self.valasztek(valasztek), width=32)
         self.valaszto.grid()
+    
+    def valasztek(self, valasztek):
+        self.rowid = [elem[0] for elem in valasztek]
+        return [elem[1] for elem in valasztek]
 
 
 class KezeloGomb(Frame):
     def __init__(self, master=None, **kw):
         super().__init__(master=master, **kw)
 
-        self.torles = Button(self, text="törlés", width=8)
-        self.reszlet = Button(self, text="részlet", width=8)
-        self.megsem = Button(self, text="mégsem", width=8)
-        self.mentes = Button(self, text="mentés", width=8)
-
-        self.torles.grid(row=0, column=0, padx=2, pady=2)
-        self.reszlet.grid(row=0, column=1, padx=2, pady=2)
-        self.megsem.grid(row=0, column=2, padx=2, pady=2)
-        self.mentes.grid(row=0, column=3, padx=2, pady=2)
+        self.megse = Button(self, text="mégse", width=8)
+        self.ok = Button(self, text="OK", width=8)
+        
+        self.megse.grid(row=0, column=0, padx=2, pady=2)
+        self.ok.grid(row=0, column=1, padx=2, pady=2)
 
 
-class SzemelyUrlap(Frame):
-    def __init__(self, master=None, kon=None, azonosito=None, **kw):
+class UjSzemelyUrlap(Frame):
+    def __init__(self, master=None, kon=None, **kw):
         super().__init__(master=master, **kw)
 
         self.master = master
         self.kon = kon
-        self.azonosito = azonosito
 
         self.szemely = Szemely(self)
         self.kezelogomb = KezeloGomb(self)
+        self.kezelogomb.megse["command"] = master.destroy
+        self.kezelogomb.ok["command"] = self.ment
 
         self.szemely.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
-        self.kezelogomb.mentes["command"] = self.ment
-        self.kezelogomb.torles["command"] = self.torol
-        self.kezelogomb.reszlet["command"] = self.mutat
-        self.kezelogomb.megsem["command"] = master.destroy
 
     def kivalaszt(self):
         szemely = self.kon.select("szemely", azonosito=self.azonosito)
@@ -129,21 +126,35 @@ class SzemelyUrlap(Frame):
         else:
                 Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
 
-    def torol(self):
-        # TODO: adatbázisban: azonosito INTEGER PRIMARY KEY ON DELETE CASCADE !!!?
-        self.kon.delete("telefon", szemely=self.azonosito)
-        self.kon.delete("email", szemely=self.azonosito)
-        self.kon.delete("cim", szemely=self.azonosito)
-        self.kon.delete("kontakt", szemely=self.azonosito)
-        if self.kon.delete("szemely", azonosito=self.azonosito):
-            print("Bejegyzés törölve.")
-        self.quit()
 
-    def mutat(self):
-        szemely = self.kon.select("elerhetoseg", "elerhetoseg", szemely=self.azonosito)
-        szemely = szemely.fetchone()
-        if szemely:
-            print(szemely["elerhetoseg"])
+class SzemelyTorloUrlap(Frame):
+    def __init__(self, master=None, kon=None, **kw):
+        super().__init__(master=master, **kw)
+
+        self.kon = kon
+        
+        self.lista = Valaszto("Személy törlése", self.nevsor(), self)
+
+        self.kezelogomb = KezeloGomb(self)
+        self.kezelogomb.megse["command"] = master.destroy
+        self.kezelogomb.ok["command"] = self.torol
+
+        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+        self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
+    
+    def nevsor(self):
+        szemelyek = self.kon.select("nev", "szemely", "nev", orderby="nev").fetchall()
+        return [(szemely["szemely"], szemely["nev"]) for szemely in szemelyek]
+
+    def torol(self):
+        azonosito = self.lista.rowid[self.lista.valaszto.current()]
+        self.kon.delete("telefon", szemely=azonosito)
+        self.kon.delete("email", szemely=azonosito)
+        self.kon.delete("cim", szemely=azonosito)
+        self.kon.delete("kontakt", szemely=azonosito)
+        if self.kon.delete("szemely", azonosito=azonosito):
+            print("Bejegyzés törölve.")
+        self.lista.valaszto["values"] = self.lista.valasztek(self.nevsor())
 
 
 class TelefonUrlap(Frame):
