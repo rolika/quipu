@@ -116,10 +116,6 @@ class UjSzemelyUrlap(Frame):
         self.szemely.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
 
-    def kivalaszt(self):
-        szemely = self.kon.select("szemely", azonosito=self.azonosito)
-        return szemely.fetchone() or {}
-
     def ment(self):
         uj = self.szemely.export()
         if uj["vezeteknev"] or uj["keresztnev"]:
