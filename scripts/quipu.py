@@ -51,13 +51,13 @@ class Quipu(Frame):
 
         self.grid()
         self.mainloop()
-    
+
     def uj_szemely(self):
         szemelyurlap = urlap.UjSzemelyUrlap(Toplevel(), self.szemely_kon)
         szemelyurlap.kezelogomb.ok["text"] = "mentés"
         szemelyurlap.grid()
-    
-    def torol_szemely(self):        
+
+    def torol_szemely(self):
         szemelytorlo_urlap = urlap.SzemelyTorloUrlap(Toplevel(), self.szemely_kon)
         szemelytorlo_urlap.kezelogomb.megse["text"] = "vissza"
         szemelytorlo_urlap.kezelogomb.ok["text"] = "törlés"
@@ -117,7 +117,7 @@ class Quipu(Frame):
                     INSERT INTO kontakt(szemely) VALUES(last_insert_rowid());
                 END;
         """)
-    
+
     def init_menu(self):
         pass
 
@@ -142,4 +142,3 @@ class Quipu(Frame):
 
 if __name__ == "__main__":
     app = Quipu()
-    
