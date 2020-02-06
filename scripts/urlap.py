@@ -89,16 +89,22 @@ class Valaszto(LabelFrame):
             self.valaszto.set("")
 
 
-
 class KezeloGomb(Frame):
     def __init__(self, master=None, **kw):
         super().__init__(master=master, **kw)
 
-        self.megse = Button(self, text="mégse", width=8)
-        self.ok = Button(self, text="OK", width=8)
+        self.master = master
+        self.valasz = False
+
+        self.megse = Button(self, text="mégse", command=self.winfo_toplevel().destroy, width=8)
+        self.ok = Button(self, text="OK", command=self.rendben, width=8)
 
         self.megse.grid(row=0, column=0, padx=2, pady=2)
         self.ok.grid(row=0, column=1, padx=2, pady=2)
+    
+    def rendben(self):
+        self.valasz = True
+        self.winfo_toplevel().destroy()
 
 
 class UjSzemelyUrlap(Frame):
@@ -122,8 +128,7 @@ class UjSzemelyUrlap(Frame):
             if self.kon.select("szemely", logic="AND", **uj).fetchone():
                 Figyelmeztetes("Ez a név már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
                 return
-            self.azonosito = self.kon.insert("szemely", **uj)
-            if self.azonosito:
+            if self.kon.insert("szemely", **uj):
                 print("Új bejegyzés mentve.")
         else:
                 Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
@@ -231,11 +236,14 @@ class TelefonUrlap(Frame):
 
 
 class Figyelmeztetes(Frame):
-    def __init__(self, szoveg, master=None, **kw):
+    def __init__(self, szoveg, master=None, csak_ok=True, **kw):
         super().__init__(master=master, **kw)
 
-        Message(self, text=szoveg, aspect=200).grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        Button(self, text="OK", width=8, command=master.destroy).grid(row=1, column=0, ipadx=2, ipady=2)
+        Message(self, text=szoveg, aspect=200).grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        gombok = KezeloGomb(self)
+        if csak_ok:
+            gombok.megse.destroy()
+        gombok.grid(row=1, column=0, padx=2, pady=2)
 
         self.grid()
 
