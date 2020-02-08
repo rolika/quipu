@@ -87,7 +87,7 @@ class Valaszto(LabelFrame):
             self.valaszto.current(0)
         except TclError:
             self.valaszto.set("")
-    
+
     def azonosito(self):
         try:
             return self.rowid[self.valaszto.current()]
@@ -164,13 +164,16 @@ class SzemelyTorloUrlap(Frame):
     def torol(self):
         azonosito = self.lista.azonosito()
         if azonosito:
-            self.kon.delete("telefon", szemely=azonosito)
-            self.kon.delete("email", szemely=azonosito)
-            self.kon.delete("cim", szemely=azonosito)
-            self.kon.delete("kontakt", szemely=azonosito)
-            if self.kon.delete("szemely", azonosito=azonosito):
-                print("Bejegyzés törölve.")
-            self.lista.beallit(self.nevsor())
+            biztos = Figyelmeztetes("Biztos vagy benne?\nMINDEN törlődik!", Toplevel(), csak_ok=False)
+            biztos.wait_window(biztos)
+            if biztos.gombok.valasz:
+                self.kon.delete("telefon", szemely=azonosito)
+                self.kon.delete("email", szemely=azonosito)
+                self.kon.delete("cim", szemely=azonosito)
+                self.kon.delete("kontakt", szemely=azonosito)
+                if self.kon.delete("szemely", azonosito=azonosito):
+                    print("Bejegyzés törölve.")
+                self.lista.beallit(self.nevsor())
 
 
 class SzemelyModositoUrlap(Frame):
@@ -198,7 +201,7 @@ class SzemelyModositoUrlap(Frame):
     def nevsor(self):
         szemelyek = self.kon.select("nev", "szemely", "nev", orderby="nev").fetchall()
         return [(szemely["szemely"], szemely["nev"]) for szemely in szemelyek]
-    
+
     def megjelenit(self, event):
         szemely = self.kon.select("szemely", azonosito=self.lista.azonosito()).fetchone()
         self.szemelyurlap.beallit(**szemely)
@@ -215,7 +218,6 @@ class SzemelyModositoUrlap(Frame):
                     print("Bejegyzés módosítva.")
             else:
                 Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
-            
 
 
 class TelefonUrlap(Frame):
@@ -291,12 +293,13 @@ class Figyelmeztetes(Frame):
         super().__init__(master=master, **kw)
 
         Message(self, text=szoveg, aspect=200).grid(row=0, column=0, sticky=W, padx=2, pady=2)
-        gombok = KezeloGomb(self)
+        self.gombok = KezeloGomb(self)
         if csak_ok:
-            gombok.megse.destroy()
-        gombok.grid(row=1, column=0, padx=2, pady=2)
+            self.gombok.megse.destroy()
+        self.gombok.grid(row=1, column=0, padx=2, pady=2)
 
         self.grid()
+
 
 if __name__ == "__main__":
     import tamer

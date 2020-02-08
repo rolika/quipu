@@ -61,7 +61,7 @@ class Quipu(Frame):
     def torol_szemely(self):
         szemelytorlo_urlap = urlap.SzemelyTorloUrlap(Toplevel(), self.szemely_kon)
         szemelytorlo_urlap.grid()
-    
+
     def modosit_szemely(self):
         szemelymodosito_urlap = urlap.SzemelyModositoUrlap(Toplevel(), self.szemely_kon)
         szemelymodosito_urlap.grid()
