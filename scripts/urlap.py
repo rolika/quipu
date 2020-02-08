@@ -87,6 +87,12 @@ class Valaszto(LabelFrame):
             self.valaszto.current(0)
         except TclError:
             self.valaszto.set("")
+    
+    def azonosito(self):
+        try:
+            return self.rowid[self.valaszto.current()]
+        except IndexError:
+            return None
 
 
 class KezeloGomb(Frame):
@@ -101,7 +107,7 @@ class KezeloGomb(Frame):
 
         self.megse.grid(row=0, column=0, padx=2, pady=2)
         self.ok.grid(row=0, column=1, padx=2, pady=2)
-    
+
     def rendben(self):
         self.valasz = True
         self.winfo_toplevel().destroy()
@@ -143,6 +149,8 @@ class SzemelyTorloUrlap(Frame):
         self.lista = Valaszto("Személy törlése", self.nevsor(), self)
 
         self.kezelogomb = KezeloGomb(self)
+        self.kezelogomb.megse["text"] = "vissza"
+        self.kezelogomb.ok["text"] = "törlés"
         self.kezelogomb.megse["command"] = master.destroy
         self.kezelogomb.ok["command"] = self.torol
 
@@ -154,17 +162,52 @@ class SzemelyTorloUrlap(Frame):
         return [(szemely["szemely"], szemely["nev"]) for szemely in szemelyek]
 
     def torol(self):
-        try:
-            azonosito = self.lista.rowid[self.lista.valaszto.current()]
-        except IndexError:
-            return
-        self.kon.delete("telefon", szemely=azonosito)
-        self.kon.delete("email", szemely=azonosito)
-        self.kon.delete("cim", szemely=azonosito)
-        self.kon.delete("kontakt", szemely=azonosito)
-        if self.kon.delete("szemely", azonosito=azonosito):
-            print("Bejegyzés törölve.")
-        self.lista.beallit(self.nevsor())
+        azonosito = self.lista.azonosito()
+        if azonosito:
+            self.kon.delete("telefon", szemely=azonosito)
+            self.kon.delete("email", szemely=azonosito)
+            self.kon.delete("cim", szemely=azonosito)
+            self.kon.delete("kontakt", szemely=azonosito)
+            if self.kon.delete("szemely", azonosito=azonosito):
+                print("Bejegyzés törölve.")
+            self.lista.beallit(self.nevsor())
+
+
+class SzemelyModositoUrlap(Frame):
+    def __init__(self, master=None, kon=None, **kw):
+        super().__init__(master=master, **kw)
+
+        self.kon = kon
+
+        self.lista = Valaszto("Személy módosítása", self.nevsor(), self)
+        self.lista.valaszto.bind("<<ComboboxSelected>>", self.megjelenit)
+
+        self.kezelogomb = KezeloGomb(self)
+        self.kezelogomb.megse["text"] = "vissza"
+        self.kezelogomb.ok["text"] = "módosít"
+        self.kezelogomb.megse["command"] = master.destroy
+        self.kezelogomb.ok["command"] = self.modosit
+
+        self.szemely = Szemely(self)
+        self.megjelenit(1)
+
+        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+        self.szemely.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
+        self.kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
+
+    def nevsor(self):
+        szemelyek = self.kon.select("nev", "szemely", "nev", orderby="nev").fetchall()
+        return [(szemely["szemely"], szemely["nev"]) for szemely in szemelyek]
+    
+    def megjelenit(self, event):
+        szemely = self.kon.select("szemely", azonosito=self.lista.azonosito()).fetchone()
+        self.szemely.beallit(**szemely)
+
+    def modosit(self):
+        azonosito = self.lista.azonosito()
+        if azonosito:
+            self.kon.update("szemely", self.szemely.export(), azonosito=azonosito)
+            print("Bejegyzés módosítva.")
 
 
 class TelefonUrlap(Frame):

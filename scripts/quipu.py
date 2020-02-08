@@ -42,6 +42,7 @@ class Quipu(Frame):
         szemelymenu = Menu(self, tearoff=0)
         szemelymenu.add_command(label="új", command=self.uj_szemely)
         szemelymenu.add_command(label="töröl", command=self.torol_szemely)
+        szemelymenu.add_command(label="módosít", command=self.modosit_szemely)
         szemelymb["menu"] = szemelymenu
 
         szervezetmb = Menubutton(self, text="Szervezet")
@@ -59,9 +60,11 @@ class Quipu(Frame):
 
     def torol_szemely(self):
         szemelytorlo_urlap = urlap.SzemelyTorloUrlap(Toplevel(), self.szemely_kon)
-        szemelytorlo_urlap.kezelogomb.megse["text"] = "vissza"
-        szemelytorlo_urlap.kezelogomb.ok["text"] = "törlés"
         szemelytorlo_urlap.grid()
+    
+    def modosit_szemely(self):
+        szemelymodosito_urlap = urlap.SzemelyModositoUrlap(Toplevel(), self.szemely_kon)
+        szemelymodosito_urlap.grid()
 
     def init_szemely_db(self):
         """ Személy adatbázis inicializálása  """
