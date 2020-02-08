@@ -216,6 +216,7 @@ class SzemelyModositoUrlap(Frame):
                     return
                 if self.kon.update("szemely", self.szemelyurlap.export(), azonosito=azonosito):
                     print("Bejegyzés módosítva.")
+                    self.lista.beallit(self.nevsor())
             else:
                 Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
 
