@@ -206,8 +206,16 @@ class SzemelyModositoUrlap(Frame):
     def modosit(self):
         azonosito = self.lista.azonosito()
         if azonosito:
-            self.kon.update("szemely", self.szemely.export(), azonosito=azonosito)
-            print("Bejegyzés módosítva.")
+            uj = self.szemely.export()
+            if uj["vezeteknev"] or uj["keresztnev"]:
+                if self.kon.select("szemely", logic="AND", **uj).fetchone():
+                    Figyelmeztetes("Ez a név már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
+                    return
+                if self.kon.update("szemely", self.szemely.export(), azonosito=azonosito):
+                    print("Bejegyzés módosítva.")
+            else:
+                Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
+            
 
 
 class TelefonUrlap(Frame):
