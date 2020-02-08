@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter.ttk import *
 
 
-class Szemely(LabelFrame):
+class SzemelyUrlap(LabelFrame):
     def __init__(self, master=None, **kw):
         super().__init__(master=master, text="személy", **kw)
 
@@ -120,16 +120,16 @@ class UjSzemelyUrlap(Frame):
         self.master = master
         self.kon = kon
 
-        self.szemely = Szemely(self)
+        self.szemelyurlap = SzemelyUrlap(self)
         self.kezelogomb = KezeloGomb(self)
         self.kezelogomb.megse["command"] = master.destroy
         self.kezelogomb.ok["command"] = self.ment
 
-        self.szemely.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+        self.szemelyurlap.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
 
     def ment(self):
-        uj = self.szemely.export()
+        uj = self.szemelyurlap.export()
         if uj["vezeteknev"] or uj["keresztnev"]:
             if self.kon.select("szemely", logic="AND", **uj).fetchone():
                 Figyelmeztetes("Ez a név már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
@@ -188,11 +188,11 @@ class SzemelyModositoUrlap(Frame):
         self.kezelogomb.megse["command"] = master.destroy
         self.kezelogomb.ok["command"] = self.modosit
 
-        self.szemely = Szemely(self)
+        self.szemelyurlap = SzemelyUrlap(self)
         self.megjelenit(1)
 
         self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.szemely.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
+        self.szemelyurlap.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
         self.kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
 
     def nevsor(self):
@@ -201,17 +201,17 @@ class SzemelyModositoUrlap(Frame):
     
     def megjelenit(self, event):
         szemely = self.kon.select("szemely", azonosito=self.lista.azonosito()).fetchone()
-        self.szemely.beallit(**szemely)
+        self.szemelyurlap.beallit(**szemely)
 
     def modosit(self):
         azonosito = self.lista.azonosito()
         if azonosito:
-            uj = self.szemely.export()
+            uj = self.szemelyurlap.export()
             if uj["vezeteknev"] or uj["keresztnev"]:
                 if self.kon.select("szemely", logic="AND", **uj).fetchone():
                     Figyelmeztetes("Ez a név már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
                     return
-                if self.kon.update("szemely", self.szemely.export(), azonosito=azonosito):
+                if self.kon.update("szemely", self.szemelyurlap.export(), azonosito=azonosito):
                     print("Bejegyzés módosítva.")
             else:
                 Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
