@@ -25,59 +25,20 @@ SOFTWARE.
 """
 
 from tkinter import *
-from tkinter.ttk import *
 import tamer
 import sqlite3
 import urlap
+import menu
 
 
 class Quipu(Frame):
     """ Fő alkalmazás """
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
-
         self.init_szemely_db()
-
-        szemelymb = Menubutton(self, text="Személy")
-        szemelymenu = Menu(self, tearoff=0)
-        telefonmenu = Menu(self, tearoff=0)
-        
-        szemelymenu.add_command(label="új", command=self.uj_szemely)
-        szemelymenu.add_command(label="töröl", command=self.torol_szemely)
-        szemelymenu.add_command(label="módosít", command=self.modosit_szemely)
-
-        telefonmenu.add_command(label="új", command=self.uj_szemelytelefon)
-        telefonmenu.add_command(label="töröl", command=self.torol_szemelytelefon)
-        telefonmenu.add_command(label="módosít", command=self.modosit_szemelytelefon)
-        szemelymenu.add_cascade(label="telefon", menu=telefonmenu)
-
-        szemelymb["menu"] = szemelymenu
-
-        szervezetmb = Menubutton(self, text="Szervezet")
-
-        szemelymb.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        szervezetmb.grid(row=0, column=1, sticky=W, ipadx=2, ipady=2)
-
+        menu.Fomenu(self, self.szemely_kon)
         self.grid()
         self.mainloop()
-
-    def uj_szemely(self):
-        urlap.UjSzemelyUrlap(Toplevel(), self.szemely_kon)
-
-    def torol_szemely(self):
-        urlap.SzemelyTorloUrlap(Toplevel(), self.szemely_kon)
-
-    def modosit_szemely(self):
-        urlap.SzemelyModositoUrlap(Toplevel(), self.szemely_kon)
-    
-    def uj_szemelytelefon(self):
-        pass
-
-    def torol_szemelytelefon(self):
-        pass
-
-    def modosit_szemelytelefon(self):
-        pass
 
     def init_szemely_db(self):
         """ Személy adatbázis inicializálása  """
@@ -133,27 +94,6 @@ class Quipu(Frame):
                     INSERT INTO kontakt(szemely) VALUES(last_insert_rowid());
                 END;
         """)
-
-    def init_menu(self):
-        pass
-
-    def kezel_szemely(self, azonosito=None):
-        urlap = szemelyurlap.SzemelyUrlap()
-        if azonosito:
-            szemely = self.szemely_kon.select("szemely", azonosito=azonosito)
-            szemely = szemely.fetchone()
-            if szemely:
-                szemely = {mezo: szemely[mezo] for mezo in urlap.mezo if szemely[mezo]}
-            urlap.felulir(**szemely)
-        urlap.mainloop()
-        if urlap.valasztas == "mentés":
-            if azonosito:
-                return self.szemely_kon.update("szemely", urlap.export(), azonosito=azonosito)
-            else:
-                return self.szemely_kon.insert("szemely", **urlap.export())
-        elif urlap.valasztas == "törlés":
-            return self.szemely_kon.delete("szemely", azonosito=azonosito)
-        return None
 
 
 if __name__ == "__main__":
