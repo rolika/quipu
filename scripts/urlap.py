@@ -123,10 +123,13 @@ class UjSzemelyUrlap(Frame):
         self.szemelyurlap = SzemelyUrlap(self)
         self.kezelogomb = KezeloGomb(self)
         self.kezelogomb.megse["command"] = master.destroy
+        self.kezelogomb.ok["text"] = "mentés"
         self.kezelogomb.ok["command"] = self.ment
 
         self.szemelyurlap.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
+
+        self.grid()
 
     def ment(self):
         uj = self.szemelyurlap.export()
@@ -156,6 +159,8 @@ class SzemelyTorloUrlap(Frame):
 
         self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
+
+        self.grid()
 
     def nevsor(self):
         szemelyek = self.kon.select("nev", "szemely", "nev", orderby="nev").fetchall()
@@ -197,6 +202,8 @@ class SzemelyModositoUrlap(Frame):
         self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         self.szemelyurlap.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
         self.kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
+
+        self.grid()
 
     def nevsor(self):
         szemelyek = self.kon.select("nev", "szemely", "nev", orderby="nev").fetchall()

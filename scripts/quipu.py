@@ -40,9 +40,17 @@ class Quipu(Frame):
 
         szemelymb = Menubutton(self, text="Személy")
         szemelymenu = Menu(self, tearoff=0)
+        telefonmenu = Menu(self, tearoff=0)
+        
         szemelymenu.add_command(label="új", command=self.uj_szemely)
         szemelymenu.add_command(label="töröl", command=self.torol_szemely)
         szemelymenu.add_command(label="módosít", command=self.modosit_szemely)
+
+        telefonmenu.add_command(label="új", command=self.uj_szemelytelefon)
+        telefonmenu.add_command(label="töröl", command=self.torol_szemelytelefon)
+        telefonmenu.add_command(label="módosít", command=self.modosit_szemelytelefon)
+        szemelymenu.add_cascade(label="telefon", menu=telefonmenu)
+
         szemelymb["menu"] = szemelymenu
 
         szervezetmb = Menubutton(self, text="Szervezet")
@@ -54,17 +62,22 @@ class Quipu(Frame):
         self.mainloop()
 
     def uj_szemely(self):
-        szemelyurlap = urlap.UjSzemelyUrlap(Toplevel(), self.szemely_kon)
-        szemelyurlap.kezelogomb.ok["text"] = "mentés"
-        szemelyurlap.grid()
+        urlap.UjSzemelyUrlap(Toplevel(), self.szemely_kon)
 
     def torol_szemely(self):
-        szemelytorlo_urlap = urlap.SzemelyTorloUrlap(Toplevel(), self.szemely_kon)
-        szemelytorlo_urlap.grid()
+        urlap.SzemelyTorloUrlap(Toplevel(), self.szemely_kon)
 
     def modosit_szemely(self):
-        szemelymodosito_urlap = urlap.SzemelyModositoUrlap(Toplevel(), self.szemely_kon)
-        szemelymodosito_urlap.grid()
+        urlap.SzemelyModositoUrlap(Toplevel(), self.szemely_kon)
+    
+    def uj_szemelytelefon(self):
+        pass
+
+    def torol_szemelytelefon(self):
+        pass
+
+    def modosit_szemelytelefon(self):
+        pass
 
     def init_szemely_db(self):
         """ Személy adatbázis inicializálása  """
