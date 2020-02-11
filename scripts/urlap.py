@@ -48,11 +48,12 @@ class SzemelyUrlap(LabelFrame):
 
 
 class ElerhetosegUrlap(Frame):
-    def __init__(self, cimke, *megjegyzes, master=None, **kw):
+    def __init__(self, cimke, master=None, **kw):
         super().__init__(master=master, **kw)
         self.cimke = cimke
         self.elerhetoseg = StringVar()
         self.megjegyzes = StringVar()
+        megjegyzes = ("alapértelmezett", "munkahelyi", "privát")
         self.megjegyzes.set(megjegyzes[0])
 
         Label(self, text=self.cimke).grid(row=0, column=0, sticky=W, padx=2, pady=2)
@@ -62,12 +63,14 @@ class ElerhetosegUrlap(Frame):
 
         self.grid()
 
-    def beallit(self, elerhetoseg, megjegyzes):
-        self.elerhetoseg.set(elerhetoseg)
-        self.megjegyzes.set(megjegyzes)
+    def beallit(self, **adatok):
+        self.elerhetoseg.set(adatok.get("telefonszam", adatok.get("emailcim", "")))
+        self.megjegyzes.set(adatok.get("megjegyzes"))
 
     def export(self):
-        return {self.elerhetoseg.get(), self.megjegyzes.get()}
+        cimke = "telefonszam" if "telefon" in self.cimke else "emailcim"
+        return {cimke: self.elerhetoseg.get(),
+                "megjegyzes": self.megjegyzes.get()}
 
 
 class Valaszto(LabelFrame):
@@ -231,7 +234,7 @@ class UjTelefonUrlap(Frame):
         super().__init__(master=master, **kw)
         self.kon = kon
         self.lista = Valaszto("Telefon hozzáadása", self.nevsor(), self)
-        self.telefonurlap = ElerhetosegUrlap("telefon", "elsődleges", "otthoni", "munkahelyi", master=self)
+        self.telefonurlap = ElerhetosegUrlap("telefon", self)
         self.kezelogomb = KezeloGomb(self)
         self.kezelogomb.megse["command"] = master.destroy
         self.kezelogomb.ok["text"] = "mentés"
@@ -249,16 +252,12 @@ class UjTelefonUrlap(Frame):
 
     def ment(self):
         uj = self.telefonurlap.export()
-        if uj["telefon"]:
-            if self.kon.select("szemely", logic="AND", **uj).fetchone():
-                Figyelmeztetes("Ez a név már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
-                return
-            if self.kon.insert("szemely", **uj):
-                print("Új bejegyzés mentve.")
+        if uj["telefonszam"]:
+            uj["szemely"] = self.lista.azonosito()
+            self.kon.insert("telefon", **uj)
+            print("Bejegyzés mentve.")
         else:
-                Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
-
-    
+            Figyelmeztetes("A telefonszám nem maradhat üresen!", Toplevel())    
 
 
 class Figyelmeztetes(Frame):
@@ -290,5 +289,5 @@ if __name__ == "__main__":
 
     # Figyelmeztetes("Ez a név már szerepel az adatbázisban.", Tk()).mainloop()
 
-    ElerhetosegUrlap("telefon", "elsődleges", "otthoni", "munkahelyi").mainloop()
+    ElerhetosegUrlap("telefon").mainloop()
 
