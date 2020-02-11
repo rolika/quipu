@@ -257,7 +257,7 @@ class UjTelefonUrlap(Frame):
             self.kon.insert("telefon", **uj)
             print("Bejegyzés mentve.")
         else:
-            Figyelmeztetes("A telefonszám nem maradhat üresen!", Toplevel())    
+            Figyelmeztetes("A telefonszám nem maradhat üresen!", Toplevel())
 
 
 class Figyelmeztetes(Frame):
