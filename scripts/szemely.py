@@ -16,7 +16,7 @@ class Szemely(dict):
     
     @property
     def azonosito(self):
-        """Sqlite rowid"""
+        """Kényelmi megoldás."""
         return self["azonosito"]
     
     @property
@@ -43,11 +43,6 @@ class Szemely(dict):
     def megjegyzes(self):
         """Kényelmi megoldás."""
         return self["megjegyzes"]
-    
-    @azonosito.setter
-    def azonosito(self, azonosito):
-        """Sqlite rowid beállítása kívülről"""
-        self["azonosito"] = azonosito
     
     def __str__(self):
         """Személyi adatok megjelenítése, elsősorban debugoláshoz"""
@@ -86,8 +81,6 @@ if __name__ == "__main__":
     import tamer
     szemely = Szemely(vezeteknev="Árvíztűrő", keresztnev="Tükörfúrógép")
     print(repr(szemely))  # arvizturo tukorfurogep
-    szemely.azonosito = 1
-    print(szemely.azonosito)  # már az is valami, ha az előző nem dob hibát
     szemely = Szemely(elotag="dr")
     if not szemely:
         print("Nincs elegendő adat")  # ki kell írnia

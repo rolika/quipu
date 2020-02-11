@@ -77,13 +77,12 @@ class ElerhetosegUrlap(Frame):
 class Valaszto(LabelFrame):
     def __init__(self, cimke, valasztek, master=None, **kw):
         super().__init__(master=master, text=cimke, **kw)
-
+        self.valasztek = valasztek
         self.valaszto = Combobox(self, width=32)
         self.beallit(valasztek)
         self.valaszto.grid()
 
     def beallit(self, valasztek):
-        self.rowid = [elem.azonosito for elem in valasztek]
         self.valaszto["values"] = [elem.listanezet() for elem in valasztek]
         try:
             self.valaszto.current(0)
@@ -92,7 +91,7 @@ class Valaszto(LabelFrame):
 
     def azonosito(self):
         try:
-            return self.rowid[self.valaszto.current()]
+            return self.valasztek[self.valaszto.current()].azonosito
         except IndexError:
             return None
 
@@ -136,7 +135,8 @@ class UjSzemelyUrlap(Frame):
         szemely = self.szemelyurlap.export()
         if szemely:
             if self.kon.select("szemely", logic="AND", **szemely).fetchone():
-                Figyelmeztetes("Ez a személy már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
+                Figyelmeztetes("Ez a személy már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!",
+                               Toplevel())
                 return
             szemely.pop("azonosito")  # majd az Sqlite megadja
             if self.kon.insert("szemely", **szemely):
@@ -207,22 +207,23 @@ class SzemelyModositoUrlap(Frame):
         self.grid()
 
     def nevsor(self):
-        szemelyek = self.kon.select("nev", "szemely", "nev", orderby="nev").fetchall()
-        return [(szemely["szemely"], szemely["nev"]) for szemely in szemelyek]
+        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
 
     def megjelenit(self, event):
-        szemely = self.kon.select("szemely", azonosito=self.lista.azonosito()).fetchone()
-        self.szemelyurlap.beallit(**szemely)
+        szemely = Szemely.adatbazisbol(self.kon.select("szemely", azonosito=self.lista.azonosito()).fetchone())
+        self.szemelyurlap.beallit(szemely)
 
     def modosit(self):
         azonosito = self.lista.azonosito()
         if azonosito:
-            uj = self.szemelyurlap.export()
-            if uj["vezeteknev"] or uj["keresztnev"]:
-                if self.kon.select("szemely", logic="AND", **uj).fetchone():
-                    Figyelmeztetes("Ez a név már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
+            szemely = self.szemelyurlap.export()
+            if szemely:
+                if self.kon.select("szemely", logic="AND", **szemely).fetchone():
+                    Figyelmeztetes("Ez a személy már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!",
+                                   Toplevel())
                     return
-                if self.kon.update("szemely", self.szemelyurlap.export(), azonosito=azonosito):
+                szemely.pop("azonosito")  # majd az Sqlite megadja
+                if self.kon.update("szemely", szemely, azonosito=azonosito):
                     print("Bejegyzés módosítva.")
                     self.lista.beallit(self.nevsor())
                     self.megjelenit(1)
