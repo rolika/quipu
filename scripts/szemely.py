@@ -9,18 +9,44 @@ class Szemely(dict):
             self[oszlop] = kwargs.get(oszlop, "")
 
     @classmethod
-    def adatbazisbol(cls, kurzor):
+    def adatbazisbol(cls, row):
         """Factory konstruktor adatbázisból történő példányososításhoz:
-        kurzor:     sqlite Row-kurzor (hozzáférés oszlopnevekkel)"""
-        return cls(**kurzor.fetchone())
+        kurzor:     sqlite Row-objektum (hozzáférés oszlopnevekkel)"""
+        return cls(**row)
     
     @property
     def azonosito(self):
         """Sqlite rowid"""
         return self["azonosito"]
     
+    @property
+    def elotag(self):
+        """Kényelmi megoldás."""
+        return self["elotag"]
+    
+    @property
+    def vezeteknev(self):
+        """Kényelmi megoldás."""
+        return self["vezeteknev"]
+    
+    @property
+    def keresztnev(self):
+        """Kényelmi megoldás."""
+        return self["keresztnev"]
+    
+    @property
+    def nem(self):
+        """Kényelmi megoldás."""
+        return self["nem"]
+    
+    @property
+    def megjegyzes(self):
+        """Kényelmi megoldás."""
+        return self["megjegyzes"]
+    
     @azonosito.setter
     def azonosito(self, azonosito):
+        """Sqlite rowid beállítása kívülről"""
         self["azonosito"] = azonosito
     
     def __str__(self):
@@ -69,7 +95,7 @@ if __name__ == "__main__":
     if szemely:
         print("Elegendő adat.")  # ki kell írnia
     kon = tamer.Tamer("szemely.db")
-    szemely = Szemely.adatbazisbol(kon.select("szemely"))
+    szemely = Szemely.adatbazisbol(kon.select("szemely").fetchone())
     print(szemely)  # a lekérdezés első bejegyzését kell kiírnia
     print(szemely["vezeteknev"])  # lekérdezés első bejegyzésének vezetékneve
     print(szemely.azonosito)  # lekérdezés első bejegyzésének rowid-je

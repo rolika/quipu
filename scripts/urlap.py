@@ -34,11 +34,11 @@ class SzemelyUrlap(LabelFrame):
             .grid(row=4, column=1, columnspan=2, sticky=W, padx=2, pady=2)
 
     def beallit(self, szemely):
-        self.elotag.set(szemely["elotag"])
-        self.vezeteknev.set(szemely["vezeteknev"])
-        self.keresztnev.set(szemely["keresztnev"])
-        self.nem.set(szemely["nem"])
-        self.megjegyzes.set(szemely["megjegyzes"])
+        self.elotag.set(szemely.elotag)
+        self.vezeteknev.set(szemely.vezeteknev)
+        self.keresztnev.set(szemely.keresztnev)
+        self.nem.set(szemely.nem)
+        self.megjegyzes.set(szemely.megjegyzes)
 
     def export(self):
         return Szemely(elotag=self.elotag.get(),
@@ -83,8 +83,8 @@ class Valaszto(LabelFrame):
         self.valaszto.grid()
 
     def beallit(self, valasztek):
-        self.rowid = [elem[0] for elem in valasztek]
-        self.valaszto["values"] = [elem[1] for elem in valasztek]
+        self.rowid = [elem.azonosito for elem in valasztek]
+        self.valaszto["values"] = [elem.listanezet() for elem in valasztek]
         try:
             self.valaszto.current(0)
         except TclError:
@@ -138,7 +138,7 @@ class UjSzemelyUrlap(Frame):
             if self.kon.select("szemely", logic="AND", **szemely).fetchone():
                 Figyelmeztetes("Ez a személy már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
                 return
-            szemely.pop("azonosito")  #  majd az Sqlite megadja
+            szemely.pop("azonosito")  # majd az Sqlite megadja
             if self.kon.insert("szemely", **szemely):
                 print("Új bejegyzés mentve.")
         else:
@@ -165,8 +165,7 @@ class SzemelyTorloUrlap(Frame):
         self.grid()
 
     def nevsor(self):
-        szemelyek = self.kon.select("nev", "szemely", "nev", orderby="nev").fetchall()
-        return [(szemely["szemely"], szemely["nev"]) for szemely in szemelyek]
+        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
 
     def torol(self):
         azonosito = self.lista.azonosito()
