@@ -47,29 +47,27 @@ class SzemelyUrlap(LabelFrame):
                 "megjegyzes": self.megjegyzes.get()}
 
 
-class KetMezo(LabelFrame):
-    def __init__(self, cimke, mezo1, mezo2, master=None, **kw):
-        super().__init__(master=master, text=cimke, **kw)
+class ElerhetosegUrlap(Frame):
+    def __init__(self, cimke, *megjegyzes, master=None, **kw):
+        super().__init__(master=master, **kw)
+        self.cimke = cimke
+        self.elerhetoseg = StringVar()
+        self.megjegyzes = StringVar()
+        self.megjegyzes.set(megjegyzes[0])
 
-        self.mezo1_oszlop = mezo1[1]
-        self.mezo2_oszlop = mezo2[1]
-        mezo1 = mezo1[0]
-        mezo2 = mezo2[0]
+        Label(self, text=self.cimke).grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self.elerhetoseg, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="megjegyzés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self.megjegyzes, *megjegyzes).grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
-        self.mezo1 = StringVar()
-        self.mezo2 = StringVar()
+        self.grid()
 
-        Label(self, text=mezo1).grid(row=0, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.mezo1, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
-        Label(self, text=mezo2).grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.mezo2, width=32).grid(row=1, column=1, sticky=W, padx=2, pady=2)
-
-    def beallit(self, **adatok):
-        self.mezo1.set(adatok.get(self.mezo1_oszlop, ""))
-        self.mezo2.set(adatok.get(self.mezo2_oszlop, ""))
+    def beallit(self, elerhetoseg, megjegyzes):
+        self.elerhetoseg.set(elerhetoseg)
+        self.megjegyzes.set(megjegyzes)
 
     def export(self):
-        return {self.mezo1_oszlop: self.mezo1.get(), self.mezo2_oszlop: self.mezo2.get()}
+        return {self.elerhetoseg.get(), self.megjegyzes.get()}
 
 
 class Valaszto(LabelFrame):
@@ -117,7 +115,6 @@ class UjSzemelyUrlap(Frame):
     def __init__(self, master=None, kon=None, **kw):
         super().__init__(master=master, **kw)
 
-        self.master = master
         self.kon = kon
 
         self.szemelyurlap = SzemelyUrlap(self)
@@ -229,72 +226,39 @@ class SzemelyModositoUrlap(Frame):
                 Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
 
 
-class TelefonUrlap(Frame):
-    def __init__(self, kon, master=None, **kw):
+class UjTelefonUrlap(Frame):
+    def __init__(self, master=None, kon=None, **kw):
         super().__init__(master=master, **kw)
-
         self.kon = kon
-        self.azonosito = None
+        self.lista = Valaszto("Telefon hozzáadása", self.nevsor(), self)
+        self.telefonurlap = ElerhetosegUrlap("telefon", "elsődleges", "otthoni", "munkahelyi", master=self)
+        self.kezelogomb = KezeloGomb(self)
+        self.kezelogomb.megse["command"] = master.destroy
+        self.kezelogomb.ok["text"] = "mentés"
+        self.kezelogomb.ok["command"] = self.ment
 
-        self.szemely = Valaszto("személyek")
-        self.ujtelefon = KetMezo("új telefonszám", ("telefonszám", "telefonszam"), ("megjegyzés", "megjegyzes"))
-        self.meglevotelefon = Valaszto("meglévő telefonszámok")
-        self.kezelogomb = KezeloGomb()
-        self.kezelogomb.mentes["command"] = self.ment
-        self.kezelogomb.torles["command"] = self.torol
-        self.kezelogomb.reszlet["command"] = self.mutat
+        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+        self.telefonurlap.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
+        self.kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
 
-        self.szemely.valaszto.bind("<<ComboboxSelected>>", self.mutat_meglevo_telefon)
+        self.grid()
 
-        nevsor = [nev["nev"] for nev in kon.select("nev", orderby="nev").fetchall()]
-        self.szemely.valaszto["values"] = nevsor
-        if nevsor:
-            self.szemely.valaszto.current(0)
-            self.mutat_meglevo_telefon(None)  # argumentum az event miatt
-        else:
-            self.szemely.valaszto.set("")
-
-        self.szemely.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.ujtelefon.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
-        self.meglevotelefon.grid(row=2, column=0, sticky=W, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=3, column=0, ipadx=2, ipady=2)
-
-    def mutat_meglevo_telefon(self, event):
-        rowid = {sor["nev"]: sor["szemely"] for sor in self.kon.select("nev").fetchall()}
-        self.azonosito = rowid[self.szemely.valaszto.get()]
-        telefonszamok = self.kon.select("telefon", szemely=self.azonosito).fetchall()
-        telefonszamok = ["{} ({})".format(szam["telefonszam"], szam["megjegyzes"]) for szam in telefonszamok]
-        self.meglevotelefon.valaszto["values"] = telefonszamok
-        if telefonszamok:
-            self.meglevotelefon.valaszto.current(0)
-        else:
-            self.meglevotelefon.valaszto.set("")
+    def nevsor(self):
+        szemelyek = self.kon.select("nev", "szemely", "nev", orderby="nev").fetchall()
+        return [(szemely["szemely"], szemely["nev"]) for szemely in szemelyek]
 
     def ment(self):
-        adatok = self.ujtelefon.export()
-        if self.azonosito and adatok["telefonszam"]:
-            adatok["szemely"] = self.azonosito
-            self.kon.insert("telefon", **adatok)
-            self.ujtelefon.beallit()
-            self.mutat_meglevo_telefon(None)
-            print("Új bejegyzés mentve.")
+        uj = self.telefonurlap.export()
+        if uj["telefon"]:
+            if self.kon.select("szemely", logic="AND", **uj).fetchone():
+                Figyelmeztetes("Ez a név már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
+                return
+            if self.kon.insert("szemely", **uj):
+                print("Új bejegyzés mentve.")
         else:
-            print("Valami elromlott...")
+                Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
 
-    def torol(self):
-        if self.azonosito:
-            self.kon.delete("telefon", logic="AND", szemely=self.azonosito, telefonszam=self.meglevotelefon.valaszto.get())
-            self.ujtelefon.beallit()
-            self.mutat_meglevo_telefon(None)
-            print("Bejegyzés törölve.")
-        else:
-            print("Valami elromlott...")
-
-    def mutat(self):
-        szemely = self.kon.select("elerhetoseg", "elerhetoseg", szemely=self.azonosito)
-        szemely = szemely.fetchone()
-        if szemely:
-            print(szemely["elerhetoseg"])
+    
 
 
 class Figyelmeztetes(Frame):
@@ -324,5 +288,7 @@ if __name__ == "__main__":
     ablak.mainloop()
     print(nevek[v.valasztas.get()])"""
 
-    Figyelmeztetes("Ez a név már szerepel az adatbázisban.", Tk()).mainloop()
+    # Figyelmeztetes("Ez a név már szerepel az adatbázisban.", Tk()).mainloop()
+
+    ElerhetosegUrlap("telefon", "elsődleges", "otthoni", "munkahelyi").mainloop()
 

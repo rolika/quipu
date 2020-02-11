@@ -7,10 +7,10 @@ class Fomenu(Frame):
         super().__init__(master=master, **kw)
         
         # főmenü
-        szemelymb = Menubutton(self, text="Személy")
-        szervezetmb = Menubutton(self, text="Szervezet")
-        projektmb = Menubutton(self, text="Projekt")
-        raktarmb = Menubutton(self, text="Raktár")
+        szemelymb = Menubutton(self, text="Személy", width=10)
+        szervezetmb = Menubutton(self, text="Szervezet", width=10)
+        projektmb = Menubutton(self, text="Projekt", width=10)
+        raktarmb = Menubutton(self, text="Raktár", width=10)
 
         # menük
         szemelymenu = Szemelymenu(szemelymb, szemely_kon)
@@ -28,6 +28,7 @@ class Szemelymenu(Menu):
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
         self.add("cascade", label="személy", menu=SzemelyAlmenu(kon, mb))
+        self.add("cascade", label="telefon", menu=TelefonAlmenu(kon, mb))
 
 
 class Alapmenu(Menu):
@@ -35,8 +36,8 @@ class Alapmenu(Menu):
         super().__init__(mb, tearoff=0)
 
         self.add("command", label="új", command=self.uj)
-        self.add("command", label="töröl", command=self.torol)
-        self.add("command", label="módosit", command=self.modosit)
+        self.add("command", label="törlés", command=self.torol)
+        self.add("command", label="változtatás", command=self.modosit)
     
     def uj(self):
         raise NotImplementedError
@@ -65,13 +66,13 @@ class SzemelyAlmenu(Alapmenu):
 
 
 class TelefonAlmenu(Alapmenu):
-    def __init__(self, kon, szulo):
-        super().__init__(szulo)
+    def __init__(self, kon, mb):
+        super().__init__(mb)
 
         self.kon = kon
 
     def uj(self):
-        pass
+        urlap.UjTelefonUrlap(Toplevel(), self.kon)
 
     def torol(self):
         pass
