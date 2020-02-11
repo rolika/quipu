@@ -1,11 +1,12 @@
-class Szemely:
-    """ Személy megvalósítása """
+class Szemely(dict):
+    """ Személy megvalósítása kulcs-érték párokkal """
     def __init__(self, **kwargs):
         """Konstruktor közvetlen példányosításhoz:
         kwargs:     személyi adatok kulcs=érték párokként"""
-        self._db_oszlop = {"elotag", "vezeteknev", "keresztnev", "nem", "megjegyzes"}
+        super().__init__(self)
+        self._db_oszlop = {"azonosito", "elotag", "vezeteknev", "keresztnev", "nem", "megjegyzes"}
         for oszlop in self._db_oszlop:
-            setattr(self, "_"+oszlop, kwargs.get(oszlop, ""))
+            self[oszlop] = kwargs.get(oszlop, "")
 
     @classmethod
     def adatbazisbol(cls, kurzor):
@@ -13,11 +14,20 @@ class Szemely:
         kurzor:     sqlite Row-kurzor (hozzáférés oszlopnevekkel)"""
         return cls(**kurzor.fetchone())
     
+    @property
+    def azonosito(self):
+        """Sqlite rowid"""
+        return self["azonosito"]
+    
+    @azonosito.setter
+    def azonosito(self, azonosito):
+        self["azonosito"] = azonosito
+    
     def __str__(self):
         """Személyi adatok megjelenítése, elsősorban debugoláshoz"""
-        elotag = self._nullazo(self._elotag)
-        megjegyzes = self._nullazo(self._megjegyzes)
-        return "{}{} {}, {}{}".format(elotag, self._vezeteknev, self._keresztnev, self._nem, megjegyzes)
+        elotag = self._nullazo(self["elotag"])
+        megjegyzes = self._nullazo(self["megjegyzes"])
+        return "{}{} {}, {}{}".format(elotag, self["vezeteknev"], self["keresztnev"], self["nem"], megjegyzes)
     
     def __repr__(self):
         """Név megjelenítése sorbarendezéshez"""
@@ -25,14 +35,15 @@ class Szemely:
     
     def __bool__(self):
         """Egy személy akkor meghatározott, ha legalább az egyik név adott"""
-        return bool(self._vezeteknev) or bool(self._keresztnev)
+        return bool(self["vezeteknev"]) or bool(self["keresztnev"])
     
     def listanezet(self):
         """Személy megjelenítése kiválasztáshoz (pl. Combobox)"""
-        return "{} {} {}{}".format(self._vezeteknev, self._keresztnev, self._elotag, self._nullazo(self._megjegyzes))
+        megjegyzes = self._nullazo(self["megjegyzes"])
+        return "{} {} {}{}".format(self["vezeteknev"], self["keresztnev"], self["elotag"], megjegyzes)
     
     def megszolitas(self):
-        return "Tisztelt {}!".format("Uram" if self._nem == "férfi" else "Hölgyem")
+        return "Tisztelt {}!".format("Uram" if self["nem"] == "férfi" else "Hölgyem")
 
     def _ascii_rep(self, szoveg):
         """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
@@ -45,10 +56,12 @@ class Szemely:
 
 
 if __name__ == "__main__":
-    """Tesztelés"""
+    """Egyszerű tesztelés"""
     import tamer
     szemely = Szemely(vezeteknev="Árvíztűrő", keresztnev="Tükörfúrógép")
     print(repr(szemely))  # arvizturo tukorfurogep
+    szemely.azonosito = 1
+    print(szemely.azonosito)  # már az is valami, ha az előző nem dob hibát
     szemely = Szemely(elotag="dr")
     if not szemely:
         print("Nincs elegendő adat")  # ki kell írnia
@@ -58,3 +71,5 @@ if __name__ == "__main__":
     kon = tamer.Tamer("szemely.db")
     szemely = Szemely.adatbazisbol(kon.select("szemely"))
     print(szemely)  # a lekérdezés első bejegyzését kell kiírnia
+    print(szemely["vezeteknev"])  # lekérdezés első bejegyzésének vezetékneve
+    print(szemely.azonosito)  # lekérdezés első bejegyzésének rowid-je

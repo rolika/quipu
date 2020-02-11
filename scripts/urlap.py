@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter.ttk import Combobox
+from szemely import Szemely
 
 
 class SzemelyUrlap(LabelFrame):
@@ -32,19 +33,19 @@ class SzemelyUrlap(LabelFrame):
         Entry(self, textvariable=self.megjegyzes, width=32)\
             .grid(row=4, column=1, columnspan=2, sticky=W, padx=2, pady=2)
 
-    def beallit(self, **adatok):
-        self.elotag.set(adatok.get("elotag", ""))
-        self.vezeteknev.set(adatok.get("vezeteknev", ""))
-        self.keresztnev.set(adatok.get("keresztnev", ""))
-        self.nem.set(adatok.get("nem", "férfi"))
-        self.megjegyzes.set(adatok.get("megjegyzes", ""))
+    def beallit(self, szemely):
+        self.elotag.set(szemely["elotag"])
+        self.vezeteknev.set(szemely["vezeteknev"])
+        self.keresztnev.set(szemely["keresztnev"])
+        self.nem.set(szemely["nem"])
+        self.megjegyzes.set(szemely["megjegyzes"])
 
     def export(self):
-        return {"elotag": self.elotag.get(),
-                "vezeteknev": self.vezeteknev.get(),
-                "keresztnev": self.keresztnev.get(),
-                "nem": self.nem.get(),
-                "megjegyzes": self.megjegyzes.get()}
+        return Szemely(elotag=self.elotag.get(),
+                      vezeteknev=self.vezeteknev.get(),
+                      keresztnev=self.keresztnev.get(),
+                      nem=self.nem.get(),
+                      megjegyzes=self.megjegyzes.get())
 
 
 class ElerhetosegUrlap(Frame):
@@ -132,12 +133,13 @@ class UjSzemelyUrlap(Frame):
         self.grid()
 
     def ment(self):
-        uj = self.szemelyurlap.export()
-        if uj["vezeteknev"] or uj["keresztnev"]:
-            if self.kon.select("szemely", logic="AND", **uj).fetchone():
-                Figyelmeztetes("Ez a név már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
+        szemely = self.szemelyurlap.export()
+        if szemely:
+            if self.kon.select("szemely", logic="AND", **szemely).fetchone():
+                Figyelmeztetes("Ez a személy már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!", Toplevel())
                 return
-            if self.kon.insert("szemely", **uj):
+            szemely.pop("azonosito")  #  majd az Sqlite megadja
+            if self.kon.insert("szemely", **szemely):
                 print("Új bejegyzés mentve.")
         else:
                 Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
