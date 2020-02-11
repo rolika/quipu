@@ -5,7 +5,7 @@ import urlap
 class Fomenu(Frame):
     def __init__(self, master=None, szemely_kon=None, **kw):
         super().__init__(master=master, **kw)
-        
+
         # főmenü
         szemelymb = Menubutton(self, text="Személy", width=10)
         szervezetmb = Menubutton(self, text="Szervezet", width=10)
@@ -38,7 +38,7 @@ class Alapmenu(Menu):
         self.add("command", label="új", command=self.uj)
         self.add("command", label="törlés", command=self.torol)
         self.add("command", label="változtatás", command=self.modosit)
-    
+
     def uj(self):
         raise NotImplementedError
 
@@ -54,13 +54,13 @@ class SzemelyAlmenu(Alapmenu):
         super().__init__(mb)
 
         self.kon = kon
-    
+
     def uj(self):
         urlap.UjSzemelyUrlap(Toplevel(), self.kon)
-    
+
     def torol(self):
         urlap.SzemelyTorloUrlap(Toplevel(), self.kon)
-    
+
     def modosit(self):
         urlap.SzemelyModositoUrlap(Toplevel(), self.kon)
 
