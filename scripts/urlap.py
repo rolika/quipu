@@ -169,7 +169,7 @@ class SzemelyTorloUrlap(Frame):
     def torol(self):
         azonosito = self.lista.azonosito()
         if azonosito:
-            biztos = Figyelmeztetes("Biztos vagy benne?\nMINDEN törlődik!", Toplevel(), csak_ok=False)
+            biztos = Figyelmeztetes("Biztos vagy benne?\nMINDEN VÉGLEGESEN törlődik!", Toplevel(), csak_ok=False)
             biztos.wait_window(biztos)
             if biztos.gombok.valasz:
                 self.kon.delete("telefon", szemely=azonosito)
@@ -261,8 +261,55 @@ class UjTelefonUrlap(Frame):
 
 
 class TelefonTorloUrlap(Frame):
-    def __init__(self, master=None, **kw):
+    def __init__(self, master=None, kon=None, **kw):
         super().__init__(master=master, **kw)
+
+        self.kon = kon
+
+        self.lista = Valaszto("Személy", self.nevsor(), self)
+        self.lista.valaszto.bind("<<ComboboxSelected>>", self.megjelenit)
+
+        self.telefon = Valaszto("Törlendő telefonszám", self.telefonszamok(), self)
+
+        self.kezelogomb = KezeloGomb(self)
+        self.kezelogomb.megse["text"] = "vissza"
+        self.kezelogomb.ok["text"] = "törlés"
+        self.kezelogomb.megse["command"] = master.destroy
+        self.kezelogomb.ok["command"] = self.torol
+
+        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+        self.telefon.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
+        self.kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
+
+        self.grid()
+
+    def nevsor(self):
+        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
+
+    def telefonszamok(self):
+        return sorted(map(lambda telefon: Telefon.adatbazisbol(telefon),
+                                                               self.kon.select("telefon",
+                                                               szemely=self.lista.azonosito())),
+                                                               key=repr)
+
+    def megjelenit(self, event):
+        self.telefon.beallit(self.telefonszamok())
+
+    def torol(self):
+        azonosito = self.lista.azonosito()
+        if azonosito:
+            biztos = Figyelmeztetes("Biztos vagy benne?\nVÉGLEGESEN törlődik!", Toplevel(), csak_ok=False)
+            biztos.wait_window(biztos)
+            if biztos.gombok.valasz:
+                if self.kon.delete("telefon", szemely=azonosito):
+                    print("Bejegyzés törölve.")
+                    self.megjelenit(1)
+
+
+class TelefonModositoUrlap(Frame):
+    def __init__(self, master=None, kon=None, **kw):
+        super().__init__(master=master, **kw)
+        
 
 
 class Figyelmeztetes(Frame):

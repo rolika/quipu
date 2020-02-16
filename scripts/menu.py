@@ -75,7 +75,7 @@ class TelefonAlmenu(Alapmenu):
         urlap.UjTelefonUrlap(Toplevel(), self.kon)
 
     def torol(self):
-        pass
+        urlap.TelefonTorloUrlap(Toplevel(), self.kon)
 
     def modosit(self):
         pass
