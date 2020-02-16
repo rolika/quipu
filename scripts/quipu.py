@@ -52,13 +52,13 @@ class Quipu(Frame):
             vezeteknev="TEXT NOT NULL", keresztnev="TEXT NOT NULL", nem="TEXT NOT NULL REFERENCES megszolitas",
             megjegyzes="TEXT")
 
-        self.szemely_kon.create("telefon", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
+        self.szemely_kon.create("telefon", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
             telefonszam="TEXT NOT NULL", megjegyzes="TEXT")
 
-        self.szemely_kon.create("email", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
+        self.szemely_kon.create("email", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
             emailcim="TEXT NOT NULL", megjegyzes="TEXT")
 
-        self.szemely_kon.create("cim", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
+        self.szemely_kon.create("cim", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
             orszag="TEXT DEFAULT 'H'", iranyitoszam="TEXT", helyseg="TEXT", utca="TEXT", megjegyzes="TEXT")
 
         self.szemely_kon.create("kontakt", azonosito="INTEGER PRIMARY KEY",
