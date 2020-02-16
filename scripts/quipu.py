@@ -24,18 +24,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-
+from tkinter import *
 import tamer
 import sqlite3
-import szemelyurlap
+import urlap
+import menu
 
 
-class Quipu:
+class Quipu(Frame):
     """ Fő alkalmazás """
-    def __init__(self):
-        self.szemely_init()
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master=master, **kwargs)
+        self.init_szemely_db()
+        menu.Fomenu(self, self.szemely_kon)
+        self.grid()
+        self.mainloop()
 
-    def szemely_init(self):
+    def init_szemely_db(self):
         """ Személy adatbázis inicializálása  """
         self.szemely_kon = tamer.Tamer("szemely.db")
 
@@ -47,15 +52,14 @@ class Quipu:
             vezeteknev="TEXT NOT NULL", keresztnev="TEXT NOT NULL", nem="TEXT NOT NULL REFERENCES megszolitas",
             megjegyzes="TEXT")
 
-        self.szemely_kon.create("telefon", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            telefonszam="TEXT NOT NULL", megjegyzes="TEXT DEFAULT 'elsődleges'")
+        self.szemely_kon.create("telefon", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
+            telefonszam="TEXT NOT NULL", megjegyzes="TEXT")
 
-        self.szemely_kon.create("email", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            emailcim="TEXT NOT NULL", megjegyzes="TEXT DEFAULT 'elsődleges'")
+        self.szemely_kon.create("email", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
+            emailcim="TEXT NOT NULL", megjegyzes="TEXT")
 
-        self.szemely_kon.create("cim", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            orszag="TEXT DEFAULT 'H'", iranyitoszam="TEXT", helyseg="TEXT", utca="TEXT",
-            megjegyzes="TEXT DEFAULT 'elsődleges'")
+        self.szemely_kon.create("cim", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
+            orszag="TEXT DEFAULT 'H'", iranyitoszam="TEXT", helyseg="TEXT", utca="TEXT", megjegyzes="TEXT")
 
         self.szemely_kon.create("kontakt", azonosito="INTEGER PRIMARY KEY",
             szemely="INTEGER NOT NULL REFERENCES szemely", szervezet="INTEGER", megjegyzes="TEXT")
@@ -64,7 +68,7 @@ class Quipu:
             PRAGMA foreign_keys = ON;
 
             CREATE VIEW IF NOT EXISTS nev(szemely, nev) AS
-                SELECT azonosito, ltrim(printf('%s %s %s', elotag, vezeteknev, keresztnev))
+                SELECT azonosito, ltrim(printf('%s %s, %s', vezeteknev, keresztnev, elotag))
                     FROM szemely;
 
             CREATE VIEW IF NOT EXISTS teljescim(szemely, cim) AS
@@ -91,27 +95,6 @@ class Quipu:
                 END;
         """)
 
-    def kezel_szemely(self, azonosito=None):
-        urlap = szemelyurlap.SzemelyUrlap()
-        if azonosito:
-            szemely = self.szemely_kon.select("szemely", azonosito=azonosito)
-            szemely = szemely.fetchone()
-            if szemely:
-                szemely = {mezo: szemely[mezo] for mezo in urlap.mezo if szemely[mezo]}
-            urlap.felulir(**szemely)
-        urlap.mainloop()
-        if urlap.valasztas == "mentés":
-            if azonosito:
-                return self.szemely_kon.update("szemely", urlap.export(), azonosito=azonosito)
-            else:
-                return self.szemely_kon.insert("szemely", **urlap.export())
-        elif urlap.valasztas == "törlés":
-            return self.szemely_kon.delete("szemely", azonosito=azonosito)
-        return None
-
 
 if __name__ == "__main__":
     app = Quipu()
-    if app.kezel_szemely(21):
-        print("bejegyzés módosítva")
-    app.szemely_kon.close()

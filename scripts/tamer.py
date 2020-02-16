@@ -47,7 +47,7 @@ class Tamer(sqlite3.Connection):
         try:
             super().__init__(db_name)
             self.row_factory = sqlite3.Row
-        except sqlite3.DatabaseError as err:
+        except sqlite3.Error as err:
             sys.exit("Couldn't connect to database: {}".format(err))
         self._db_name = db_name
 
@@ -73,18 +73,18 @@ class Tamer(sqlite3.Connection):
                              .format(table, ", ".join("{} {}".format(colname, constraint)\
                              for colname, constraint in cols.items())))
             return True
-        except sqlite3.DatabaseError as err:
+        except sqlite3.Error as err:
             print("Couldn't create table:", err, file=sys.stderr)
             return False
 
 
-    def insert(self, table, **what):
+    def insert(self, table, **kwargs):
         """Insert new row into database.
         Commits after succesful execution.
 
         Args:
-            table:  string containing a valid table-name
-            **what: columnname=value separated by commas.
+            table:      string containing a valid table-name
+            **kwargs:   columnname=value separated by commas.
 
         Returns:
             primary key of last inserted row or None if insertion failed
@@ -94,34 +94,35 @@ class Tamer(sqlite3.Connection):
             https://docs.python.org/3/library/stdtypes.html#mapping-types-dict
         """
         lastrowid = None
-        cols = ", ".join(what.keys())
-        qmarks = ", ".join("?" for _ in what)
-        values = tuple(what.values())
+        cols = ", ".join(kwargs.keys())
+        qmarks = ", ".join("?" for _ in kwargs)
+        values = tuple(kwargs.values())
 
         try:
             with self:
                 lastrowid = self.execute("""INSERT INTO {}({}) VALUES({})"""\
                 .format(table, cols, qmarks), values).lastrowid
-        except sqlite3.DatabaseError as err:
+        except sqlite3.Error as err:
             print("Couldn't insert item:", err, file=sys.stderr)
-            return None
         return lastrowid
 
 
-    def select(self, table, logic="OR", *what, **where):
+    def select(self, table, *cols, **kwargs):
         """Select row(s) from database.
         Using only the mandatory arguments selects everything.
 
         Args:
             table:      string containing a valid table-name
-            logic:      logical operator in the WHERE clause. This simple function won't allow to
-                        mix logical operators. Provided without kwargs won't have any effect.
-            *what:      list of strings containing columnnames to select
-            **where:    narrow selection with column=value pair(s). If more pairs are specified,
+            *cols:      list of strings containing columnnames to select
+            **kwargs:   narrow selection with column=value pair(s). If more pairs are specified,
                         they're bound together with the provided logical operator in the WHERE
-                        clause of the query. The default 'OR' means any, 'AND' means all of the
-                        conditions in kwargs must be met. 'NOT' is only partially supported, it
-                        makes only sense with one kwarg, but the latter won't be verified.
+                        clause of the query.
+                        Special keys:
+                            logic:      defaults to OR. NOT is only partially supported, it
+                                        makes only sense with one kwarg, but the latter won't be
+                                        verified.
+                            orderby:    specify the ORDER BY clause
+                            ordering:   defaults to ASC, specify DESC if you want descending order
 
         Returns:
             Cursor-object of resulting query (powered as row_factory) or
@@ -130,35 +131,42 @@ class Tamer(sqlite3.Connection):
         Reading:
             https://sqlite.org/lang_select.html
             https://www.w3schools.com/sql/sql_and_or.asp
-        """        
-        if what:
-            select_stmnt = """SELECT {}""".format(", ".join(col for col in what))
+        """
+        if cols:
+            select_stmnt = """SELECT {}""".format(", ".join(col for col in cols))
         else:
             select_stmnt = """SELECT *"""
         select_stmnt += """ FROM {}"""
 
+        logic = kwargs.pop("logic", "OR")
+        orderby = kwargs.pop("orderby", "")
+        ordering = kwargs.pop("ordering", "ASC")
+
+        if orderby:
+            orderby = " ORDER BY " + orderby + " " + ordering
+
         try:
-            if where:
-                select_stmnt += self._stmnt("WHERE", logic, **where)
-                return self.execute(select_stmnt.format(table), tuple(where.values()))
-            return self.execute(select_stmnt.format(table))
+            if kwargs:
+                select_stmnt += self._stmnt("WHERE", logic, **kwargs)
+                return self.execute(select_stmnt.format(table) + orderby, tuple(kwargs.values()))
+            return self.execute(select_stmnt.format(table) + orderby)
         except sqlite3.Error as err:
             print("Couldn't select any item:", err, file=sys.stderr)
             return None
 
 
-    def delete(self, table, logic="OR", **kwargs):
+    def delete(self, table, **kwargs):
         """Delete row(s) from database.
 
         Args:
             table:      string containing a valid table-name
-            logic:      logical operator in the WHERE clause. This simple function won't allow to
-                        mix logical operators. Provided without kwargs has no sense.
             **kwargs:   specify criteria with column=value pair(s). If more pairs are specified,
                         they're bound together with the provided logical operator in the WHERE
-                        clause of the query. The default 'OR' means any, 'AND' means all of the
-                        conditions in kwargs must be met. 'NOT' is only partially supported, it
-                        makes only sense with one kwarg, but the latter won't be verified.
+                        clause of the query.
+                        Special keys:
+                            logic:      defaults to OR. NOT is only partially supported, it
+                                        makes only sense with one kwarg, but the latter won't be
+                                        verified.
 
         Returns:
             boolean:    indicates success
@@ -166,6 +174,7 @@ class Tamer(sqlite3.Connection):
         Reading:
             https://sqlite.org/lang_delete.html
         """
+        logic = kwargs.pop("logic", "OR")
         delete_stmnt = """DELETE FROM {}""" + self._stmnt("WHERE", logic, **kwargs)
 
         try:
@@ -177,19 +186,19 @@ class Tamer(sqlite3.Connection):
             return False
 
 
-    def update(self, table, what, logic="OR", **where):
+    def update(self, table, what, **where):
         """Update values in existing row(s) in the database.
 
         Args:
             table:      string containing a valid table-name
             what:       dictionary containing column=new_value pairs
-            logic:      logical operator in the WHERE clause. This simple function won't allow to
-                        mix logical operators.
             **where:    update criteria as column=value pair(s). If more pairs are specified,
                         they're bound together with the provided logical operator in the WHERE
-                        clause of the query. The default 'OR' means any, 'AND' means all of the
-                        conditions in kwargs must be met. 'NOT' is only partially supported, it
-                        makes only sense with one kwarg, but the latter won't be verified.
+                        clause of the query.
+                        Special keys:
+                            logic:      defaults to OR. NOT is only partially supported, it
+                                        makes only sense with one kwarg, but the latter won't be
+                                        verified.
 
         Returns:
             boolean:    indicates success
@@ -197,6 +206,7 @@ class Tamer(sqlite3.Connection):
         Reading:
             https://sqlite.org/lang_update.html
         """
+        logic = where.pop("logic", "OR")
         update_stmnt = """ UPDATE {}""" + self._stmnt("SET", ",", **what)\
                                         + self._stmnt("WHERE", logic, **where)
 
@@ -228,7 +238,7 @@ class Tamer(sqlite3.Connection):
             https://sqlite.org/lang_droptable.html
             https://www.sqlite.org/faq.html#q11
             https://docs.python.org/3/library/os.html#os.unlink
-        """        
+        """
         if table and column:
             if  column not in self.get_columns(table):
                 print("'{}' doesn't exist in '{}'".format(column, table), file=sys.stderr)
@@ -255,7 +265,7 @@ class Tamer(sqlite3.Connection):
             except sqlite3.Error as err:
                 print("Couldn't drop column:", err, file=sys.stderr)
                 return False
-            
+
         elif table:
             try:
                 with self:
@@ -277,14 +287,14 @@ class Tamer(sqlite3.Connection):
 
     def rename(self, table, new):
         """Rename existing table in the database.
-        
+
         Args:
             table:  string containing table to rename
             new:    string containing new name
 
         Returns:
             boolean:    indicates success
-            
+
         Reading:
             https://sqlite.org/lang_altertable.html
         """
@@ -295,11 +305,11 @@ class Tamer(sqlite3.Connection):
         except sqlite3.Error as err:
             print("Couldn't rename table:", err, file=sys.stderr)
             return False
-            
-    
+
+
     def add(self, table, column, constraint=""):
         """Add a new column to an existing table.
-        
+
         Args:
             table:      string containing table to alter
             column:     string containing columnname
@@ -307,7 +317,7 @@ class Tamer(sqlite3.Connection):
 
         Returns:
             boolean:    indicates success
-            
+
         Reading:
             https://sqlite.org/lang_altertable.html
         """
@@ -319,17 +329,17 @@ class Tamer(sqlite3.Connection):
         except sqlite3.Error as err:
             print("Couldn't add new column:", err, file=sys.stderr)
             return False
-            
-    
+
+
     def get_columns(self, table):
         """Return all user defined column names in table.
-        
+
         Args:
             table:  string containing tablename
-        
+
         Returns:
             tuple of strings containing user defined column names or None if an error occured
-        
+
         Reading:
             https://sqlite.org/pragma.html#pragma_table_info
         """
@@ -340,17 +350,17 @@ class Tamer(sqlite3.Connection):
         except sqlite3.Error as err:
             print("Couldn't retrieve column names:", err, file=sys.stderr)
             return None
-            
-    
+
+
     def get_tables(self):
         """Return all user defined table names in the database.
-        
+
         Args:
             none
-        
+
         Returns:
             tuple of strings containing user defined table names or None if an error occured
-        
+
         Reading:
             https://stackoverflow.com/questions/82875/
         """

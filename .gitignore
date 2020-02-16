@@ -1,5 +1,5 @@
+.vscode
 .git
 .venv
-.vscode
 __pycache__
 *.db
