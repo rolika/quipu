@@ -66,7 +66,7 @@ class TelefonszamUrlap(LabelFrame):
         self.grid()
 
     def beallit(self, telefon):
-        self.elerhetoseg.set(telefon.telefonszam)
+        self.telefonszam.set(telefon.telefonszam)
         self.megjegyzes.set(telefon.megjegyzes)
 
     def export(self):
@@ -233,16 +233,19 @@ class SzemelyModositoUrlap(Frame):
 class UjTelefonUrlap(Frame):
     def __init__(self, master=None, kon=None, **kw):
         super().__init__(master=master, **kw)
+
         self.kon = kon
+
         self.lista = Valaszto("Telefon hozzáadása", self.nevsor(), self)
-        self.telefonurlap = TelefonszamUrlap(self)
+        self.telefon = TelefonszamUrlap(self)
+
         self.kezelogomb = KezeloGomb(self)
         self.kezelogomb.megse["command"] = master.destroy
         self.kezelogomb.ok["text"] = "mentés"
         self.kezelogomb.ok["command"] = self.ment
 
         self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.telefonurlap.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
+        self.telefon.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
         self.kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
 
         self.grid()
@@ -251,9 +254,10 @@ class UjTelefonUrlap(Frame):
         return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
 
     def ment(self):
-        uj = self.telefonurlap.export()
+        uj = self.telefon.export()
         if uj.telefonszam:
             uj["szemely"] = self.lista.azonosito()
+            uj.pop("azonosito")  # majd az Sqlite megadja
             self.kon.insert("telefon", **uj)
             print("Bejegyzés mentve.")
         else:
@@ -309,7 +313,60 @@ class TelefonTorloUrlap(Frame):
 class TelefonModositoUrlap(Frame):
     def __init__(self, master=None, kon=None, **kw):
         super().__init__(master=master, **kw)
-        
+
+        self.kon = kon
+
+        self.lista = Valaszto("Személy", self.nevsor(), self)
+        self.lista.valaszto.bind("<<ComboboxSelected>>", self.megjelenit)
+
+        self.telefon = Valaszto("Módosítandó telefonszám", self.telefonszamok(), self)
+        self.telefon.valaszto.bind("<<ComboboxSelected>>", self.kiir)
+
+        self.modosito = TelefonszamUrlap(self)
+        self.megjelenit(1)
+
+        self.kezelogomb = KezeloGomb(self)
+        self.kezelogomb.megse["text"] = "vissza"
+        self.kezelogomb.ok["text"] = "módosít"
+        self.kezelogomb.megse["command"] = master.destroy
+        self.kezelogomb.ok["command"] = self.modosit
+
+        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+        self.telefon.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
+        self.modosito.grid(row=2, column=0, sticky=W, ipadx=2, ipady=2)
+        self.kezelogomb.grid(row=3, column=0, ipadx=2, ipady=2)
+
+        self.grid()
+
+    def nevsor(self):
+        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
+
+    def telefonszamok(self):
+        return sorted(map(lambda telefon: Telefon.adatbazisbol(telefon),
+                                                               self.kon.select("telefon",
+                                                               szemely=self.lista.azonosito())),
+                                                               key=repr)
+
+    def megjelenit(self, event):
+        self.telefon.beallit(self.telefonszamok())
+        self.kiir(1)
+
+    def kiir(self, event):
+        azonosito = self.telefon.azonosito()
+        try:
+            telefonszam = next(filter(lambda telefonszam: telefonszam.azonosito == azonosito, self.telefonszamok()))
+        except StopIteration:            
+            telefonszam = Telefon(telefonszam="", megjegyzes="")
+        self.modosito.beallit(telefonszam)
+
+    def modosit(self):
+        telefonszam = self.modosito.export()
+        if telefonszam and self.telefonszamok():
+            telefonszam.pop("azonosito")  # majd az Sqlite megadja
+            telefonszam.szemely = self.lista.azonosito()
+            self.kon.update("telefon", telefonszam, azonosito=self.telefon.azonosito())
+            self.megjelenit(1)
+            print("Bejegyzés módosítva.")
 
 
 class Figyelmeztetes(Frame):

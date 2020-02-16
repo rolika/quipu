@@ -78,7 +78,7 @@ class TelefonAlmenu(Alapmenu):
         urlap.TelefonTorloUrlap(Toplevel(), self.kon)
 
     def modosit(self):
-        pass
+        urlap.TelefonModositoUrlap(Toplevel(), self.kon)
 
 
 if __name__ == "__main__":
