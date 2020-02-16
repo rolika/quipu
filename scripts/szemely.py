@@ -3,10 +3,24 @@ class Szemely(dict):
     def __init__(self, **kwargs):
         """Konstruktor közvetlen példányosításhoz:
         kwargs:     személyi adatok kulcs=érték párokként"""
-        super().__init__(self)
+        super().__init__(kwargs)
         self._db_oszlop = {"azonosito", "elotag", "vezeteknev", "keresztnev", "nem", "megjegyzes"}
         for oszlop in self._db_oszlop:
             self[oszlop] = kwargs.get(oszlop, "")
+    
+    def __str__(self):
+        """Személyi adatok megjelenítése, elsősorban debugoláshoz"""
+        elotag = self._nullazo(self["elotag"])
+        megjegyzes = self._nullazo(self["megjegyzes"])
+        return "{}{} {}, {}{}".format(elotag, self["vezeteknev"], self["keresztnev"], self["nem"], megjegyzes)
+    
+    def __repr__(self):
+        """Név megjelenítése sorbarendezéshez"""
+        return self._ascii_rep(self.listanezet())
+    
+    def __bool__(self):
+        """Egy személy akkor meghatározott, ha legalább az egyik név adott"""
+        return bool(self["vezeteknev"]) or bool(self["keresztnev"])
 
     @classmethod
     def adatbazisbol(cls, row):
@@ -44,22 +58,8 @@ class Szemely(dict):
         """Kényelmi megoldás."""
         return self["megjegyzes"]
     
-    def __str__(self):
-        """Személyi adatok megjelenítése, elsősorban debugoláshoz"""
-        elotag = self._nullazo(self["elotag"])
-        megjegyzes = self._nullazo(self["megjegyzes"])
-        return "{}{} {}, {}{}".format(elotag, self["vezeteknev"], self["keresztnev"], self["nem"], megjegyzes)
-    
-    def __repr__(self):
-        """Név megjelenítése sorbarendezéshez"""
-        return self._ascii_rep(self.listanezet())
-    
-    def __bool__(self):
-        """Egy személy akkor meghatározott, ha legalább az egyik név adott"""
-        return bool(self["vezeteknev"]) or bool(self["keresztnev"])
-    
     def listanezet(self):
-        """Személy megjelenítése kiválasztáshoz (pl. Combobox)"""
+        """Személy megjelenítése kiválasztáshoz (Combobox)"""
         megjegyzes = self._nullazo(self["megjegyzes"])
         return "{} {} {}{}".format(self["vezeteknev"], self["keresztnev"], self["elotag"], megjegyzes)
     

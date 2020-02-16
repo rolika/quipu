@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter.ttk import Combobox
 from szemely import Szemely
+from telefon import Telefon
 
 
 class SzemelyUrlap(LabelFrame):
@@ -48,30 +49,28 @@ class SzemelyUrlap(LabelFrame):
                       megjegyzes=self.megjegyzes.get())
 
 
-class ElerhetosegUrlap(Frame):
-    def __init__(self, cimke, master=None, **kw):
-        super().__init__(master=master, **kw)
-        self.cimke = cimke
-        self.elerhetoseg = StringVar()
+class TelefonszamUrlap(LabelFrame):
+    def __init__(self, master=None, **kw):
+        super().__init__(master=master, text="telefonszám", **kw)
+
+        self.telefonszam = StringVar()
         self.megjegyzes = StringVar()
         megjegyzes = ("alapértelmezett", "munkahelyi", "privát")
         self.megjegyzes.set(megjegyzes[0])
 
-        Label(self, text=self.cimke).grid(row=0, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.elerhetoseg, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="telefonszám").grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self.telefonszam, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
         Label(self, text="megjegyzés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
         OptionMenu(self, self.megjegyzes, *megjegyzes).grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
         self.grid()
 
-    def beallit(self, **adatok):
-        self.elerhetoseg.set(adatok.get("telefonszam", adatok.get("emailcim", "")))
-        self.megjegyzes.set(adatok.get("megjegyzes"))
+    def beallit(self, telefon):
+        self.elerhetoseg.set(telefon.telefonszam)
+        self.megjegyzes.set(telefon.megjegyzes)
 
     def export(self):
-        cimke = "telefonszam" if "telefon" in self.cimke else "emailcim"
-        return {cimke: self.elerhetoseg.get(),
-                "megjegyzes": self.megjegyzes.get()}
+        return Telefon(telefonszam=self.telefonszam.get(), megjegyzes=self.megjegyzes.get())
 
 
 class Valaszto(LabelFrame):
@@ -236,7 +235,7 @@ class UjTelefonUrlap(Frame):
         super().__init__(master=master, **kw)
         self.kon = kon
         self.lista = Valaszto("Telefon hozzáadása", self.nevsor(), self)
-        self.telefonurlap = ElerhetosegUrlap("telefon", self)
+        self.telefonurlap = TelefonszamUrlap(self)
         self.kezelogomb = KezeloGomb(self)
         self.kezelogomb.megse["command"] = master.destroy
         self.kezelogomb.ok["text"] = "mentés"
@@ -249,17 +248,21 @@ class UjTelefonUrlap(Frame):
         self.grid()
 
     def nevsor(self):
-        szemelyek = self.kon.select("nev", "szemely", "nev", orderby="nev").fetchall()
-        return [(szemely["szemely"], szemely["nev"]) for szemely in szemelyek]
+        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
 
     def ment(self):
         uj = self.telefonurlap.export()
-        if uj["telefonszam"]:
+        if uj.telefonszam:
             uj["szemely"] = self.lista.azonosito()
             self.kon.insert("telefon", **uj)
             print("Bejegyzés mentve.")
         else:
             Figyelmeztetes("A telefonszám nem maradhat üresen!", Toplevel())
+
+
+class TelefonTorloUrlap(Frame):
+    def __init__(self, master=None, **kw):
+        super().__init__(master=master, **kw)
 
 
 class Figyelmeztetes(Frame):
@@ -291,5 +294,5 @@ if __name__ == "__main__":
 
     # Figyelmeztetes("Ez a név már szerepel az adatbázisban.", Tk()).mainloop()
 
-    ElerhetosegUrlap("telefon").mainloop()
+    TelefonszamUrlap().mainloop()
 
