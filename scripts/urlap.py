@@ -300,12 +300,12 @@ class TelefonTorloUrlap(Frame):
         self.telefon.beallit(self.telefonszamok())
 
     def torol(self):
-        azonosito = self.lista.azonosito()
+        azonosito = self.telefon.azonosito()
         if azonosito:
             biztos = Figyelmeztetes("Biztos vagy benne?\nVÉGLEGESEN törlődik!", Toplevel(), csak_ok=False)
             biztos.wait_window(biztos)
             if biztos.gombok.valasz:
-                if self.kon.delete("telefon", szemely=azonosito):
+                if self.kon.delete("telefon", logic="AND", azonosito=azonosito):
                     print("Bejegyzés törölve.")
                     self.megjelenit(1)
 
