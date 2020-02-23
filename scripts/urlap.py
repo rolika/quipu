@@ -291,10 +291,10 @@ class TelefonTorloUrlap(Frame):
         return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
 
     def telefonszamok(self):
-        return sorted(map(lambda telefon: Telefon.adatbazisbol(telefon),
-                                                               self.kon.select("telefon",
-                                                               szemely=self.lista.azonosito())),
-                                                               key=repr)
+        szemely = self.lista.azonosito()
+        telefonszamok = [Telefon.adatbazisbol(telefon) for telefon in self.kon.select("telefon", szemely=szemely)]
+        print(telefonszamok)
+        return telefonszamok
 
     def megjelenit(self, event):
         self.telefon.beallit(self.telefonszamok())
@@ -305,7 +305,7 @@ class TelefonTorloUrlap(Frame):
             biztos = Figyelmeztetes("Biztos vagy benne?\nVÉGLEGESEN törlődik!", Toplevel(), csak_ok=False)
             biztos.wait_window(biztos)
             if biztos.gombok.valasz:
-                if self.kon.delete("telefon", logic="AND", azonosito=azonosito):
+                if self.kon.delete("telefon", azonosito=azonosito):
                     print("Bejegyzés törölve.")
                     self.megjelenit(1)
 
@@ -343,9 +343,7 @@ class TelefonModositoUrlap(Frame):
 
     def telefonszamok(self):
         return sorted(map(lambda telefon: Telefon.adatbazisbol(telefon),
-                                                               self.kon.select("telefon",
-                                                               szemely=self.lista.azonosito())),
-                                                               key=repr)
+                          self.kon.select("telefon", szemely=self.lista.azonosito())), key=repr)
 
     def megjelenit(self, event):
         self.telefon.beallit(self.telefonszamok())
@@ -355,7 +353,7 @@ class TelefonModositoUrlap(Frame):
         azonosito = self.telefon.azonosito()
         try:
             telefonszam = next(filter(lambda telefonszam: telefonszam.azonosito == azonosito, self.telefonszamok()))
-        except StopIteration:            
+        except StopIteration:
             telefonszam = Telefon(telefonszam="", megjegyzes="")
         self.modosito.beallit(telefonszam)
 
