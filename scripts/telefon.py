@@ -14,7 +14,7 @@ class Telefon(dict):
     @classmethod
     def adatbazisbol(cls, row):
         """Factory konstruktor adatbázisból történő példányososításhoz:
-        kurzor:     sqlite Row-objektum (hozzáférés oszlopnevekkel)"""
+        row:    sqlite Row-objektum (hozzáférés oszlopnevekkel)"""
         return cls(**row)
     
     @property
