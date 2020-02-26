@@ -8,6 +8,10 @@ class Email:
 
     def __bool__(self):
         return bool(self.emailcim)
+    
+    @property
+    def adatok(self):
+        return self._adatok
 
     @property
     def azonosito(self):

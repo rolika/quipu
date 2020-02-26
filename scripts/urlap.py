@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter.ttk import Combobox
 from szemely import Szemely
 from telefon import Telefon
+from email import Email
 
 
 class SzemelyUrlap(LabelFrame):
@@ -71,6 +72,30 @@ class TelefonszamUrlap(LabelFrame):
 
     def export(self):
         return Telefon(telefonszam=self.telefonszam.get(), megjegyzes=self.megjegyzes.get())
+
+
+class EmailcimUrlap(LabelFrame):
+    def __init__(self, master=None, **kw):
+        super().__init__(master=master, text="email-cím", **kw)
+
+        self.emailcim = StringVar()
+        self.megjegyzes = StringVar()
+        megjegyzes = ("alapértelmezett", "munkahelyi", "privát")
+        self.megjegyzes.set(megjegyzes[0])
+
+        Label(self, text="email-cím").grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self.emailcim, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="megjegyzés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self.megjegyzes, *megjegyzes).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+
+        self.grid()
+
+    def beallit(self, email):
+        self.emailcim.set(email.emailcim)
+        self.megjegyzes.set(telefon.megjegyzes)
+
+    def export(self):
+        return Email(emailcim=self.emailcim.get(), megjegyzes=self.megjegyzes.get())
 
 
 class Valaszto(LabelFrame):
@@ -365,6 +390,42 @@ class TelefonModositoUrlap(Frame):
             self.kon.update("telefon", telefonszam, azonosito=self.telefon.azonosito())
             self.megjelenit(1)
             print("Bejegyzés módosítva.")
+
+
+class UjEmailUrlap(Frame):
+    def __init__(self, master=None, kon=None, **kw):
+        super().__init__(master=master, **kw)
+        self._kon = kon
+
+        self._nevsor = Valaszto("Email hozzáadása", self.nevsor(), self)
+        self._email = EmailcimUrlap(self)
+
+        self._kezelogomb = KezeloGomb(self)
+        self._kezelogomb.megse["command"] = master.destroy
+        self._kezelogomb.ok["text"] = "mentés"
+        self._kezelogomb.ok["command"] = self._ment
+
+        self._nevsor.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+        self._email.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
+        self._kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
+
+        self.grid()
+
+    def nevsor(self):
+        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self._kon.select("szemely")), key=repr)
+
+    def _ment(self):
+        emailcim = self._email.export()
+        if emailcim:
+            emailcim.kon = self._kon
+            emailcim.szemely = self._nevsor.azonosito()
+            if emailcim.ment():
+                print("Bejegyzés mentve.")
+            else:
+                print("Nem sikerült elmenteni.")
+        else:
+            Figyelmeztetes("Az email-cím nem maradhat üresen!", Toplevel())
+
 
 
 class Figyelmeztetes(Frame):
