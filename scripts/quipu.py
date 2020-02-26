@@ -44,12 +44,8 @@ class Quipu(Frame):
         """ Személy adatbázis inicializálása  """
         self.szemely_kon = tamer.Tamer("szemely.db")
 
-        self.szemely_kon.create("megszolitas", nem="TEXT PRIMARY KEY", megszolitas="TEXT NOT NULL")
-        self.szemely_kon.insert("megszolitas", nem="nő", megszolitas="Hölgyem")
-        self.szemely_kon.insert("megszolitas", nem="férfi", megszolitas="Uram")
-
         self.szemely_kon.create("szemely", azonosito="INTEGER PRIMARY KEY", elotag="TEXT",
-            vezeteknev="TEXT NOT NULL", keresztnev="TEXT NOT NULL", nem="TEXT NOT NULL REFERENCES megszolitas",
+            vezeteknev="TEXT NOT NULL", keresztnev="TEXT NOT NULL", nem="TEXT NOT NULL",
             megjegyzes="TEXT")
 
         self.szemely_kon.create("telefon", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
