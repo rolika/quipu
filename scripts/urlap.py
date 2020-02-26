@@ -82,6 +82,7 @@ class Valaszto(LabelFrame):
         self.valaszto.grid()
 
     def beallit(self, valasztek):
+        self.valasztek = valasztek
         self.valaszto["values"] = [elem.listanezet() for elem in valasztek]
         try:
             self.valaszto.current(0)
@@ -293,7 +294,6 @@ class TelefonTorloUrlap(Frame):
     def telefonszamok(self):
         szemely = self.lista.azonosito()
         telefonszamok = [Telefon.adatbazisbol(telefon) for telefon in self.kon.select("telefon", szemely=szemely)]
-        print(telefonszamok)
         return telefonszamok
 
     def megjelenit(self, event):
