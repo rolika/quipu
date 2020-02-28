@@ -28,10 +28,18 @@ class Email:
     @property
     def emailcim(self):
         return self._adatok.get("emailcim")
+    
+    @emailcim.setter
+    def emailcim(self, emailcim):
+        self._adatok["emailcim"] = emailcim
 
     @property
     def megjegyzes(self):
         return self._adatok.get("megjegyzes")
+    
+    @megjegyzes.setter
+    def megjegyzes(self, megjegyzes):
+        self._adatok["megjegyzes"] = megjegyzes
 
     @property
     def kon(self):

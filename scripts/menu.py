@@ -93,7 +93,7 @@ class EmailAlmenu(Alapmenu):
         urlap.EmailTorloUrlap(Toplevel(), self._kon)
 
     def modosit(self):
-        urlap.EmailModositoUrlap(Toplevel(), self._kon)
+        urlap.EmailModositoUrlap(self._kon)
 
 if __name__ == "__main__":
     Fomenu(Tk()).mainloop()

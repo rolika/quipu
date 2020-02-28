@@ -93,7 +93,7 @@ class EmailcimUrlap(LabelFrame):
 
     def beallit(self, email):
         self.emailcim.set(email.emailcim)
-        self.megjegyzes.set(telefon.megjegyzes)
+        self.megjegyzes.set(email.megjegyzes)
 
     def export(self):
         return Email(emailcim=self.emailcim.get(), megjegyzes=self.megjegyzes.get())
@@ -120,7 +120,7 @@ class Valaszto(LabelFrame):
             return self.valasztek[self.valaszto.current()].azonosito
         except IndexError:
             return None
-    
+
     @property
     def idx(self):
         return self.valaszto.current()
@@ -396,16 +396,16 @@ class UjEmailUrlap(Frame):
         super().__init__(master=master, **kw)
         self._kon = kon
 
-        self._nevek = Valaszto("Email hozzáadása", self._nevsor(), self)
-        self._email = EmailcimUrlap(self)
+        self._nev_valaszto = Valaszto("Email hozzáadása", self._nevsor(), self)
+        self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+
+        self._emailcimurlap = EmailcimUrlap(self)
+        self._emailcimurlap.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
 
         self._kezelogomb = KezeloGomb(self)
         self._kezelogomb.megse["command"] = master.destroy
         self._kezelogomb.ok["text"] = "mentés"
         self._kezelogomb.ok["command"] = self._ment
-
-        self._nevek.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self._email.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
         self._kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
 
         self.grid()
@@ -414,10 +414,10 @@ class UjEmailUrlap(Frame):
         return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self._kon.select("szemely")), key=repr)
 
     def _ment(self):
-        emailcim = self._email.export()
+        emailcim = self._emailcimurlap.export()
         if emailcim:
             emailcim.kon = self._kon
-            emailcim.szemely = self._nevek.azonosito()
+            emailcim.szemely = self._nev_valaszto.azonosito()
             if emailcim.ment():
                 print("Bejegyzés mentve.")
             else:
@@ -446,17 +446,17 @@ class EmailTorloUrlap(Frame):
         self._kezelo.grid(row=2, column=0, ipadx=2, ipady=2)
 
         self.grid()
-    
+
     def _nevsor(self):
         return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self._kon.select("szemely")), key=repr)
-    
+
     def _emailcimek(self):
         szemely = self._nev_valaszto.azonosito()
         return [Email(**email) for email in self._kon.select("email", szemely=szemely)]
-    
+
     def _elerhetosegek(self, event):
         self._email_valaszto.beallit(self._emailcimek())
-    
+
     def _torol(self):
         idx = self._email_valaszto.idx
         biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
@@ -468,6 +468,64 @@ class EmailTorloUrlap(Frame):
                 self._elerhetosegek(1)
             else:
                 print("Nem sikerült törölni.")
+
+
+class EmailModositoUrlap(Toplevel):
+    def __init__(self, kon=None, **kw):
+        super().__init__(**kw)
+        self._kon = kon
+
+        self._nev_valaszto = Valaszto("Személy", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
+        self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+
+        self._email_valaszto = Valaszto("Módosítandó email-cím", self._emailcimek(), self)
+        self._email_valaszto.valaszto.bind("<<ComboboxSelected>>", self._kiir_elerhetoseg)
+        self._email_valaszto.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
+
+        self._emailcim_urlap = EmailcimUrlap(self)
+        self._emailcim_urlap.grid(row=2, column=0, sticky=W, ipadx=2, ipady=2)
+        self._kiir_elerhetoseg(1)
+
+        self._kezelo = KezeloGomb(self)
+        self._kezelo.megse["text"] = "vissza"
+        self._kezelo.ok["text"] = "módosít"
+        self._kezelo.megse["command"] = self.destroy
+        self._kezelo.ok["command"] = self._modosit
+        self._kezelo.grid(row=3, column=0, ipadx=2, ipady=2)
+
+        self.grid()
+
+    def _nevsor(self):
+        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self._kon.select("szemely")), key=repr)
+
+    def _emailcimek(self):
+        szemely = self._nev_valaszto.azonosito()
+        return [Email(**email) for email in self._kon.select("email", szemely=szemely)]
+
+    def _elerhetosegek(self, event):
+        self._email_valaszto.beallit(self._emailcimek())
+    
+    def _kiir_elerhetoseg(self, event):
+        idx = self._email_valaszto.idx
+        self._emailcim_urlap.beallit(self._emailcimek()[idx])
+
+    def _modosit(self):
+        idx = self._email_valaszto.idx
+        if idx >= 0:
+            emailcim = self._emailcimek()[idx]
+            uj = self._emailcim_urlap.export()
+            emailcim.emailcim = uj.emailcim
+            emailcim.megjegyzes = uj.megjegyzes
+            if emailcim:
+                emailcim.kon = self._kon
+                if emailcim.ment():
+                    print("Bejegyzés módosítva.")
+                    self._elerhetosegek(1)
+                else:
+                    print("Nem sikerült módosítani.")
+            else:
+                messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
 
 
 if __name__ == "__main__":
