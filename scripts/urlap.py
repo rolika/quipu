@@ -505,27 +505,27 @@ class EmailModositoUrlap(Toplevel):
 
     def _elerhetosegek(self, event):
         self._email_valaszto.beallit(self._emailcimek())
+        self._kiir_elerhetoseg(1)
     
     def _kiir_elerhetoseg(self, event):
         idx = self._email_valaszto.idx
-        self._emailcim_urlap.beallit(self._emailcimek()[idx])
+        emailcim = self._emailcimek()[idx] if idx >= 0 else Email(emailcim="", megjegyzes="")
+        self._emailcim_urlap.beallit(emailcim)
 
     def _modosit(self):
         idx = self._email_valaszto.idx
         if idx >= 0:
             emailcim = self._emailcimek()[idx]
-            uj = self._emailcim_urlap.export()
-            emailcim.emailcim = uj.emailcim
-            emailcim.megjegyzes = uj.megjegyzes
+            emailcim.modosit(self._emailcim_urlap.export())
             if emailcim:
                 emailcim.kon = self._kon
                 if emailcim.ment():
                     print("Bejegyzés módosítva.")
-                    self._elerhetosegek(1)
                 else:
                     print("Nem sikerült módosítani.")
             else:
                 messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
+            self._elerhetosegek(1)
 
 
 if __name__ == "__main__":

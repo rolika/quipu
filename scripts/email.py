@@ -28,18 +28,10 @@ class Email:
     @property
     def emailcim(self):
         return self._adatok.get("emailcim")
-    
-    @emailcim.setter
-    def emailcim(self, emailcim):
-        self._adatok["emailcim"] = emailcim
 
     @property
     def megjegyzes(self):
         return self._adatok.get("megjegyzes")
-    
-    @megjegyzes.setter
-    def megjegyzes(self, megjegyzes):
-        self._adatok["megjegyzes"] = megjegyzes
 
     @property
     def kon(self):
@@ -52,6 +44,11 @@ class Email:
     def listanezet(self):
         """Elérhetőseg megjelenítése kiválasztáshoz (Combobox)"""
         return "{} ({})".format(self.emailcim, self.megjegyzes)
+    
+    def modosit(self, email):
+        """Új email-osztály alapján módosítja az emailcímet és a megjegyzést"""
+        self._adatok["emailcim"] = email.emailcim
+        self._adatok["megjegyzes"] = email.megjegyzes
 
     def ment(self):
         """Menti vagy módosítja az emailcím-adatokat"""
