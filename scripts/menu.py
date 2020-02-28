@@ -29,6 +29,7 @@ class Szemelymenu(Menu):
         mb["menu"] = self
         self.add("cascade", label="személy", menu=SzemelyAlmenu(kon, mb))
         self.add("cascade", label="telefon", menu=TelefonAlmenu(kon, mb))
+        self.add("cascade", label="email", menu=EmailAlmenu(kon, mb))
 
 
 class Alapmenu(Menu):
@@ -37,7 +38,7 @@ class Alapmenu(Menu):
 
         self.add("command", label="új", command=self.uj)
         self.add("command", label="törlés", command=self.torol)
-        self.add("command", label="változtatás", command=self.modosit)
+        self.add("command", label="módosítás", command=self.modosit)
 
     def uj(self):
         raise NotImplementedError
@@ -80,6 +81,19 @@ class TelefonAlmenu(Alapmenu):
     def modosit(self):
         urlap.TelefonModositoUrlap(Toplevel(), self.kon)
 
+class EmailAlmenu(Alapmenu):
+    def __init__(self, kon, mb):
+        super().__init__(mb)
+        self._kon = kon
+    
+    def uj(self):
+        urlap.UjEmailUrlap(Toplevel(), self._kon)
+
+    def torol(self):
+        urlap.EmailTorloUrlap(Toplevel(), self._kon)
+
+    def modosit(self):
+        urlap.EmailModositoUrlap(self._kon)
 
 if __name__ == "__main__":
     Fomenu(Tk()).mainloop()
