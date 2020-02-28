@@ -3,15 +3,21 @@ class Email:
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
-        self._adatok = dict(kwargs)
+        if kwargs:
+            self._adatok = dict(kwargs)
+        else:
+            self._adatok = {
+                "emailcim": "",
+                "megjegyzes": ""
+            }
 
     def __bool__(self):
         return bool(self.emailcim)
-    
+
     @property
     def adatok(self):
         return self._adatok
-    
+
     @adatok.setter
     def adatok(self, email):
         """Új email-osztály alapján módosítja a meglévőt."""

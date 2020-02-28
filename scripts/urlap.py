@@ -510,10 +510,10 @@ class EmailModositoUrlap(Toplevel):
     def _elerhetosegek(self, event):
         self._email_valaszto.beallit(self._emailcimek())
         self._kiir_elerhetoseg(1)
-    
+
     def _kiir_elerhetoseg(self, event):
         idx = self._email_valaszto.idx
-        emailcim = self._emailcimek()[idx] if idx >= 0 else Email(emailcim="", megjegyzes="")
+        emailcim = self._emailcimek()[idx] if idx >= 0 else Email()
         self._emailcim_urlap.beallit(emailcim)
 
     def _modosit(self):

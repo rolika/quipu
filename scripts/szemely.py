@@ -83,7 +83,7 @@ class Szemely:
     def torol(self, kon):
         """Törli az adatbázisból az email-bejegyzést"""
         return kon.delete("szemely", azonosito=self.azonosito)
-    
+
     def meglevo(self, kon):
         """Ellenőrzi, hogy a személy szerepel-e az adatbázisban"""
         adatok = copy.copy(self._adatok)  # shallow copy
