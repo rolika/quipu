@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 from tkinter.ttk import Combobox
 from szemely import Szemely
 from telefon import Telefon
@@ -164,14 +165,13 @@ class UjSzemelyUrlap(Frame):
         szemely = self.szemelyurlap.export()
         if szemely:
             if self.kon.select("szemely", logic="AND", **szemely).fetchone():
-                Figyelmeztetes("Ez a személy már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!",
-                               Toplevel())
+                messagebox.showwarning("A név már létezik!", "Különböztesd meg a megjegyzésben!", parent=self)
                 return
             szemely.pop("azonosito")  # majd az Sqlite megadja
             if self.kon.insert("szemely", **szemely):
                 print("Új bejegyzés mentve.")
         else:
-                Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
+            messagebox.showwarning("Hiányos adat!", "Legalább az egyik nevet add meg!", parent=self)
 
 
 class SzemelyTorloUrlap(Frame):
@@ -198,17 +198,15 @@ class SzemelyTorloUrlap(Frame):
 
     def torol(self):
         azonosito = self.lista.azonosito()
-        if azonosito:
-            biztos = Figyelmeztetes("Biztos vagy benne?\nMINDEN VÉGLEGESEN törlődik!", Toplevel(), csak_ok=False)
-            biztos.wait_window(biztos)
-            if biztos.gombok.valasz:
-                self.kon.delete("telefon", szemely=azonosito)
-                self.kon.delete("email", szemely=azonosito)
-                self.kon.delete("cim", szemely=azonosito)
-                self.kon.delete("kontakt", szemely=azonosito)
-                if self.kon.delete("szemely", azonosito=azonosito):
-                    print("Bejegyzés törölve.")
-                self.lista.beallit(self.nevsor())
+        biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN törlődik!", parent=self)
+        if azonosito and biztos:
+            self.kon.delete("telefon", szemely=azonosito)
+            self.kon.delete("email", szemely=azonosito)
+            self.kon.delete("cim", szemely=azonosito)
+            self.kon.delete("kontakt", szemely=azonosito)
+            if self.kon.delete("szemely", azonosito=azonosito):
+                print("Bejegyzés törölve.")
+            self.lista.beallit(self.nevsor())
 
 
 class SzemelyModositoUrlap(Frame):
@@ -248,8 +246,7 @@ class SzemelyModositoUrlap(Frame):
             szemely = self.szemelyurlap.export()
             if szemely:
                 if self.kon.select("szemely", logic="AND", **szemely).fetchone():
-                    Figyelmeztetes("Ez a személy már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!",
-                                   Toplevel())
+                    messagebox.showwarning("A név már létezik!", "Különböztesd meg a megjegyzésben!", parent=self)
                     return
                 szemely.pop("azonosito")  # majd az Sqlite megadja
                 if self.kon.update("szemely", szemely, azonosito=azonosito):
@@ -257,7 +254,7 @@ class SzemelyModositoUrlap(Frame):
                     self.lista.beallit(self.nevsor())
                     self.megjelenit(1)
             else:
-                Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
+                messagebox.showwarning("Hiányos adat!", "Legalább az egyik nevet add meg!", parent=self)
 
 
 class UjTelefonUrlap(Frame):
@@ -291,7 +288,7 @@ class UjTelefonUrlap(Frame):
             self.kon.insert("telefon", **uj)
             print("Bejegyzés mentve.")
         else:
-            Figyelmeztetes("A telefonszám nem maradhat üresen!", Toplevel())
+            messagebox.showwarning("Hiányos adat!", "Add meg a telefonszámot!", parent=self)
 
 
 class TelefonTorloUrlap(Frame):
@@ -330,13 +327,11 @@ class TelefonTorloUrlap(Frame):
 
     def torol(self):
         azonosito = self.telefon.azonosito()
-        if azonosito:
-            biztos = Figyelmeztetes("Biztos vagy benne?\nVÉGLEGESEN törlődik!", Toplevel(), csak_ok=False)
-            biztos.wait_window(biztos)
-            if biztos.gombok.valasz:
-                if self.kon.delete("telefon", azonosito=azonosito):
-                    print("Bejegyzés törölve.")
-                    self.megjelenit(1)
+        biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
+        if azonosito and biztos:
+            if self.kon.delete("telefon", azonosito=azonosito):
+                print("Bejegyzés törölve.")
+                self.megjelenit(1)
 
 
 class TelefonModositoUrlap(Frame):
@@ -428,7 +423,7 @@ class UjEmailUrlap(Frame):
             else:
                 print("Nem sikerült elmenteni.")
         else:
-            Figyelmeztetes("Az email-cím nem maradhat üresen!", Toplevel())
+            messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
 
 
 class EmailTorloUrlap(Frame):
@@ -464,32 +459,15 @@ class EmailTorloUrlap(Frame):
     
     def _torol(self):
         idx = self._email_valaszto.idx
-        if idx >= 0:
-            biztos = Figyelmeztetes("Biztos vagy benne?\nVÉGLEGESEN törlődik!", Toplevel(), csak_ok=False)
-            biztos.wait_window(biztos)
-            if biztos.gombok.valasz:
-                emailcim = self._emailcimek()[idx]
-                emailcim.kon = self._kon
-                if emailcim.torol():
-                    print("Bejegyzés törölve.")
-                    self._elerhetosegek(1)
-                else:
-                    print("Nem sikerült törölni.")
-                
-
-
-
-class Figyelmeztetes(Frame):
-    def __init__(self, szoveg, master=None, csak_ok=True, **kw):
-        super().__init__(master=master, **kw)
-
-        Message(self, text=szoveg, aspect=200).grid(row=0, column=0, sticky=W, padx=2, pady=2)
-        self.gombok = KezeloGomb(self)
-        if csak_ok:
-            self.gombok.megse.destroy()
-        self.gombok.grid(row=1, column=0, padx=2, pady=2)
-
-        self.grid()
+        biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
+        if idx >= 0 and biztos:
+            emailcim = self._emailcimek()[idx]
+            emailcim.kon = self._kon
+            if emailcim.torol():
+                print("Bejegyzés törölve.")
+                self._elerhetosegek(1)
+            else:
+                print("Nem sikerült törölni.")
 
 
 if __name__ == "__main__":
@@ -505,8 +483,6 @@ if __name__ == "__main__":
     v = Valaszto("személy", nevsor, ablak)
     ablak.mainloop()
     print(nevek[v.valasztas.get()])"""
-
-    # Figyelmeztetes("Ez a név már szerepel az adatbázisban.", Tk()).mainloop()
 
     TelefonszamUrlap().mainloop()
 
