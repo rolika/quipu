@@ -163,7 +163,7 @@ class UjSzemelyUrlap(Toplevel):
     def _ment(self):
         szemely = self._szemelyurlap.export()
         if szemely:
-            if self._meglevo(szemely):
+            if szemely.meglevo(self._kon):
                 messagebox.showwarning("A név már létezik!", "Különböztesd meg a megjegyzésben!", parent=self)
                 return
             if szemely.ment(self._kon):
@@ -172,9 +172,6 @@ class UjSzemelyUrlap(Toplevel):
                 print("Nem sikerült elmenteni.")
         else:
             messagebox.showwarning("Hiányos adat!", "Legalább az egyik nevet add meg!", parent=self)
-    
-    def _meglevo(self, szemely):
-        return bool(self._kon.select("szemely", logic="AND", **szemely.adatok).fetchone())
 
 
 class SzemelyTorloUrlap(Toplevel):
@@ -214,50 +211,55 @@ class SzemelyTorloUrlap(Toplevel):
                 print("Nem sikerült törölni.")
 
 
-class SzemelyModositoUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
+class SzemelyModositoUrlap(Toplevel):
+    def __init__(self, kon=None, **kw):
+        super().__init__(**kw)
 
-        self.kon = kon
+        self._kon = kon
 
-        self.lista = Valaszto("Személy módosítása", self.nevsor(), self)
-        self.lista.valaszto.bind("<<ComboboxSelected>>", self.megjelenit)
+        self._nev_valaszto = Valaszto("Személy módosítása", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenit)
+        self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self.kezelogomb = KezeloGomb(self)
-        self.kezelogomb.megse["text"] = "vissza"
-        self.kezelogomb.ok["text"] = "módosít"
-        self.kezelogomb.megse["command"] = master.destroy
-        self.kezelogomb.ok["command"] = self.modosit
+        self._szemelyurlap = SzemelyUrlap(self)
+        self._szemelyurlap.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
+        self._megjelenit(1)
 
-        self.szemelyurlap = SzemelyUrlap(self)
-        self.megjelenit(1)
-
-        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.szemelyurlap.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
+        kezelo = KezeloGomb(self)
+        kezelo.megse["text"] = "vissza"
+        kezelo.ok["text"] = "módosít"
+        kezelo.megse["command"] = self.destroy
+        kezelo.ok["command"] = self._modosit
+        kezelo.grid(row=2, column=0, ipadx=2, ipady=2)
 
         self.grid()
 
-    def nevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self.kon.select("szemely")), key=repr)
+    def _nevsor(self):
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
-    def megjelenit(self, event):
-        szemely = Szemely.adatbazisbol(self.kon.select("szemely", azonosito=self.lista.azonosito()).fetchone())
-        self.szemelyurlap.beallit(szemely)
+    def _megjelenit(self, event):
+        idx = self._nev_valaszto.idx
+        if idx >= 0:
+            szemely = self._nevsor()[idx]
+        else:
+            szemely = Szemely()
+        self._szemelyurlap.beallit(szemely)
 
-    def modosit(self):
-        azonosito = self.lista.azonosito()
-        if azonosito:
-            szemely = self.szemelyurlap.export()
+    def _modosit(self):
+        idx = self._nev_valaszto.idx
+        if idx >= 0:
+            szemely = self._nevsor()[idx]
+            szemely.adatok = self._szemelyurlap.export()
             if szemely:
-                if self.kon.select("szemely", logic="AND", **szemely).fetchone():
+                if szemely.meglevo(self._kon):
                     messagebox.showwarning("A név már létezik!", "Különböztesd meg a megjegyzésben!", parent=self)
                     return
-                szemely.pop("azonosito")  # majd az Sqlite megadja
-                if self.kon.update("szemely", szemely, azonosito=azonosito):
+                if szemely.ment(self._kon):
                     print("Bejegyzés módosítva.")
-                    self.lista.beallit(self.nevsor())
-                    self.megjelenit(1)
+                else:
+                    print("Nem sikerült módosítani.")
+                self._nev_valaszto.beallit(self._nevsor())
+                self._megjelenit(1)
             else:
                 messagebox.showwarning("Hiányos adat!", "Legalább az egyik nevet add meg!", parent=self)
 

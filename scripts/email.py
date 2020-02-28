@@ -4,7 +4,6 @@ class Email:
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
         self._adatok = dict(kwargs)
-        self._kon = None
 
     def __bool__(self):
         return bool(self.emailcim)
@@ -38,14 +37,6 @@ class Email:
     @property
     def megjegyzes(self):
         return self._adatok.get("megjegyzes")
-
-    @property
-    def kon(self):
-        return self._kon
-
-    @kon.setter
-    def kon(self, kon_):
-        self._kon = kon_
 
     def listanezet(self):
         """Elérhetőseg megjelenítése kiválasztáshoz (Combobox)"""

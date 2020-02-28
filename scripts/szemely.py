@@ -1,10 +1,21 @@
+import copy
+
+
 class Szemely:
     """Személy megvalósítása."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
-        self._adatok = dict(kwargs)
-        self._kon = None
+        if kwargs:
+            self._adatok = dict(kwargs)
+        else:  # űrlap mezőinek törléséhez
+            self._adatok = {
+                "elotag": "",
+                "vezeteknev": "",
+                "keresztnev": "",
+                "nem": "férfi",
+                "megjegyzes": ""
+            }
 
     def __str__(self):
         """Személyi adatok megjelenítése, elsősorban debugoláshoz"""
@@ -57,14 +68,6 @@ class Szemely:
     def megjegyzes(self):
         return self._adatok.get("megjegyzes")
 
-    @property
-    def kon(self):
-        return self._kon
-
-    @kon.setter
-    def kon(self, kon):
-        self._kon = kon
-
     def listanezet(self):
         """Személy megjelenítése kiválasztáshoz (Combobox)"""
         megjegyzes = self._nullazo(self.megjegyzes)
@@ -80,6 +83,12 @@ class Szemely:
     def torol(self, kon):
         """Törli az adatbázisból az email-bejegyzést"""
         return kon.delete("szemely", azonosito=self.azonosito)
+    
+    def meglevo(self, kon):
+        """Ellenőrzi, hogy a személy szerepel-e az adatbázisban"""
+        adatok = copy.copy(self._adatok)  # shallow copy
+        adatok.pop("azonosito", None)
+        return kon.select("szemely", logic="AND", **adatok).fetchone()
 
     def megszolitas(self):
         return "Tisztelt {}!".format("Uram" if self.nem == "férfi" else "Hölgyem")
