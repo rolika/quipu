@@ -70,16 +70,16 @@ class Szemely:
         megjegyzes = self._nullazo(self.megjegyzes)
         return "{} {} {}{}".format(self.vezeteknev, self.keresztnev, self.elotag, megjegyzes)
 
-    def ment(self):
+    def ment(self, kon):
         """Menti vagy módosítja a személyi adatokat"""
         if self.azonosito:
-            return self._kon.update("szemely", self._adatok, azonosito=self.azonosito)  # True vagy False
+            return kon.update("szemely", self._adatok, azonosito=self.azonosito)  # True vagy False
         else:
-            return self._kon.insert("szemely", **self._adatok)  # lastrowid vagy None
+            return kon.insert("szemely", **self._adatok)  # lastrowid vagy None
 
-    def torol(self):
+    def torol(self, kon):
         """Törli az adatbázisból az email-bejegyzést"""
-        return self._kon.delete("szemely", azonosito=self.azonosito)
+        return kon.delete("szemely", azonosito=self.azonosito)
 
     def megszolitas(self):
         return "Tisztelt {}!".format("Uram" if self.nem == "férfi" else "Hölgyem")

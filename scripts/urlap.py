@@ -166,8 +166,7 @@ class UjSzemelyUrlap(Toplevel):
             if self._meglevo(szemely):
                 messagebox.showwarning("A név már létezik!", "Különböztesd meg a megjegyzésben!", parent=self)
                 return
-            szemely.kon = self._kon
-            if szemely.ment():
+            if szemely.ment(self._kon):
                 print("Bejegyzés mentve.")
             else:
                 print("Nem sikerült elmenteni.")
@@ -208,8 +207,7 @@ class SzemelyTorloUrlap(Toplevel):
             self._kon.delete("email", szemely=szemely.azonosito)
             self._kon.delete("cim", szemely=szemely.azonosito)
             self._kon.delete("kontakt", szemely=szemely.azonosito)
-            szemely.kon = self._kon
-            if szemely.torol():
+            if szemely.torol(self._kon):
                 print("Bejegyzés törölve.")
                 self._nev_valaszto.beallit(self._nevsor())
             else:
@@ -406,14 +404,14 @@ class UjEmailUrlap(Frame):
         self._nev_valaszto = Valaszto("Email hozzáadása", self._nevsor(), self)
         self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self._emailcimurlap = EmailcimUrlap(self)
-        self._emailcimurlap.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
+        self._emailcim_urlap = EmailcimUrlap(self)
+        self._emailcim_urlap.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self._kezelogomb = KezeloGomb(self)
-        self._kezelogomb.megse["command"] = master.destroy
-        self._kezelogomb.ok["text"] = "mentés"
-        self._kezelogomb.ok["command"] = self._ment
-        self._kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
+        kezelo = KezeloGomb(self)
+        kezelo.megse["command"] = master.destroy
+        kezelo.ok["text"] = "mentés"
+        kezelo.ok["command"] = self._ment
+        kezelo.grid(row=2, column=0, ipadx=2, ipady=2)
 
         self.grid()
 
@@ -421,11 +419,10 @@ class UjEmailUrlap(Frame):
         return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
     def _ment(self):
-        emailcim = self._emailcimurlap.export()
+        emailcim = self._emailcim_urlap.export()
         if emailcim:
-            emailcim.kon = self._kon
             emailcim.szemely = self._nev_valaszto.azonosito()
-            if emailcim.ment():
+            if emailcim.ment(self._kon):
                 print("Bejegyzés mentve.")
             else:
                 print("Nem sikerült elmenteni.")
@@ -445,12 +442,12 @@ class EmailTorloUrlap(Frame):
         self._email_valaszto = Valaszto("Törlendő email-cím", self._emailcimek(), self)
         self._email_valaszto.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self._kezelo = KezeloGomb(self)
-        self._kezelo.megse["text"] = "vissza"
-        self._kezelo.ok["text"] = "törlés"
-        self._kezelo.megse["command"] = master.destroy
-        self._kezelo.ok["command"] = self._torol
-        self._kezelo.grid(row=2, column=0, ipadx=2, ipady=2)
+        kezelo = KezeloGomb(self)
+        kezelo.megse["text"] = "vissza"
+        kezelo.ok["text"] = "törlés"
+        kezelo.megse["command"] = master.destroy
+        kezelo.ok["command"] = self._torol
+        kezelo.grid(row=2, column=0, ipadx=2, ipady=2)
 
         self.grid()
 
@@ -466,11 +463,9 @@ class EmailTorloUrlap(Frame):
 
     def _torol(self):
         idx = self._email_valaszto.idx
-        biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
-        if idx >= 0 and biztos:
+        if idx >= 0 and messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self):
             emailcim = self._emailcimek()[idx]
-            emailcim.kon = self._kon
-            if emailcim.torol():
+            if emailcim.torol(self._kon):
                 print("Bejegyzés törölve.")
                 self._elerhetosegek(1)
             else:
@@ -494,12 +489,12 @@ class EmailModositoUrlap(Toplevel):
         self._emailcim_urlap.grid(row=2, column=0, sticky=W, ipadx=2, ipady=2)
         self._kiir_elerhetoseg(1)
 
-        self._kezelo = KezeloGomb(self)
-        self._kezelo.megse["text"] = "vissza"
-        self._kezelo.ok["text"] = "módosít"
-        self._kezelo.megse["command"] = self.destroy
-        self._kezelo.ok["command"] = self._modosit
-        self._kezelo.grid(row=3, column=0, ipadx=2, ipady=2)
+        kezelo = KezeloGomb(self)
+        kezelo.megse["text"] = "vissza"
+        kezelo.ok["text"] = "módosít"
+        kezelo.megse["command"] = self.destroy
+        kezelo.ok["command"] = self._modosit
+        kezelo.grid(row=3, column=0, ipadx=2, ipady=2)
 
         self.grid()
 
@@ -523,10 +518,9 @@ class EmailModositoUrlap(Toplevel):
         idx = self._email_valaszto.idx
         if idx >= 0:
             emailcim = self._emailcimek()[idx]
-            emailcim.modosit(self._emailcim_urlap.export())
+            emailcim.adatok = self._emailcim_urlap.export()
             if emailcim:
-                emailcim.kon = self._kon
-                if emailcim.ment():
+                if emailcim.ment(self._kon):
                     print("Bejegyzés módosítva.")
                 else:
                     print("Nem sikerült módosítani.")

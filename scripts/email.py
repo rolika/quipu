@@ -12,6 +12,12 @@ class Email:
     @property
     def adatok(self):
         return self._adatok
+    
+    @adatok.setter
+    def adatok(self, email):
+        """Új email-osztály alapján módosítja a meglévőt."""
+        self._adatok["emailcim"] = email.emailcim
+        self._adatok["megjegyzes"] = email.megjegyzes
 
     @property
     def azonosito(self):
@@ -44,20 +50,15 @@ class Email:
     def listanezet(self):
         """Elérhetőseg megjelenítése kiválasztáshoz (Combobox)"""
         return "{} ({})".format(self.emailcim, self.megjegyzes)
-    
-    def modosit(self, email):
-        """Új email-osztály alapján módosítja az emailcímet és a megjegyzést"""
-        self._adatok["emailcim"] = email.emailcim
-        self._adatok["megjegyzes"] = email.megjegyzes
 
-    def ment(self):
+    def ment(self, kon):
         """Menti vagy módosítja az emailcím-adatokat"""
         if self.azonosito:
-            return self._kon.update("email", self._adatok, azonosito=self.azonosito)  # True vagy False
+            return kon.update("email", self._adatok, azonosito=self.azonosito)  # True vagy False
         else:
-            return self._kon.insert("email", **self._adatok)  # lastrowid vagy None
+            return kon.insert("email", **self._adatok)  # lastrowid vagy None
 
-    def torol(self):
+    def torol(self, kon):
         """Törli az adatbázisból az email-bejegyzést"""
-        return self._kon.delete("email", azonosito=self.azonosito)
+        return kon.delete("email", azonosito=self.azonosito)
 
