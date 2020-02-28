@@ -5,45 +5,54 @@ class Szemely:
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
         self._adatok = dict(kwargs)
         self._kon = None
-    
+
     def __str__(self):
         """Személyi adatok megjelenítése, elsősorban debugoláshoz"""
         elotag = self._nullazo(self.elotag)
         megjegyzes = self._nullazo(self.megjegyzes)
         return "{}{} {}, {}{}".format(elotag, self.vezeteknev, self.keresztnev, self.nem, megjegyzes)
-    
+
     def __repr__(self):
         """Név megjelenítése sorbarendezéshez"""
         return self._ascii_rep(self.listanezet())
-    
+
     def __bool__(self):
         """Egy személy akkor meghatározott, ha legalább az egyik név adott"""
         return bool(self.vezeteknev) or bool(self.keresztnev)
-    
+
     @property
     def adatok(self):
         return self._adatok
-    
+
+    @adatok.setter
+    def adatok(self, uj):
+        """Új személy-osztály alapján módosítja a meglévőt."""
+        self._adatok["elotag"] = uj.elotag
+        self._adatok["vezeteknev"] = uj.vezeteknev
+        self._adatok["keresztnev"] = uj.keresztnev
+        self._adatok["nem"] = uj.nem
+        self._adatok["megjegyzes"] = uj.megjegyzes
+
     @property
     def azonosito(self):
         return self._adatok.get("azonosito")
-    
+
     @property
     def elotag(self):
         return self._adatok.get("elotag")
-    
+
     @property
     def vezeteknev(self):
         return self._adatok.get("vezeteknev")
-    
+
     @property
     def keresztnev(self):
         return self._adatok.get("keresztnev")
-    
+
     @property
     def nem(self):
         return self._adatok.get("nem")
-    
+
     @property
     def megjegyzes(self):
         return self._adatok.get("megjegyzes")
@@ -53,21 +62,13 @@ class Szemely:
         return self._kon
 
     @kon.setter
-    def kon(self, kon_):
-        self._kon = kon_
-    
+    def kon(self, kon):
+        self._kon = kon
+
     def listanezet(self):
         """Személy megjelenítése kiválasztáshoz (Combobox)"""
         megjegyzes = self._nullazo(self.megjegyzes)
         return "{} {} {}{}".format(self.vezeteknev, self.keresztnev, self.elotag, megjegyzes)
-    
-    def modosit(self, szemely):
-        """Új személy-osztály alapján módosítja a meglévőt."""
-        self._adatok["elotag"] = szemely.elotag
-        self._adatok["vezeteknev"] = szemely.vezeteknev
-        self._adatok["keresztnev"] = szemely.keresztnev
-        self._adatok["nem"] = szemely.nem
-        self._adatok["megjegyzes"] = szemely.megjegyzes
 
     def ment(self):
         """Menti vagy módosítja a személyi adatokat"""
@@ -79,7 +80,7 @@ class Szemely:
     def torol(self):
         """Törli az adatbázisból az email-bejegyzést"""
         return self._kon.delete("szemely", azonosito=self.azonosito)
-    
+
     def megszolitas(self):
         return "Tisztelt {}!".format("Uram" if self.nem == "férfi" else "Hölgyem")
 
@@ -87,7 +88,7 @@ class Szemely:
         """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
         szoveg:     string"""
         return szoveg.lower().translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))
-    
+
     def _nullazo(self, attr):
         """Ha hiányzik az adat, nem írjuk ki egyáltalán."""
         return ", {}".format(attr) if attr else ""

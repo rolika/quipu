@@ -178,39 +178,42 @@ class UjSzemelyUrlap(Toplevel):
         return bool(self._kon.select("szemely", logic="AND", **szemely.adatok).fetchone())
 
 
-class SzemelyTorloUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
+class SzemelyTorloUrlap(Toplevel):
+    def __init__(self, kon=None, **kw):
+        super().__init__(**kw)
 
-        self.kon = kon
+        self._kon = kon
 
-        self.lista = Valaszto("Személy törlése", self.nevsor(), self)
+        self._nev_valaszto = Valaszto("személy törlése", self._nevsor(), self)
+        self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self.kezelogomb = KezeloGomb(self)
-        self.kezelogomb.megse["text"] = "vissza"
-        self.kezelogomb.ok["text"] = "törlés"
-        self.kezelogomb.megse["command"] = master.destroy
-        self.kezelogomb.ok["command"] = self.torol
-
-        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
+        kezelo = KezeloGomb(self)
+        kezelo.megse["text"] = "vissza"
+        kezelo.ok["text"] = "törlés"
+        kezelo.megse["command"] = self.destroy
+        kezelo.ok["command"] = self._torol
+        kezelo.grid(row=1, column=0, ipadx=2, ipady=2)
 
         self.grid()
 
-    def nevsor(self):
-        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
+    def _nevsor(self):
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
-    def torol(self):
-        azonosito = self.lista.azonosito()
+    def _torol(self):
+        idx = self._nev_valaszto.idx
         biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN törlődik!", parent=self)
-        if azonosito and biztos:
-            self.kon.delete("telefon", szemely=azonosito)
-            self.kon.delete("email", szemely=azonosito)
-            self.kon.delete("cim", szemely=azonosito)
-            self.kon.delete("kontakt", szemely=azonosito)
-            if self.kon.delete("szemely", azonosito=azonosito):
+        if idx >= 0 and biztos:
+            szemely = self._nevsor()[idx]
+            self._kon.delete("telefon", szemely=szemely.azonosito)  # GDPR!
+            self._kon.delete("email", szemely=szemely.azonosito)
+            self._kon.delete("cim", szemely=szemely.azonosito)
+            self._kon.delete("kontakt", szemely=szemely.azonosito)
+            szemely.kon = self._kon
+            if szemely.torol():
                 print("Bejegyzés törölve.")
-            self.lista.beallit(self.nevsor())
+                self._nev_valaszto.beallit(self._nevsor())
+            else:
+                print("Nem sikerült törölni.")
 
 
 class SzemelyModositoUrlap(Frame):
@@ -238,7 +241,7 @@ class SzemelyModositoUrlap(Frame):
         self.grid()
 
     def nevsor(self):
-        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
+        return sorted(map(lambda szemely: Szemely(**szemely), self.kon.select("szemely")), key=repr)
 
     def megjelenit(self, event):
         szemely = Szemely.adatbazisbol(self.kon.select("szemely", azonosito=self.lista.azonosito()).fetchone())
@@ -282,7 +285,7 @@ class UjTelefonUrlap(Frame):
         self.grid()
 
     def nevsor(self):
-        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
+        return sorted(map(lambda szemely: Szemely(**szemely), self.kon.select("szemely")), key=repr)
 
     def ment(self):
         uj = self.telefon.export()
@@ -319,7 +322,7 @@ class TelefonTorloUrlap(Frame):
         self.grid()
 
     def nevsor(self):
-        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
+        return sorted(map(lambda szemely: Szemely(**szemely), self.kon.select("szemely")), key=repr)
 
     def telefonszamok(self):
         szemely = self.lista.azonosito()
@@ -367,7 +370,7 @@ class TelefonModositoUrlap(Frame):
         self.grid()
 
     def nevsor(self):
-        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
+        return sorted(map(lambda szemely: Szemely(**szemely), self.kon.select("szemely")), key=repr)
 
     def telefonszamok(self):
         return sorted(map(lambda telefon: Telefon.adatbazisbol(telefon),
@@ -415,7 +418,7 @@ class UjEmailUrlap(Frame):
         self.grid()
 
     def _nevsor(self):
-        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self._kon.select("szemely")), key=repr)
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
     def _ment(self):
         emailcim = self._emailcimurlap.export()
@@ -452,7 +455,7 @@ class EmailTorloUrlap(Frame):
         self.grid()
 
     def _nevsor(self):
-        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self._kon.select("szemely")), key=repr)
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
     def _emailcimek(self):
         szemely = self._nev_valaszto.azonosito()
@@ -501,7 +504,7 @@ class EmailModositoUrlap(Toplevel):
         self.grid()
 
     def _nevsor(self):
-        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self._kon.select("szemely")), key=repr)
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
     def _emailcimek(self):
         szemely = self._nev_valaszto.azonosito()
