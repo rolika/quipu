@@ -53,17 +53,16 @@ class Alapmenu(Menu):
 class SzemelyAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
-
-        self.kon = kon
+        self._kon = kon
 
     def uj(self):
-        urlap.UjSzemelyUrlap(Toplevel(), self.kon)
+        urlap.UjSzemelyUrlap(self._kon)
 
     def torol(self):
-        urlap.SzemelyTorloUrlap(Toplevel(), self.kon)
+        urlap.SzemelyTorloUrlap(self._kon)
 
     def modosit(self):
-        urlap.SzemelyModositoUrlap(Toplevel(), self.kon)
+        urlap.SzemelyModositoUrlap(self._kon)
 
 
 class TelefonAlmenu(Alapmenu):

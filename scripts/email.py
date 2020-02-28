@@ -1,7 +1,7 @@
 class Email:
     """Email-elérhetőség megvalósítása."""
     def __init__(self, **kwargs):
-        """Konstruktor adatbázisból történő példányosításhoz.
+        """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
         self._adatok = dict(kwargs)
         self._kon = None

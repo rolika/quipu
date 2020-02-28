@@ -144,34 +144,38 @@ class KezeloGomb(Frame):
         self.winfo_toplevel().destroy()
 
 
-class UjSzemelyUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
+class UjSzemelyUrlap(Toplevel):
+    def __init__(self, kon=None, **kw):
+        super().__init__(**kw)
+        self._kon = kon
 
-        self.kon = kon
+        self._szemelyurlap = SzemelyUrlap(self)
+        self._szemelyurlap.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self.szemelyurlap = SzemelyUrlap(self)
-        self.kezelogomb = KezeloGomb(self)
-        self.kezelogomb.megse["command"] = master.destroy
-        self.kezelogomb.ok["text"] = "mentés"
-        self.kezelogomb.ok["command"] = self.ment
-
-        self.szemelyurlap.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
+        kezelo = KezeloGomb(self)
+        kezelo.megse["command"] = self.destroy
+        kezelo.ok["text"] = "mentés"
+        kezelo.ok["command"] = self._ment
+        kezelo.grid(row=1, column=0, ipadx=2, ipady=2)
 
         self.grid()
 
-    def ment(self):
-        szemely = self.szemelyurlap.export()
+    def _ment(self):
+        szemely = self._szemelyurlap.export()
         if szemely:
-            if self.kon.select("szemely", logic="AND", **szemely).fetchone():
+            if self._meglevo(szemely):
                 messagebox.showwarning("A név már létezik!", "Különböztesd meg a megjegyzésben!", parent=self)
                 return
-            szemely.pop("azonosito")  # majd az Sqlite megadja
-            if self.kon.insert("szemely", **szemely):
-                print("Új bejegyzés mentve.")
+            szemely.kon = self._kon
+            if szemely.ment():
+                print("Bejegyzés mentve.")
+            else:
+                print("Nem sikerült elmenteni.")
         else:
             messagebox.showwarning("Hiányos adat!", "Legalább az egyik nevet add meg!", parent=self)
+    
+    def _meglevo(self, szemely):
+        return bool(self._kon.select("szemely", logic="AND", **szemely.adatok).fetchone())
 
 
 class SzemelyTorloUrlap(Frame):

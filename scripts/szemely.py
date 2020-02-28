@@ -1,18 +1,16 @@
-class Szemely(dict):
-    """ Személy megvalósítása kulcs-érték párokkal """
+class Szemely:
+    """Személy megvalósítása."""
     def __init__(self, **kwargs):
-        """Konstruktor közvetlen példányosításhoz:
-        kwargs:     személyi adatok kulcs=érték párokként"""
-        super().__init__(kwargs)
-        self._db_oszlop = {"azonosito", "elotag", "vezeteknev", "keresztnev", "nem", "megjegyzes"}
-        for oszlop in self._db_oszlop:
-            self[oszlop] = kwargs.get(oszlop, "")
+        """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
+        kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
+        self._adatok = dict(kwargs)
+        self._kon = None
     
     def __str__(self):
         """Személyi adatok megjelenítése, elsősorban debugoláshoz"""
-        elotag = self._nullazo(self["elotag"])
-        megjegyzes = self._nullazo(self["megjegyzes"])
-        return "{}{} {}, {}{}".format(elotag, self["vezeteknev"], self["keresztnev"], self["nem"], megjegyzes)
+        elotag = self._nullazo(self.elotag)
+        megjegyzes = self._nullazo(self.megjegyzes)
+        return "{}{} {}, {}{}".format(elotag, self.vezeteknev, self.keresztnev, self.nem, megjegyzes)
     
     def __repr__(self):
         """Név megjelenítése sorbarendezéshez"""
@@ -20,51 +18,70 @@ class Szemely(dict):
     
     def __bool__(self):
         """Egy személy akkor meghatározott, ha legalább az egyik név adott"""
-        return bool(self["vezeteknev"]) or bool(self["keresztnev"])
-
-    @classmethod
-    def adatbazisbol(cls, row):
-        """Factory konstruktor adatbázisból történő példányososításhoz:
-        kurzor:     sqlite Row-objektum (hozzáférés oszlopnevekkel)"""
-        return cls(**row)
+        return bool(self.vezeteknev) or bool(self.keresztnev)
+    
+    @property
+    def adatok(self):
+        return self._adatok
     
     @property
     def azonosito(self):
-        """Kényelmi megoldás."""
-        return self["azonosito"]
+        return self._adatok.get("azonosito")
     
     @property
     def elotag(self):
-        """Kényelmi megoldás."""
-        return self["elotag"]
+        return self._adatok.get("elotag")
     
     @property
     def vezeteknev(self):
-        """Kényelmi megoldás."""
-        return self["vezeteknev"]
+        return self._adatok.get("vezeteknev")
     
     @property
     def keresztnev(self):
-        """Kényelmi megoldás."""
-        return self["keresztnev"]
+        return self._adatok.get("keresztnev")
     
     @property
     def nem(self):
-        """Kényelmi megoldás."""
-        return self["nem"]
+        return self._adatok.get("nem")
     
     @property
     def megjegyzes(self):
-        """Kényelmi megoldás."""
-        return self["megjegyzes"]
+        return self._adatok.get("megjegyzes")
+
+    @property
+    def kon(self):
+        return self._kon
+
+    @kon.setter
+    def kon(self, kon_):
+        self._kon = kon_
     
     def listanezet(self):
         """Személy megjelenítése kiválasztáshoz (Combobox)"""
-        megjegyzes = self._nullazo(self["megjegyzes"])
-        return "{} {} {}{}".format(self["vezeteknev"], self["keresztnev"], self["elotag"], megjegyzes)
+        megjegyzes = self._nullazo(self.megjegyzes)
+        return "{} {} {}{}".format(self.vezeteknev, self.keresztnev, self.elotag, megjegyzes)
+    
+    def modosit(self, szemely):
+        """Új személy-osztály alapján módosítja a meglévőt."""
+        self._adatok["elotag"] = szemely.elotag
+        self._adatok["vezeteknev"] = szemely.vezeteknev
+        self._adatok["keresztnev"] = szemely.keresztnev
+        self._adatok["nem"] = szemely.nem
+        self._adatok["megjegyzes"] = szemely.megjegyzes
+
+    def ment(self):
+        """Menti vagy módosítja a személyi adatokat"""
+        if self.azonosito:
+            return self._kon.update("szemely", self._adatok, azonosito=self.azonosito)  # True vagy False
+        else:
+            return self._kon.insert("szemely", **self._adatok)  # lastrowid vagy None
+
+    def torol(self):
+        """Törli az adatbázisból az email-bejegyzést"""
+        return self._kon.delete("szemely", azonosito=self.azonosito)
     
     def megszolitas(self):
-        return "Tisztelt {}!".format("Uram" if self["nem"] == "férfi" else "Hölgyem")
+        return "Tisztelt {}!".format("Uram" if self.nem == "férfi" else "Hölgyem")
 
     def _ascii_rep(self, szoveg):
         """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
