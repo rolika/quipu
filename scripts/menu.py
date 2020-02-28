@@ -72,13 +72,13 @@ class TelefonAlmenu(Alapmenu):
         self.kon = kon
 
     def uj(self):
-        urlap.UjTelefonUrlap(Toplevel(), self.kon)
+        urlap.UjTelefonUrlap(self.kon)
 
     def torol(self):
-        urlap.TelefonTorloUrlap(Toplevel(), self.kon)
+        urlap.TelefonTorloUrlap(self.kon)
 
     def modosit(self):
-        urlap.TelefonModositoUrlap(Toplevel(), self.kon)
+        urlap.TelefonModositoUrlap(self.kon)
 
 class EmailAlmenu(Alapmenu):
     def __init__(self, kon, mb):
@@ -86,10 +86,10 @@ class EmailAlmenu(Alapmenu):
         self._kon = kon
     
     def uj(self):
-        urlap.UjEmailUrlap(Toplevel(), self._kon)
+        urlap.UjEmailUrlap(self._kon)
 
     def torol(self):
-        urlap.EmailTorloUrlap(Toplevel(), self._kon)
+        urlap.EmailTorloUrlap(self._kon)
 
     def modosit(self):
         urlap.EmailModositoUrlap(self._kon)

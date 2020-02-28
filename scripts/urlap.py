@@ -264,9 +264,9 @@ class SzemelyModositoUrlap(Toplevel):
                 messagebox.showwarning("Hiányos adat!", "Legalább az egyik nevet add meg!", parent=self)
 
 
-class UjTelefonUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
+class UjTelefonUrlap(Toplevel):
+    def __init__(self, kon=None, **kw):
+        super().__init__(**kw)
 
         self.kon = kon
 
@@ -274,7 +274,7 @@ class UjTelefonUrlap(Frame):
         self.telefon = TelefonszamUrlap(self)
 
         self.kezelogomb = KezeloGomb(self)
-        self.kezelogomb.megse["command"] = master.destroy
+        self.kezelogomb.megse["command"] = self.destroy
         self.kezelogomb.ok["text"] = "mentés"
         self.kezelogomb.ok["command"] = self.ment
 
@@ -298,9 +298,9 @@ class UjTelefonUrlap(Frame):
             messagebox.showwarning("Hiányos adat!", "Add meg a telefonszámot!", parent=self)
 
 
-class TelefonTorloUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
+class TelefonTorloUrlap(Toplevel):
+    def __init__(self, kon=None, **kw):
+        super().__init__(**kw)
 
         self.kon = kon
 
@@ -312,7 +312,7 @@ class TelefonTorloUrlap(Frame):
         self.kezelogomb = KezeloGomb(self)
         self.kezelogomb.megse["text"] = "vissza"
         self.kezelogomb.ok["text"] = "törlés"
-        self.kezelogomb.megse["command"] = master.destroy
+        self.kezelogomb.megse["command"] = self.destroy
         self.kezelogomb.ok["command"] = self.torol
 
         self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
@@ -341,9 +341,9 @@ class TelefonTorloUrlap(Frame):
                 self.megjelenit(1)
 
 
-class TelefonModositoUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
+class TelefonModositoUrlap(Toplevel):
+    def __init__(self, kon=None, **kw):
+        super().__init__(**kw)
 
         self.kon = kon
 
@@ -359,7 +359,7 @@ class TelefonModositoUrlap(Frame):
         self.kezelogomb = KezeloGomb(self)
         self.kezelogomb.megse["text"] = "vissza"
         self.kezelogomb.ok["text"] = "módosít"
-        self.kezelogomb.megse["command"] = master.destroy
+        self.kezelogomb.megse["command"] = self.destroy
         self.kezelogomb.ok["command"] = self.modosit
 
         self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
@@ -398,9 +398,9 @@ class TelefonModositoUrlap(Frame):
             print("Bejegyzés módosítva.")
 
 
-class UjEmailUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
+class UjEmailUrlap(Toplevel):
+    def __init__(self, kon=None, **kw):
+        super().__init__(**kw)
         self._kon = kon
 
         self._nev_valaszto = Valaszto("Email hozzáadása", self._nevsor(), self)
@@ -410,7 +410,7 @@ class UjEmailUrlap(Frame):
         self._emailcim_urlap.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
 
         kezelo = KezeloGomb(self)
-        kezelo.megse["command"] = master.destroy
+        kezelo.megse["command"] = self.destroy
         kezelo.ok["text"] = "mentés"
         kezelo.ok["command"] = self._ment
         kezelo.grid(row=2, column=0, ipadx=2, ipady=2)
@@ -432,9 +432,9 @@ class UjEmailUrlap(Frame):
             messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
 
 
-class EmailTorloUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
+class EmailTorloUrlap(Toplevel):
+    def __init__(self, kon=None, **kw):
+        super().__init__(**kw)
         self._kon = kon
 
         self._nev_valaszto = Valaszto("Személy", self._nevsor(), self)
@@ -447,7 +447,7 @@ class EmailTorloUrlap(Frame):
         kezelo = KezeloGomb(self)
         kezelo.megse["text"] = "vissza"
         kezelo.ok["text"] = "törlés"
-        kezelo.megse["command"] = master.destroy
+        kezelo.megse["command"] = self.destroy
         kezelo.ok["command"] = self._torol
         kezelo.grid(row=2, column=0, ipadx=2, ipady=2)
 
