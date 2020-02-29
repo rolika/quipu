@@ -343,58 +343,58 @@ class TelefonTorloUrlap(Toplevel):
 class TelefonModositoUrlap(Toplevel):
     def __init__(self, kon=None, **kw):
         super().__init__(**kw)
+        self._kon = kon
 
-        self.kon = kon
+        self._nev_valaszto = Valaszto("személy", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
+        self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self.lista = Valaszto("Személy", self.nevsor(), self)
-        self.lista.valaszto.bind("<<ComboboxSelected>>", self.megjelenit)
+        self._telefon_valaszto = Valaszto("módosítandó telefonszam", self._telefonszamok(), self)
+        self._telefon_valaszto.valaszto.bind("<<ComboboxSelected>>", self._kiir_elerhetoseg)
+        self._telefon_valaszto.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self.telefon = Valaszto("Módosítandó telefonszám", self.telefonszamok(), self)
-        self.telefon.valaszto.bind("<<ComboboxSelected>>", self.kiir)
+        self._telefonszam_urlap = TelefonszamUrlap(self)
+        self._telefonszam_urlap.grid(row=2, column=0, sticky=W, ipadx=2, ipady=2)
+        self._kiir_elerhetoseg(1)
 
-        self.modosito = TelefonszamUrlap(self)
-        self.megjelenit(1)
-
-        self.kezelogomb = KezeloGomb(self)
-        self.kezelogomb.megse["text"] = "vissza"
-        self.kezelogomb.ok["text"] = "módosít"
-        self.kezelogomb.megse["command"] = self.destroy
-        self.kezelogomb.ok["command"] = self.modosit
-
-        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.telefon.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
-        self.modosito.grid(row=2, column=0, sticky=W, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=3, column=0, ipadx=2, ipady=2)
+        kezelo = KezeloGomb(self)
+        kezelo.megse["text"] = "vissza"
+        kezelo.ok["text"] = "módosít"
+        kezelo.megse["command"] = self.destroy
+        kezelo.ok["command"] = self._modosit
+        kezelo.grid(row=3, column=0, ipadx=2, ipady=2)
 
         self.grid()
 
-    def nevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self.kon.select("szemely")), key=repr)
+    def _nevsor(self):
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
-    def telefonszamok(self):
-        return sorted(map(lambda telefon: Telefon.adatbazisbol(telefon),
-                          self.kon.select("telefon", szemely=self.lista.azonosito())), key=repr)
+    def _telefonszamok(self):
+        szemely = self._nev_valaszto.azonosito()
+        return [Telefon(**telefon) for telefon in self._kon.select("telefon", szemely=szemely)]
 
-    def megjelenit(self, event):
-        self.telefon.beallit(self.telefonszamok())
-        self.kiir(1)
+    def _elerhetosegek(self, event):
+        self._telefon_valaszto.beallit(self._telefonszamok())
+        self._kiir_elerhetoseg(1)
 
-    def kiir(self, event):
-        azonosito = self.telefon.azonosito()
-        try:
-            telefonszam = next(filter(lambda telefonszam: telefonszam.azonosito == azonosito, self.telefonszamok()))
-        except StopIteration:
-            telefonszam = Telefon(telefonszam="", megjegyzes="")
-        self.modosito.beallit(telefonszam)
+    def _kiir_elerhetoseg(self, event):
+        idx = self._telefon_valaszto.idx
+        telefonszam = self._telefonszamok()[idx] if idx >= 0 else Telefon()
+        self._telefonszam_urlap.beallit(telefonszam)
 
-    def modosit(self):
-        telefonszam = self.modosito.export()
-        if telefonszam and self.telefonszamok():
-            telefonszam.pop("azonosito")  # majd az Sqlite megadja
-            telefonszam.szemely = self.lista.azonosito()
-            self.kon.update("telefon", telefonszam, azonosito=self.telefon.azonosito())
-            self.megjelenit(1)
-            print("Bejegyzés módosítva.")
+    def _modosit(self):
+        idx = self._telefon_valaszto.idx
+        if idx >= 0:
+            telefonszam = self._telefonszamok()[idx]
+            telefonszam.adatok = self._telefonszam_urlap.export()
+            if telefonszam:
+                if telefonszam.ment(self._kon):
+                    print("Bejegyzés módosítva.")
+                else:
+                    print("Nem sikerült módosítani.")
+            else:
+                messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
+            self._elerhetosegek(1)
 
 
 class UjEmailUrlap(Toplevel):
