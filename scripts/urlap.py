@@ -267,78 +267,77 @@ class SzemelyModositoUrlap(Toplevel):
 class UjTelefonUrlap(Toplevel):
     def __init__(self, kon=None, **kw):
         super().__init__(**kw)
+        self._kon = kon
 
-        self.kon = kon
+        self._nev_valaszto = Valaszto("telefon hozzáadása", self._nevsor(), self)
+        self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self.lista = Valaszto("Telefon hozzáadása", self.nevsor(), self)
-        self.telefon = TelefonszamUrlap(self)
+        self._telefonszam_urlap = TelefonszamUrlap(self)
+        self._telefonszam_urlap.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self.kezelogomb = KezeloGomb(self)
-        self.kezelogomb.megse["command"] = self.destroy
-        self.kezelogomb.ok["text"] = "mentés"
-        self.kezelogomb.ok["command"] = self.ment
-
-        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.telefon.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
+        kezelo = KezeloGomb(self)
+        kezelo.megse["command"] = self.destroy
+        kezelo.ok["text"] = "mentés"
+        kezelo.ok["command"] = self._ment
+        kezelo.grid(row=2, column=0, ipadx=2, ipady=2)
 
         self.grid()
 
-    def nevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self.kon.select("szemely")), key=repr)
+    def _nevsor(self):
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
-    def ment(self):
-        uj = self.telefon.export()
-        if uj.telefonszam:
-            uj["szemely"] = self.lista.azonosito()
-            uj.pop("azonosito")  # majd az Sqlite megadja
-            self.kon.insert("telefon", **uj)
-            print("Bejegyzés mentve.")
+    def _ment(self):
+        telefonszam = self._telefonszam_urlap.export()
+        if telefonszam:
+            telefonszam.szemely = self._nev_valaszto.azonosito()
+            if telefonszam.ment(self._kon):
+                print("Bejegyzés mentve.")
+            else:
+                print("Nem sikerült elmenteni.")
         else:
-            messagebox.showwarning("Hiányos adat!", "Add meg a telefonszámot!", parent=self)
+            messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
 
 
 class TelefonTorloUrlap(Toplevel):
     def __init__(self, kon=None, **kw):
         super().__init__(**kw)
+        self._kon = kon
 
-        self.kon = kon
+        self._nev_valaszto = Valaszto("személy", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
+        self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self.lista = Valaszto("Személy", self.nevsor(), self)
-        self.lista.valaszto.bind("<<ComboboxSelected>>", self.megjelenit)
+        self._telefon_valaszto = Valaszto("törlendő telefonszám", self._telefonszamok(), self)
+        self._telefon_valaszto.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self.telefon = Valaszto("Törlendő telefonszám", self.telefonszamok(), self)
-
-        self.kezelogomb = KezeloGomb(self)
-        self.kezelogomb.megse["text"] = "vissza"
-        self.kezelogomb.ok["text"] = "törlés"
-        self.kezelogomb.megse["command"] = self.destroy
-        self.kezelogomb.ok["command"] = self.torol
-
-        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.telefon.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
+        kezelo = KezeloGomb(self)
+        kezelo.megse["text"] = "vissza"
+        kezelo.ok["text"] = "törlés"
+        kezelo.megse["command"] = self.destroy
+        kezelo.ok["command"] = self._torol
+        kezelo.grid(row=2, column=0, ipadx=2, ipady=2)
 
         self.grid()
 
-    def nevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self.kon.select("szemely")), key=repr)
+    def _nevsor(self):
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
-    def telefonszamok(self):
-        szemely = self.lista.azonosito()
-        telefonszamok = [Telefon.adatbazisbol(telefon) for telefon in self.kon.select("telefon", szemely=szemely)]
-        return telefonszamok
+    def _telefonszamok(self):
+        szemely = self._nev_valaszto.azonosito()
+        return [Telefon(**telefon) for telefon in self._kon.select("telefon", szemely=szemely)]
 
-    def megjelenit(self, event):
-        self.telefon.beallit(self.telefonszamok())
+    def _elerhetosegek(self, event):
+        self._telefon_valaszto.beallit(self._telefonszamok())
 
-    def torol(self):
-        azonosito = self.telefon.azonosito()
-        biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
-        if azonosito and biztos:
-            if self.kon.delete("telefon", azonosito=azonosito):
+    def _torol(self):
+        idx = self._telefon_valaszto.idx
+        if idx >= 0 and messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self):
+            telefonszam = self._telefonszamok()[idx]
+            if telefonszam.torol(self._kon):
                 print("Bejegyzés törölve.")
-                self.megjelenit(1)
+            else:
+                print("Nem sikerült törölni.")
+            self._elerhetosegek(1)
 
 
 class TelefonModositoUrlap(Toplevel):
@@ -403,7 +402,7 @@ class UjEmailUrlap(Toplevel):
         super().__init__(**kw)
         self._kon = kon
 
-        self._nev_valaszto = Valaszto("Email hozzáadása", self._nevsor(), self)
+        self._nev_valaszto = Valaszto("email hozzáadása", self._nevsor(), self)
         self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
 
         self._emailcim_urlap = EmailcimUrlap(self)
@@ -437,11 +436,11 @@ class EmailTorloUrlap(Toplevel):
         super().__init__(**kw)
         self._kon = kon
 
-        self._nev_valaszto = Valaszto("Személy", self._nevsor(), self)
+        self._nev_valaszto = Valaszto("személy", self._nevsor(), self)
         self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
         self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self._email_valaszto = Valaszto("Törlendő email-cím", self._emailcimek(), self)
+        self._email_valaszto = Valaszto("törlendő email-cím", self._emailcimek(), self)
         self._email_valaszto.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
 
         kezelo = KezeloGomb(self)
@@ -469,9 +468,9 @@ class EmailTorloUrlap(Toplevel):
             emailcim = self._emailcimek()[idx]
             if emailcim.torol(self._kon):
                 print("Bejegyzés törölve.")
-                self._elerhetosegek(1)
             else:
                 print("Nem sikerült törölni.")
+            self._elerhetosegek(1)
 
 
 class EmailModositoUrlap(Toplevel):
@@ -479,11 +478,11 @@ class EmailModositoUrlap(Toplevel):
         super().__init__(**kw)
         self._kon = kon
 
-        self._nev_valaszto = Valaszto("Személy", self._nevsor(), self)
+        self._nev_valaszto = Valaszto("személy", self._nevsor(), self)
         self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
         self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
 
-        self._email_valaszto = Valaszto("Módosítandó email-cím", self._emailcimek(), self)
+        self._email_valaszto = Valaszto("módosítandó email-cím", self._emailcimek(), self)
         self._email_valaszto.valaszto.bind("<<ComboboxSelected>>", self._kiir_elerhetoseg)
         self._email_valaszto.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
 
