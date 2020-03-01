@@ -73,7 +73,6 @@ class SzemelyAlmenu(Alapmenu):
 class TelefonAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
-
         self.kon = kon
 
     def uj(self):
@@ -91,13 +90,13 @@ class EmailAlmenu(Alapmenu):
         self._kon = kon
     
     def uj(self):
-        urlap.UjEmailUrlap(self._kon)
+        urlap.UjEmailUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
-        urlap.EmailTorloUrlap(self._kon)
+        urlap.EmailTorloUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def modosit(self):
-        urlap.EmailModositoUrlap(self._kon)
+        urlap.EmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 if __name__ == "__main__":
     Fomenu(Tk()).mainloop()

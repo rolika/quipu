@@ -36,7 +36,7 @@ class SzemelyUrlap(Frame):
         Label(self, text="megjegyzés").grid(row=4, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._megjegyzes, width=32)\
             .grid(row=4, column=1, columnspan=2, sticky=W, padx=2, pady=2)
-    
+
     @property
     def fokusz(self):
         return self._fokusz
@@ -78,28 +78,26 @@ class TelefonszamUrlap(Frame):
         return Telefon(telefonszam=self._telefonszam.get(), megjegyzes=self._megjegyzes.get())
 
 
-class EmailcimUrlap(LabelFrame):
+class EmailcimUrlap(Frame):
     def __init__(self, master=None, **kw):
-        super().__init__(master=master, text="email-cím", **kw)
+        super().__init__(master=master, **kw)
 
-        self.emailcim = StringVar()
-        self.megjegyzes = StringVar()
+        self._emailcim = StringVar()
+        self._megjegyzes = StringVar()
         megjegyzes = ("alapértelmezett", "munkahelyi", "privát")
-        self.megjegyzes.set(megjegyzes[0])
+        self._megjegyzes.set(megjegyzes[0])
 
         Label(self, text="email-cím").grid(row=0, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.emailcim, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._emailcim, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
         Label(self, text="megjegyzés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        OptionMenu(self, self.megjegyzes, *megjegyzes).grid(row=1, column=1, sticky=W, padx=2, pady=2)
-
-        self.grid()
+        OptionMenu(self, self._megjegyzes, *megjegyzes).grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
     def beallit(self, email):
-        self.emailcim.set(email.emailcim)
-        self.megjegyzes.set(email.megjegyzes)
+        self._emailcim.set(email.emailcim)
+        self._megjegyzes.set(email.megjegyzes)
 
     def export(self):
-        return Email(emailcim=self.emailcim.get(), megjegyzes=self.megjegyzes.get())
+        return Email(emailcim=self._emailcim.get(), megjegyzes=self._megjegyzes.get())
 
 
 class Valaszto(LabelFrame):
@@ -117,11 +115,11 @@ class Valaszto(LabelFrame):
             self._valaszto.current(0)
         except TclError:
             self._valaszto.set("")
-    
+
     @property
     def valaszto(self):
         return self._valaszto
-    
+
     @property
     def elem(self):
         try:
@@ -134,14 +132,14 @@ class UjSzemelyUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Új személy felvitele")
-    
+
     def body(self, szulo):
         """Override Dialog.body - gui megjelenítése"""
         self._szemelyurlap = SzemelyUrlap(self)
         self._szemelyurlap.pack(ipadx=2, ipady=2)
         return self._szemelyurlap.fokusz
-    
-    def validate(self):        
+
+    def validate(self):
         """Override Dialog.validate - adatok ellenőrzése"""
         szemely = self._szemelyurlap.export()
         if not szemely:
@@ -170,14 +168,14 @@ class SzemelyTorloUrlap(simpledialog.Dialog):
         self._nev_valaszto = Valaszto("név", self._nevsor(), self)
         self._nev_valaszto.pack(ipadx=2, ipady=2)
         return self._nev_valaszto.valaszto
-    
+
     def validate(self):
         szemely = self._nev_valaszto.elem
         biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN törlődik!", parent=self)
         return szemely and biztos
 
     def apply(self):
-        szemely = self._nev_valaszto.elem        
+        szemely = self._nev_valaszto.elem
         self._kon.delete("telefon", szemely=szemely.azonosito)  # GDPR!
         self._kon.delete("email", szemely=szemely.azonosito)
         self._kon.delete("cim", szemely=szemely.azonosito)
@@ -208,7 +206,7 @@ class SzemelyModositoUrlap(simpledialog.Dialog):
         self._megjelenit(1)
 
         return self._nev_valaszto.valaszto
-    
+
     def validate(self):
         self._szemely = self._uj_szemely()
         if not self._szemely:
@@ -232,7 +230,7 @@ class SzemelyModositoUrlap(simpledialog.Dialog):
 
     def _megjelenit(self, event):
         self._szemelyurlap.beallit(self._nev_valaszto.elem or Szemely())
-    
+
     def _uj_szemely(self):
         szemely = self._nev_valaszto.elem
         szemely.adatok = self._szemelyurlap.export()
@@ -243,8 +241,8 @@ class UjTelefonUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon
         self._telefonszam = None
-        super().__init__(szulo, title="Új telefonszám hozáadása")
-    
+        super().__init__(szulo, title="Új telefonszám hozzáadása")
+
     def body(self, szulo):
         self._nev_valaszto = Valaszto("név", self._nevsor(), self)
         self._nev_valaszto.pack(ipadx=2, ipady=2)
@@ -253,7 +251,7 @@ class UjTelefonUrlap(simpledialog.Dialog):
         self._telefonszam_urlap.pack(ipadx=2, ipady=2)
 
         return self._nev_valaszto.valaszto
-    
+
     def validate(self):
         self._telefonszam = self._telefonszam_urlap.export()
         if not self._telefonszam:
@@ -269,7 +267,7 @@ class UjTelefonUrlap(simpledialog.Dialog):
             print("Nem sikerült elmenteni.")
 
     def _nevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)       
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
 
 class TelefonTorloUrlap(simpledialog.Dialog):
@@ -287,8 +285,8 @@ class TelefonTorloUrlap(simpledialog.Dialog):
         self._telefon_valaszto.pack(ipadx=2, ipady=2)
 
         return self._nev_valaszto.valaszto
-    
-    def validate(self):        
+
+    def validate(self):
         self._telefonszam = self._telefon_valaszto.elem
         biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
         return self._telefonszam and biztos
@@ -331,8 +329,8 @@ class TelefonModositoUrlap(simpledialog.Dialog):
         self._kiir_elerhetoseg(1)
 
         return self._nev_valaszto.valaszto
-    
-    def validate(self):        
+
+    def validate(self):
         self._telefonszam = self._uj_telefonszam()
         if not self._telefonszam:
             messagebox.showwarning("Hiányos adat!", "Add meg a telefonszámot!", parent=self)
@@ -359,7 +357,7 @@ class TelefonModositoUrlap(simpledialog.Dialog):
 
     def _kiir_elerhetoseg(self, event):
         self._telefonszam_urlap.beallit(self._telefon_valaszto.elem or Telefon())
-    
+
     def _uj_telefonszam(self):
         telefon = self._telefon_valaszto.elem
         if telefon:
@@ -367,137 +365,132 @@ class TelefonModositoUrlap(simpledialog.Dialog):
         return telefon
 
 
-class UjEmailUrlap(Toplevel):
-    def __init__(self, kon=None, **kw):
-        super().__init__(**kw)
+class UjEmailUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
         self._kon = kon
+        self._emailcim = None
+        super().__init__(szulo, title="Új email-cím hozzáadása")
 
-        self._nev_valaszto = Valaszto("email hozzáadása", self._nevsor(), self)
-        self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
 
         self._emailcim_urlap = EmailcimUrlap(self)
-        self._emailcim_urlap.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
+        self._emailcim_urlap.pack(ipadx=2, ipady=2)
 
-        kezelo = KezeloGomb(self)
-        kezelo.megse["command"] = self.destroy
-        kezelo.ok["text"] = "mentés"
-        kezelo.ok["command"] = self._ment
-        kezelo.grid(row=2, column=0, ipadx=2, ipady=2)
+        return self._nev_valaszto.valaszto
 
-        self.grid()
+    def validate(self):
+        self._emailcim = self._emailcim_urlap.export()
+        if not self._emailcim:
+            messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
+            return False
+        return True
+
+    def apply(self):
+        self._emailcim.szemely = self._nev_valaszto.elem.azonosito
+        if self._emailcim.ment(self._kon):
+            print("Bejegyzés mentve.")
+        else:
+            print("Nem sikerült elmenteni.")
 
     def _nevsor(self):
         return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
-    def _ment(self):
-        emailcim = self._emailcim_urlap.export()
-        if emailcim:
-            emailcim.szemely = self._nev_valaszto.azonosito()
-            if emailcim.ment(self._kon):
-                print("Bejegyzés mentve.")
-            else:
-                print("Nem sikerült elmenteni.")
-        else:
-            messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
 
-
-class EmailTorloUrlap(Toplevel):
-    def __init__(self, kon=None, **kw):
-        super().__init__(**kw)
+class EmailTorloUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
         self._kon = kon
+        self._emailcim = None
+        super().__init__(szulo, title="Email-cím törlése")
 
-        self._nev_valaszto = Valaszto("személy", self._nevsor(), self)
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
         self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
-        self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
 
         self._email_valaszto = Valaszto("törlendő email-cím", self._emailcimek(), self)
-        self._email_valaszto.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
+        self._email_valaszto.pack(ipadx=2, ipady=2)
 
-        kezelo = KezeloGomb(self)
-        kezelo.megse["text"] = "vissza"
-        kezelo.ok["text"] = "törlés"
-        kezelo.megse["command"] = self.destroy
-        kezelo.ok["command"] = self._torol
-        kezelo.grid(row=2, column=0, ipadx=2, ipady=2)
+        return self._nev_valaszto.valaszto
 
-        self.grid()
+    def validate(self):
+        self._emailcim = self._email_valaszto.elem
+        biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
+        return self._emailcim and biztos
+
+    def apply(self):
+        if self._emailcim.torol(self._kon):
+            print("Bejegyzés törölve.")
+        else:
+            print("Nem sikerült törölni.")
+        self._elerhetosegek(1)
 
     def _nevsor(self):
         return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
     def _emailcimek(self):
-        szemely = self._nev_valaszto.azonosito()
-        return [Email(**email) for email in self._kon.select("email", szemely=szemely)]
+        szemely = self._nev_valaszto.elem
+        return [Email(**email) for email in self._kon.select("email", szemely=szemely.azonosito)]
 
     def _elerhetosegek(self, event):
         self._email_valaszto.beallit(self._emailcimek())
 
-    def _torol(self):
-        idx = self._email_valaszto.idx
-        if idx >= 0 and messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self):
-            emailcim = self._emailcimek()[idx]
-            if emailcim.torol(self._kon):
-                print("Bejegyzés törölve.")
-            else:
-                print("Nem sikerült törölni.")
-            self._elerhetosegek(1)
 
-
-class EmailModositoUrlap(Toplevel):
-    def __init__(self, kon=None, **kw):
-        super().__init__(**kw)
+class EmailModositoUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
         self._kon = kon
+        self._emailcim = None
+        super().__init__(szulo, title="Email-cím módosítása")
 
-        self._nev_valaszto = Valaszto("személy", self._nevsor(), self)
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
         self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
-        self._nev_valaszto.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
 
         self._email_valaszto = Valaszto("módosítandó email-cím", self._emailcimek(), self)
         self._email_valaszto.valaszto.bind("<<ComboboxSelected>>", self._kiir_elerhetoseg)
-        self._email_valaszto.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
+        self._email_valaszto.pack(ipadx=2, ipady=2)
 
         self._emailcim_urlap = EmailcimUrlap(self)
-        self._emailcim_urlap.grid(row=2, column=0, sticky=W, ipadx=2, ipady=2)
+        self._emailcim_urlap.pack(ipadx=2, ipady=2)
         self._kiir_elerhetoseg(1)
 
-        kezelo = KezeloGomb(self)
-        kezelo.megse["text"] = "vissza"
-        kezelo.ok["text"] = "módosít"
-        kezelo.megse["command"] = self.destroy
-        kezelo.ok["command"] = self._modosit
-        kezelo.grid(row=3, column=0, ipadx=2, ipady=2)
+        return self._nev_valaszto.valaszto
 
-        self.grid()
+    def validate(self):
+        self._emailcim = self._uj_emailcim()
+        if not self._emailcim:
+            messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
+            return False
+        return True
+
+    def apply(self):
+        if self._emailcim.ment(self._kon):
+            print("Bejegyzés módosítva.")
+        else:
+            print("Nem sikerült módosítani.")
+        self._elerhetosegek(1)
 
     def _nevsor(self):
         return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
     def _emailcimek(self):
-        szemely = self._nev_valaszto.azonosito()
-        return [Email(**email) for email in self._kon.select("email", szemely=szemely)]
+        szemely = self._nev_valaszto.elem
+        return [Email(**email) for email in self._kon.select("email", szemely=szemely.azonosito)]
 
     def _elerhetosegek(self, event):
         self._email_valaszto.beallit(self._emailcimek())
         self._kiir_elerhetoseg(1)
 
     def _kiir_elerhetoseg(self, event):
-        idx = self._email_valaszto.idx
-        emailcim = self._emailcimek()[idx] if idx >= 0 else Email()
-        self._emailcim_urlap.beallit(emailcim)
+        self._emailcim_urlap.beallit(self._email_valaszto.elem or Email())
 
-    def _modosit(self):
-        idx = self._email_valaszto.idx
-        if idx >= 0:
-            emailcim = self._emailcimek()[idx]
-            emailcim.adatok = self._emailcim_urlap.export()
-            if emailcim:
-                if emailcim.ment(self._kon):
-                    print("Bejegyzés módosítva.")
-                else:
-                    print("Nem sikerült módosítani.")
-            else:
-                messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
-            self._elerhetosegek(1)
+    def _uj_emailcim(self):
+        email = self._email_valaszto.elem
+        if email:
+            email.adatok = self._emailcim_urlap.export()
+        return email
 
 
 if __name__ == "__main__":
