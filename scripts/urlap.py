@@ -1,54 +1,59 @@
 from tkinter import *
 from tkinter import messagebox
+from tkinter import simpledialog
 from tkinter.ttk import Combobox
 from szemely import Szemely
 from telefon import Telefon
 from email import Email
 
 
-class SzemelyUrlap(LabelFrame):
+class SzemelyUrlap(Frame):
     def __init__(self, master=None, **kw):
-        super().__init__(master=master, text="személy", **kw)
+        super().__init__(master=master, **kw)
 
-        self.elotag = StringVar()
-        self.vezeteknev = StringVar()
-        self.keresztnev = StringVar()
-        self.nem = StringVar()
-        self.megjegyzes = StringVar()
+        self._elotag = StringVar()
+        self._vezeteknev = StringVar()
+        self._keresztnev = StringVar()
+        self._nem = StringVar()
+        self._megjegyzes = StringVar()
 
         Label(self, text="előtag").grid(row=0, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.elotag, width=8).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._elotag, width=8).grid(row=0, column=1, sticky=W, padx=2, pady=2)
 
         Label(self, text="vezetéknév").grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.vezeteknev, width=32)\
-            .grid(row=1, column=1, columnspan=2, sticky=W, padx=2, pady=2)
+        self._fokusz = Entry(self, textvariable=self._vezeteknev, width=32)
+        self._fokusz.grid(row=1, column=1, columnspan=2, sticky=W, padx=2, pady=2)
 
         Label(self, text="keresztnév").grid(row=2, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.keresztnev, width=32)\
+        Entry(self, textvariable=self._keresztnev, width=32)\
             .grid(row=2, column=1, columnspan=2, sticky=W, padx=2, pady=2)
 
         Label(self, text="nem").grid(row=3, column=0, sticky=W, padx=2, pady=2)
-        Radiobutton(self, text="nő", value="nő", variable=self.nem).grid(row=3, column=1, sticky=W, padx=2, pady=2)
-        Radiobutton(self, text="férfi", value="férfi", variable=self.nem).grid(row=3, column=2, sticky=W, padx=2, pady=2)
-        self.nem.set("férfi")
+        Radiobutton(self, text="nő", value="nő", variable=self._nem).grid(row=3, column=1, sticky=W, padx=2, pady=2)
+        Radiobutton(self, text="férfi", value="férfi", variable=self._nem).grid(row=3, column=2, sticky=W, padx=2, pady=2)
+        self._nem.set("férfi")
 
         Label(self, text="megjegyzés").grid(row=4, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.megjegyzes, width=32)\
+        Entry(self, textvariable=self._megjegyzes, width=32)\
             .grid(row=4, column=1, columnspan=2, sticky=W, padx=2, pady=2)
+    
+    @property
+    def fokusz(self):
+        return self._fokusz
 
     def beallit(self, szemely):
-        self.elotag.set(szemely.elotag)
-        self.vezeteknev.set(szemely.vezeteknev)
-        self.keresztnev.set(szemely.keresztnev)
-        self.nem.set(szemely.nem)
-        self.megjegyzes.set(szemely.megjegyzes)
+        self._elotag.set(szemely.elotag)
+        self._vezeteknev.set(szemely.vezeteknev)
+        self._keresztnev.set(szemely.keresztnev)
+        self._nem.set(szemely.nem)
+        self._megjegyzes.set(szemely.megjegyzes)
 
     def export(self):
-        return Szemely(elotag=self.elotag.get(),
-                      vezeteknev=self.vezeteknev.get(),
-                      keresztnev=self.keresztnev.get(),
-                      nem=self.nem.get(),
-                      megjegyzes=self.megjegyzes.get())
+        return Szemely(elotag=self._elotag.get(),
+                      vezeteknev=self._vezeteknev.get(),
+                      keresztnev=self._keresztnev.get(),
+                      nem=self._nem.get(),
+                      megjegyzes=self._megjegyzes.get())
 
 
 class TelefonszamUrlap(LabelFrame):
@@ -144,34 +149,35 @@ class KezeloGomb(Frame):
         self.winfo_toplevel().destroy()
 
 
-class UjSzemelyUrlap(Toplevel):
-    def __init__(self, kon=None, **kw):
-        super().__init__(**kw)
+class UjSzemelyUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
         self._kon = kon
-
+        super().__init__(szulo, title="Új személy felvitele")
+    
+    def body(self, szulo):
+        """Override Dialog.body - gui megjelenítése"""
         self._szemelyurlap = SzemelyUrlap(self)
-        self._szemelyurlap.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-
-        kezelo = KezeloGomb(self)
-        kezelo.megse["command"] = self.destroy
-        kezelo.ok["text"] = "mentés"
-        kezelo.ok["command"] = self._ment
-        kezelo.grid(row=1, column=0, ipadx=2, ipady=2)
-
-        self.grid()
-
-    def _ment(self):
+        self._szemelyurlap.pack()
+        return self._szemelyurlap.fokusz
+    
+    def validate(self):        
+        """Override Dialog.validate - adatok ellenőrzése"""
         szemely = self._szemelyurlap.export()
-        if szemely:
-            if szemely.meglevo(self._kon):
-                messagebox.showwarning("A név már létezik!", "Különböztesd meg a megjegyzésben!", parent=self)
-                return
-            if szemely.ment(self._kon):
-                print("Bejegyzés mentve.")
-            else:
-                print("Nem sikerült elmenteni.")
-        else:
+        if not szemely:
             messagebox.showwarning("Hiányos adat!", "Legalább az egyik nevet add meg!", parent=self)
+            return False
+        if szemely.meglevo(self._kon):
+            messagebox.showwarning("A név már létezik!", "Különböztesd meg a megjegyzésben!", parent=self)
+            return False
+        return True
+
+    def apply(self):
+        """Override Dialog.apply - helyes adatok feldolgozása"""
+        szemely = self._szemelyurlap.export()
+        if szemely.ment(self._kon):
+            print("Bejegyzés mentve.")
+        else:  # adatbázis-hiba visszajelzése
+            print("Nem sikerült elmenteni.")
 
 
 class SzemelyTorloUrlap(Toplevel):
@@ -531,18 +537,7 @@ class EmailModositoUrlap(Toplevel):
 
 
 if __name__ == "__main__":
-    import tamer
-    #szemelyurlap = SzemelyUrlap(kon = tamer.Tamer("szemely.db"), azonosito=1)
-    #szemelyurlap.mainloop()
-    #telefonurlap = TelefonUrlap(tamer.Tamer("szemely.db"))
-    #telefonurlap.mainloop()
-    """nevsor = kon.select("nev").fetchall()
-    nevek = {nev["nev"]: nev["szemely"] for nev in nevsor}
-    nevsor = [nev["nev"] for nev in nevsor]
-    ablak = Tk()
-    v = Valaszto("személy", nevsor, ablak)
-    ablak.mainloop()
-    print(nevek[v.valasztas.get()])"""
-
-    TelefonszamUrlap().mainloop()
+    szulo = Tk()
+    urlap = UjSzemelyUrlap(szulo)
+    szulo.mainloop()
 

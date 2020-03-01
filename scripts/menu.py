@@ -35,10 +35,15 @@ class Szemelymenu(Menu):
 class Alapmenu(Menu):
     def __init__(self, mb):
         super().__init__(mb, tearoff=0)
+        self._mb = mb
 
         self.add("command", label="új", command=self.uj)
         self.add("command", label="törlés", command=self.torol)
         self.add("command", label="módosítás", command=self.modosit)
+    
+    @property
+    def mb(self):
+        return self._mb
 
     def uj(self):
         raise NotImplementedError
@@ -56,7 +61,7 @@ class SzemelyAlmenu(Alapmenu):
         self._kon = kon
 
     def uj(self):
-        urlap.UjSzemelyUrlap(self._kon)
+        urlap.UjSzemelyUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
         urlap.SzemelyTorloUrlap(self._kon)
