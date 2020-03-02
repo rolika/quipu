@@ -5,6 +5,7 @@ from tkinter.ttk import Combobox
 from szemely import Szemely
 from telefon import Telefon
 from email import Email
+from cim import Cim
 
 
 class SzemelyUrlap(Frame):
@@ -98,6 +99,81 @@ class EmailcimUrlap(Frame):
 
     def export(self):
         return Email(emailcim=self._emailcim.get(), megjegyzes=self._megjegyzes.get())
+
+
+class CimUrlap(Frame):
+    def __init__(self, master=None, **kw):
+        super().__init__(master=master, **kw)
+
+        self._orszag = StringVar()
+        self._iranyitoszam = StringVar()
+        self._helyseg = StringVar()
+        self._utca = StringVar()
+        self._hrsz = StringVar()
+        self._postafiok = StringVar()
+        self._honlap = StringVar()
+        self._megjegyzes = StringVar()
+
+        self._orszagok = {
+            "Magyarország": "H",
+            "Németország": "D",
+            "Ausztria": "A",
+            "Svájc": "CH",
+            "Hollandia": "NL",
+            "Szlovákia": "SK",
+            "Csehország": "CZ",
+            "USA": "USA",
+            "Románia": "RO"
+        }
+        self._orszag.set("Magyarország")
+        megjegyzesek = ("alapértelmezett", "székhely", "telephely", "levelezési cím", "lakhely", "tartózkodási hely")
+        self._megjegyzes.set(megjegyzesek[0])
+
+        Label(self, text="ország").grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self._orszag, *self._orszagok.keys()).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="irányítószám").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        iranyitoszam = Entry(self, textvariable=self._iranyitoszam, width=8)
+        iranyitoszam.grid(row=1, column=1, sticky=W, padx=2, pady=2)
+        iranyitoszam.focus_set()
+        Label(self, text="helység").grid(row=2, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._helyseg, width=32).grid(row=2, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="utca, házszám").grid(row=3, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._utca, width=32).grid(row=3, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="helyrajzi szám").grid(row=4, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._hrsz, width=8).grid(row=4, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="postafiók").grid(row=5, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._postafiok, width=8).grid(row=5, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="honlap").grid(row=6, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._honlap, width=32).grid(row=6, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="megjegyzés").grid(row=7, column=0, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self._megjegyzes, *megjegyzesek).grid(row=7, column=1, sticky=W, padx=2, pady=2)
+
+    def beallit(self, cim):
+        self._orszag.set(self._kodbol_orszag(cim.orszag))
+        self._iranyitoszam.set(cim.iranyitoszam)
+        self._helyseg.set(cim.helyseg)
+        self._utca.set(cim.utca)
+        self._hrsz.set(cim.hrsz)
+        self._postafiok.set(cim.postafiok)
+        self._honlap.set(cim.honlap)
+        self._megjegyzes.set(cim.megjegyzes)
+
+    def export(self):
+        return Cim(
+            orszag=self._orszagok[self._orszag.get()],
+            iranyitoszam=self._iranyitoszam.get(),
+            helyseg=self._helyseg.get(),
+            utca=self._utca.get(),
+            hrsz=self._hrsz.get(),
+            postafiok=self._postafiok.get(),
+            honlap=self._honlap.get(),
+            megjegyzes=self._megjegyzes.get()
+        )
+    
+    def _kodbol_orszag(self, kod):
+        for orszagnev, orszagkod in self._orszagok.items():
+            if orszagkod == kod:
+                return orszagnev  # mindig lesz találat
 
 
 class Valaszto(LabelFrame):
@@ -493,8 +569,136 @@ class EmailModositoUrlap(simpledialog.Dialog):
         return email
 
 
-if __name__ == "__main__":
-    szulo = Tk()
-    urlap = UjSzemelyUrlap(szulo)
-    szulo.mainloop()
+class UjCimUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        self._cim = None
+        super().__init__(szulo, title="Új cím hozzáadása")
 
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._cim_urlap = CimUrlap(self)
+        self._cim_urlap.pack(ipadx=2, ipady=2)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        self._cim = self._cim_urlap.export()
+        if not self._cim:
+            messagebox.showwarning("Hiányos adat!", "Legalább a helységet add meg!", parent=self)
+            return False
+        return True
+
+    def apply(self):
+        self._cim.szemely = self._nev_valaszto.elem.azonosito
+        if self._cim.ment(self._kon):
+            print("Bejegyzés mentve.")
+        else:
+            print("Nem sikerült elmenteni.")
+
+    def _nevsor(self):
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
+
+
+class CimTorloUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        self._cim = None
+        super().__init__(szulo, title="Cím törlése")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._cim_valaszto = Valaszto("törlendő cím", self._cimek(), self)
+        self._cim_valaszto.pack(ipadx=2, ipady=2)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        self._cim = self._cim_valaszto.elem
+        biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
+        return self._cim and biztos
+
+    def apply(self):
+        if self._cim.torol(self._kon):
+            print("Bejegyzés törölve.")
+        else:
+            print("Nem sikerült törölni.")
+        self._elerhetosegek(1)
+
+    def _nevsor(self):
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
+
+    def _cimek(self):
+        szemely = self._nev_valaszto.elem
+        return [Cim(**cim) for cim in self._kon.select("cim", szemely=szemely.azonosito)]
+
+    def _elerhetosegek(self, event):
+        self._cim_valaszto.beallit(self._cimek())
+
+
+class CimModositoUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        self._cim = None
+        super().__init__(szulo, title="Cím módosítása")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._cim_valaszto = Valaszto("módosítandó email-cím", self._cimek(), self)
+        self._cim_valaszto.valaszto.bind("<<ComboboxSelected>>", self._kiir_elerhetoseg)
+        self._cim_valaszto.pack(ipadx=2, ipady=2)
+
+        self._cim_urlap = CimUrlap(self)
+        self._cim_urlap.pack(ipadx=2, ipady=2)
+        self._kiir_elerhetoseg(1)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        self._cim = self._uj_cim()
+        if not self._cim:
+            messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
+            return False
+        return True
+
+    def apply(self):
+        if self._cim.ment(self._kon):
+            print("Bejegyzés módosítva.")
+        else:
+            print("Nem sikerült módosítani.")
+        self._elerhetosegek(1)
+
+    def _nevsor(self):
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
+
+    def _cimek(self):
+        szemely = self._nev_valaszto.elem
+        return [Cim(**cim) for cim in self._kon.select("cim", szemely=szemely.azonosito)]
+
+    def _elerhetosegek(self, event):
+        self._cim_valaszto.beallit(self._cimek())
+        self._kiir_elerhetoseg(1)
+
+    def _kiir_elerhetoseg(self, event):
+        self._cim_urlap.beallit(self._cim_valaszto.elem or Cim())
+
+    def _uj_cim(self):
+        cim = self._cim_valaszto.elem
+        if cim:
+            cim.adatok = self._cim_urlap.export()
+        return cim
+
+
+if __name__ == "__main__":
+    c = CimUrlap()
+    c.pack()
+    c.mainloop()
+    print(c.export())

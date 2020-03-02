@@ -55,7 +55,7 @@ class Quipu(Frame):
             emailcim="TEXT NOT NULL", megjegyzes="TEXT")
 
         self.szemely_kon.create("cim", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            orszag="TEXT DEFAULT 'H'", iranyitoszam="TEXT", helyseg="TEXT", utca="TEXT", megjegyzes="TEXT")
+            orszag="TEXT DEFAULT 'H'", iranyitoszam="TEXT", helyseg="TEXT NOT NULL", utca="TEXT", hrsz="TEXT", postafiok="TEXT", honlap="TEXT", megjegyzes="TEXT")
 
         self.szemely_kon.create("kontakt", azonosito="INTEGER PRIMARY KEY",
             szemely="INTEGER NOT NULL REFERENCES szemely", szervezet="INTEGER", megjegyzes="TEXT")
