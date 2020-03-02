@@ -35,10 +35,15 @@ class Szemelymenu(Menu):
 class Alapmenu(Menu):
     def __init__(self, mb):
         super().__init__(mb, tearoff=0)
+        self._mb = mb
 
         self.add("command", label="új", command=self.uj)
         self.add("command", label="törlés", command=self.torol)
         self.add("command", label="módosítás", command=self.modosit)
+    
+    @property
+    def mb(self):
+        return self._mb
 
     def uj(self):
         raise NotImplementedError
@@ -56,29 +61,28 @@ class SzemelyAlmenu(Alapmenu):
         self._kon = kon
 
     def uj(self):
-        urlap.UjSzemelyUrlap(self._kon)
+        urlap.UjSzemelyUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
-        urlap.SzemelyTorloUrlap(self._kon)
+        urlap.SzemelyTorloUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def modosit(self):
-        urlap.SzemelyModositoUrlap(self._kon)
+        urlap.SzemelyModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 
 class TelefonAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
-
         self.kon = kon
 
     def uj(self):
-        urlap.UjTelefonUrlap(self.kon)
+        urlap.UjTelefonUrlap(self.mb.winfo_toplevel(), self.kon)
 
     def torol(self):
-        urlap.TelefonTorloUrlap(self.kon)
+        urlap.TelefonTorloUrlap(self.mb.winfo_toplevel(), self.kon)
 
     def modosit(self):
-        urlap.TelefonModositoUrlap(self.kon)
+        urlap.TelefonModositoUrlap(self.mb.winfo_toplevel(), self.kon)
 
 class EmailAlmenu(Alapmenu):
     def __init__(self, kon, mb):
@@ -86,13 +90,13 @@ class EmailAlmenu(Alapmenu):
         self._kon = kon
     
     def uj(self):
-        urlap.UjEmailUrlap(self._kon)
+        urlap.UjEmailUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
-        urlap.EmailTorloUrlap(self._kon)
+        urlap.EmailTorloUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def modosit(self):
-        urlap.EmailModositoUrlap(self._kon)
+        urlap.EmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 if __name__ == "__main__":
     Fomenu(Tk()).mainloop()
