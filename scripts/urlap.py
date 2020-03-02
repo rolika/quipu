@@ -602,6 +602,45 @@ class UjCimUrlap(simpledialog.Dialog):
         return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
 
+class CimTorloUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        self._cim = None
+        super().__init__(szulo, title="Cím törlése")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._cim_valaszto = Valaszto("törlendő cím", self._cimek(), self)
+        self._cim_valaszto.pack(ipadx=2, ipady=2)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        self._cim = self._cim_valaszto.elem
+        biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
+        return self._cim and biztos
+
+    def apply(self):
+        if self._cim.torol(self._kon):
+            print("Bejegyzés törölve.")
+        else:
+            print("Nem sikerült törölni.")
+        self._elerhetosegek(1)
+
+    def _nevsor(self):
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
+
+    def _cimek(self):
+        szemely = self._nev_valaszto.elem
+        return [Cim(**cim) for cim in self._kon.select("cim", szemely=szemely.azonosito)]
+
+    def _elerhetosegek(self, event):
+        self._cim_valaszto.beallit(self._cimek())
+
+
 if __name__ == "__main__":
     c = CimUrlap()
     c.pack()
