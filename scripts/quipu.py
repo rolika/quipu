@@ -35,38 +35,103 @@ class Quipu(Frame):
     """ Fő alkalmazás """
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
-        self.init_szemely_db()
-        menu.Fomenu(self, self.szemely_kon)
+        self._init_szemely_db()
+        self._init_szervezet_db()
+        menu.Fomenu(self, self._szemely_kon, self._szervezet_kon)
         self.grid()
         self.mainloop()
 
-    def init_szemely_db(self):
+    def _init_szemely_db(self):
         """ Személy adatbázis inicializálása  """
-        self.szemely_kon = tamer.Tamer("szemely.db")
+        self._szemely_kon = tamer.Tamer("szemely.db")
 
-        self.szemely_kon.create("szemely", azonosito="INTEGER PRIMARY KEY", elotag="TEXT",
-            vezeteknev="TEXT NOT NULL", keresztnev="TEXT NOT NULL", nem="TEXT NOT NULL",
+        self._szemely_kon.create("szemely",
+            azonosito="INTEGER PRIMARY KEY",
+            elotag="TEXT",
+            vezeteknev="TEXT NOT NULL",
+            keresztnev="TEXT NOT NULL", 
+            nem="TEXT NOT NULL",
             megjegyzes="TEXT")
 
-        self.szemely_kon.create("telefon", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            telefonszam="TEXT NOT NULL", megjegyzes="TEXT")
+        self._szemely_kon.create("telefon",
+            azonosito="INTEGER PRIMARY KEY", 
+            szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
+            telefonszam="TEXT NOT NULL",
+            megjegyzes="TEXT")
 
-        self.szemely_kon.create("email", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            emailcim="TEXT NOT NULL", megjegyzes="TEXT")
+        self._szemely_kon.create("email",
+            azonosito="INTEGER PRIMARY KEY",
+            szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
+            emailcim="TEXT NOT NULL",
+            megjegyzes="TEXT")
 
-        self.szemely_kon.create("cim", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            orszag="TEXT DEFAULT 'H'", iranyitoszam="TEXT", helyseg="TEXT NOT NULL", utca="TEXT", hrsz="TEXT", postafiok="TEXT", honlap="TEXT", megjegyzes="TEXT")
+        self._szemely_kon.create("cim",
+            azonosito="INTEGER PRIMARY KEY",
+            szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
+            orszag="TEXT DEFAULT 'H'", 
+            iranyitoszam="TEXT", 
+            helyseg="TEXT NOT NULL", 
+            utca="TEXT", 
+            hrsz="TEXT", 
+            postafiok="TEXT", 
+            honlap="TEXT", 
+            megjegyzes="TEXT")
 
-        self.szemely_kon.create("kontakt", azonosito="INTEGER PRIMARY KEY",
-            szemely="INTEGER NOT NULL REFERENCES szemely", szervezet="INTEGER", megjegyzes="TEXT")
+        self._szemely_kon.create("kontakt", 
+            azonosito="INTEGER PRIMARY KEY",
+            szemely="INTEGER NOT NULL REFERENCES szemely", 
+            szervezet="INTEGER", 
+            megjegyzes="TEXT")
 
-        self.szemely_kon.executescript("""
+        self._szemely_kon.executescript("""
             -- automatikusan add hozzá a kontaktszemélyhez is
             CREATE TRIGGER IF NOT EXISTS kntkt AFTER INSERT ON szemely
                 BEGIN
                     INSERT INTO kontakt(szemely) VALUES(last_insert_rowid());
                 END;
         """)
+    
+    def _init_szervezet_db(self):
+        """Szervezet adatbázis inicializálása"""
+        self._szervezet_kon = tamer.Tamer("szervezet.db")
+
+        self._szervezet_kon.create("szervezet",
+            azonosito="INTEGER PRIMARY KEY", 
+            rovidnev="TEXT NOT NULL", 
+            hossznev="TEXT",
+            megjegyzes="TEXT")
+
+        self._szervezet_kon.create("telefon",
+            azonosito="INTEGER PRIMARY KEY", 
+            szervezet="INTEGER NOT NULL REFERENCES szervezet",
+            telefonszam="TEXT NOT NULL",
+            megjegyzes="TEXT")
+
+        self._szervezet_kon.create("email",
+            azonosito="INTEGER PRIMARY KEY",
+            szervezet="INTEGER NOT NULL REFERENCES szervezet",
+            emailcim="TEXT NOT NULL",
+            megjegyzes="TEXT")
+
+        self._szervezet_kon.create("cim",
+            azonosito="INTEGER PRIMARY KEY",
+            szervezet="INTEGER NOT NULL REFERENCES szervezet",
+            orszag="TEXT DEFAULT 'H'", 
+            iranyitoszam="TEXT", 
+            helyseg="TEXT NOT NULL", 
+            utca="TEXT", 
+            hrsz="TEXT", 
+            postafiok="TEXT", 
+            honlap="TEXT", 
+            megjegyzes="TEXT")
+        
+        self._szervezet_kon.create("vevo",
+            azonosito="INTEGER PRIMARY KEY",
+            szervezet="INTEGER NOT NULL REFERENCES szervezet")
+        
+        self._szervezet_kon.create("szallito",
+            azonosito="INTEGER PRIMARY KEY",
+            szervezet="INTEGER NOT NULL REFERENCES szervezet")
 
 
 if __name__ == "__main__":

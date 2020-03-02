@@ -3,7 +3,7 @@ import urlap
 
 
 class Fomenu(Frame):
-    def __init__(self, master=None, szemely_kon=None, **kw):
+    def __init__(self, master=None, szemely_kon=None, szervezet_kon=None, **kw):
         super().__init__(master=master, **kw)
 
         # főmenü
@@ -13,7 +13,8 @@ class Fomenu(Frame):
         raktarmb = Menubutton(self, text="Raktár", width=10)
 
         # menük
-        szemelymenu = Szemelymenu(szemelymb, szemely_kon)
+        szemelymenu = SzemelyMenu(szemelymb, szemely_kon)
+        szervezetmenu = SzervezetMenu(szervezetmb, szervezet_kon)
 
         szemelymb.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         szervezetmb.grid(row=0, column=1, sticky=W, ipadx=2, ipady=2)
@@ -23,7 +24,7 @@ class Fomenu(Frame):
         self.grid()
 
 
-class Szemelymenu(Menu):
+class SzemelyMenu(Menu):
     def __init__(self, mb, kon):
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
@@ -31,6 +32,16 @@ class Szemelymenu(Menu):
         self.add("cascade", label="telefon", menu=TelefonAlmenu(kon, mb))
         self.add("cascade", label="email", menu=EmailAlmenu(kon, mb))
         self.add("cascade", label="cím", menu=CimAlmenu(kon, mb))
+
+
+class SzervezetMenu(Menu):
+    def __init__(self, mb, kon):
+        super().__init__(mb, tearoff=0)
+        mb["menu"] = self
+        self.add("cascade", label="szervezet", menu=SzervezetAlmenu(kon, mb))
+        self.add("cascade", label="telefon", menu=SzervezetTelefonAlmenu(kon, mb))
+        self.add("cascade", label="email", menu=SzervezetEmailAlmenu(kon, mb))
+        self.add("cascade", label="cím", menu=SzervezetCimAlmenu(kon, mb))
 
 
 class Alapmenu(Menu):
@@ -85,6 +96,7 @@ class TelefonAlmenu(Alapmenu):
     def modosit(self):
         urlap.TelefonModositoUrlap(self.mb.winfo_toplevel(), self.kon)
 
+
 class EmailAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
@@ -99,6 +111,7 @@ class EmailAlmenu(Alapmenu):
     def modosit(self):
         urlap.EmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
+
 class CimAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
@@ -112,6 +125,67 @@ class CimAlmenu(Alapmenu):
 
     def modosit(self):
         urlap.CimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+
+
+class SzervezetAlmenu(Alapmenu):
+    def __init__(self, kon, mb):
+        super().__init__(mb)
+        self._kon = kon
+
+    def uj(self):
+        urlap.UjSzervezetUrlap(self.mb.winfo_toplevel(), self._kon)
+
+    def torol(self):
+        urlap.SzervezetTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+
+    def modosit(self):
+        urlap.SzervezetModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+
+
+class SzervezetTelefonAlmenu(Alapmenu):
+    def __init__(self, kon, mb):
+        super().__init__(mb)
+        self.kon = kon
+
+    def uj(self):
+        urlap.UjSzervezetTelefonUrlap(self.mb.winfo_toplevel(), self.kon)
+
+    def torol(self):
+        urlap.SzervezetTelefonTorloUrlap(self.mb.winfo_toplevel(), self.kon)
+
+    def modosit(self):
+        urlap.SzervezetTelefonModositoUrlap(self.mb.winfo_toplevel(), self.kon)
+
+
+class SzervezetEmailAlmenu(Alapmenu):
+    def __init__(self, kon, mb):
+        super().__init__(mb)
+        self._kon = kon
+    
+    def uj(self):
+        urlap.UjSzervezetEmailUrlap(self.mb.winfo_toplevel(), self._kon)
+
+    def torol(self):
+        urlap.SzervezetEmailTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+
+    def modosit(self):
+        urlap.SzervezetEmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+
+
+class SzervezetCimAlmenu(Alapmenu):
+    def __init__(self, kon, mb):
+        super().__init__(mb)
+        self._kon = kon
+    
+    def uj(self):
+        urlap.UjSzervezetCimUrlap(self.mb.winfo_toplevel(), self._kon)
+
+    def torol(self):
+        urlap.SzervezetCimTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+
+    def modosit(self):
+        urlap.SzervezetCimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+
 
 if __name__ == "__main__":
     Fomenu(Tk()).mainloop()
