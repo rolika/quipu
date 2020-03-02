@@ -6,7 +6,14 @@ class Cim:
         if kwargs:
             self._adatok = dict(kwargs)
         else:  # űrlap mezőinek törléséhez
-            self._adatok = {oszlop: "" for oszlop in self.oszlopnevek}
+            self._adatok["orszag"] = ""
+            self._adatok["iranyitoszam"] = ""
+            self._adatok["helyseg"] = ""
+            self._adatok["utca"] = ""
+            self._adatok["hrsz"] = ""
+            self._adatok["postafiok"] = ""
+            self._adatok["honlap"] = ""
+            self._adatok["megjegyzes"] = ""
 
     def __str__(self):
         return "{}-{} {}, {}".format(self.orszag, self.iranyitoszam, self.helyseg, self.utca)
@@ -22,8 +29,14 @@ class Cim:
     @adatok.setter
     def adatok(self, cim):
         """Új cím-osztály alapján módosítja a meglévőt."""
-        for oszlop in self.oszlopnevek:
-            self._adatok[oszlop] = getattr(cim, oszlop, "")
+        self._adatok["orszag"] = cim.orszag
+        self._adatok["iranyitoszam"] = cim.iranyitoszam
+        self._adatok["helyseg"] = cim.helyseg
+        self._adatok["utca"] = cim.utca
+        self._adatok["hrsz"] = cim.hrsz
+        self._adatok["postafiok"] = cim.postafiok
+        self._adatok["honlap"] = cim.honlap
+        self._adatok["megjegyzes"] = cim.megjegyzes
 
     @property
     def azonosito(self):
