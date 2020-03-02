@@ -5,6 +5,7 @@ from tkinter.ttk import Combobox
 from szemely import Szemely
 from telefon import Telefon
 from email import Email
+from cim import Cim
 
 
 class SzemelyUrlap(Frame):

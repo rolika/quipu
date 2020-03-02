@@ -30,6 +30,7 @@ class Szemelymenu(Menu):
         self.add("cascade", label="személy", menu=SzemelyAlmenu(kon, mb))
         self.add("cascade", label="telefon", menu=TelefonAlmenu(kon, mb))
         self.add("cascade", label="email", menu=EmailAlmenu(kon, mb))
+        self.add("cascade", label="cím", menu=CimAlmenu(kon, mb))
 
 
 class Alapmenu(Menu):
@@ -97,6 +98,20 @@ class EmailAlmenu(Alapmenu):
 
     def modosit(self):
         urlap.EmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+
+class CimAlmenu(Alapmenu):
+    def __init__(self, kon, mb):
+        super().__init__(mb)
+        self._kon = kon
+    
+    def uj(self):
+        urlap.UjCimUrlap(self.mb.winfo_toplevel(), self._kon)
+
+    def torol(self):
+        urlap.CimTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+
+    def modosit(self):
+        urlap.CimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 if __name__ == "__main__":
     Fomenu(Tk()).mainloop()
