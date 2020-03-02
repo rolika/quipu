@@ -69,29 +69,6 @@ class Cim:
     def megjegyzes(self):
         return self._adatok.get("megjegyzes", "")
 
-    @property
-    def oszlopnevek(self):
-        """Cím-rekord "publikus" oszlopnevei, melyeket az űrlapon ki lehet tölteni"""
-        return ("orszag", "iranyitoszam", "helyseg", "utca", "hrsz", "postafiok", "honlap", "megjegyzes")
-
-    @property
-    def megjegyzesek(self):
-        return ("alapértelmezett", "székhely", "telephely", "levelezési cím", "lakhely", "tartózkodási hely")
-
-    @property
-    def orszagok(self):
-        return {
-            "Magyarország": "H",
-            "Deutschland": "D",
-            "Österreich": "A",
-            "Schweiz": "CH",
-            "Nederlanden": "NL",
-            "Slovenská republika": "SK",
-            "Ceská republika": "CZ",
-            "United States of America": "USA",
-            "Románia": "RO"
-        }
-
     def listanezet(self):
         return str(self)
 
