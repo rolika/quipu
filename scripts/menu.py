@@ -1,5 +1,6 @@
 from tkinter import *
-import urlap
+import szemelyurlap
+import szervezeturlap
 
 
 class Fomenu(Frame):
@@ -73,13 +74,13 @@ class SzemelyAlmenu(Alapmenu):
         self._kon = kon
 
     def uj(self):
-        urlap.UjSzemelyUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.UjSzemelyUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
-        urlap.SzemelyTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.SzemelyTorloUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def modosit(self):
-        urlap.SzemelyModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.SzemelyModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 
 class TelefonAlmenu(Alapmenu):
@@ -88,13 +89,13 @@ class TelefonAlmenu(Alapmenu):
         self.kon = kon
 
     def uj(self):
-        urlap.UjTelefonUrlap(self.mb.winfo_toplevel(), self.kon)
+        szemelyurlap.UjTelefonUrlap(self.mb.winfo_toplevel(), self.kon)
 
     def torol(self):
-        urlap.TelefonTorloUrlap(self.mb.winfo_toplevel(), self.kon)
+        szemelyurlap.TelefonTorloUrlap(self.mb.winfo_toplevel(), self.kon)
 
     def modosit(self):
-        urlap.TelefonModositoUrlap(self.mb.winfo_toplevel(), self.kon)
+        szemelyurlap.TelefonModositoUrlap(self.mb.winfo_toplevel(), self.kon)
 
 
 class EmailAlmenu(Alapmenu):
@@ -103,13 +104,13 @@ class EmailAlmenu(Alapmenu):
         self._kon = kon
     
     def uj(self):
-        urlap.UjEmailUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.UjEmailUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
-        urlap.EmailTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.EmailTorloUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def modosit(self):
-        urlap.EmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.EmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 
 class CimAlmenu(Alapmenu):
@@ -118,13 +119,13 @@ class CimAlmenu(Alapmenu):
         self._kon = kon
     
     def uj(self):
-        urlap.UjCimUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.UjCimUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
-        urlap.CimTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.CimTorloUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def modosit(self):
-        urlap.CimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.CimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 
 class SzervezetAlmenu(Alapmenu):
@@ -133,13 +134,13 @@ class SzervezetAlmenu(Alapmenu):
         self._kon = kon
 
     def uj(self):
-        urlap.UjSzervezetUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.UjSzervezetUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
-        urlap.SzervezetTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.SzervezetTorloUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def modosit(self):
-        urlap.SzervezetModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.SzervezetModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 
 class SzervezetTelefonAlmenu(Alapmenu):
@@ -148,13 +149,13 @@ class SzervezetTelefonAlmenu(Alapmenu):
         self.kon = kon
 
     def uj(self):
-        urlap.UjSzervezetTelefonUrlap(self.mb.winfo_toplevel(), self.kon)
+        szervezeturlap.UjSzervezetTelefonUrlap(self.mb.winfo_toplevel(), self.kon)
 
     def torol(self):
-        urlap.SzervezetTelefonTorloUrlap(self.mb.winfo_toplevel(), self.kon)
+        szervezeturlap.SzervezetTelefonTorloUrlap(self.mb.winfo_toplevel(), self.kon)
 
     def modosit(self):
-        urlap.SzervezetTelefonModositoUrlap(self.mb.winfo_toplevel(), self.kon)
+        szervezeturlap.SzervezetTelefonModositoUrlap(self.mb.winfo_toplevel(), self.kon)
 
 
 class SzervezetEmailAlmenu(Alapmenu):
@@ -163,13 +164,13 @@ class SzervezetEmailAlmenu(Alapmenu):
         self._kon = kon
     
     def uj(self):
-        urlap.UjSzervezetEmailUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.UjSzervezetEmailUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
-        urlap.SzervezetEmailTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.SzervezetEmailTorloUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def modosit(self):
-        urlap.SzervezetEmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.SzervezetEmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 
 class SzervezetCimAlmenu(Alapmenu):
@@ -178,13 +179,13 @@ class SzervezetCimAlmenu(Alapmenu):
         self._kon = kon
     
     def uj(self):
-        urlap.UjSzervezetCimUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.UjSzervezetCimUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
-        urlap.SzervezetCimTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.SzervezetCimTorloUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def modosit(self):
-        urlap.SzervezetCimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.SzervezetCimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 
 if __name__ == "__main__":

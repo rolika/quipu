@@ -6,14 +6,16 @@ class Cim:
         if kwargs:
             self._adatok = dict(kwargs)
         else:  # űrlap mezőinek törléséhez
-            self._adatok["orszag"] = ""
-            self._adatok["iranyitoszam"] = ""
-            self._adatok["helyseg"] = ""
-            self._adatok["utca"] = ""
-            self._adatok["hrsz"] = ""
-            self._adatok["postafiok"] = ""
-            self._adatok["honlap"] = ""
-            self._adatok["megjegyzes"] = ""
+            self._adatok = {
+                "orszag": "",
+                "iranyitoszam": "",
+                "helyseg": "",
+                "utca": "",
+                "hrsz": "",
+                "postafiok": "",
+                "honlap": "",
+                "megjegyzes": ""
+            }
 
     def __str__(self):
         return "{}-{} {}, {}".format(self.orszag, self.iranyitoszam, self.helyseg, self.utca)
