@@ -11,14 +11,14 @@ class Szervezet:
         else:  # űrlap mezőinek törléséhez
             self._adatok = {
                 "rovidnev": "",
-                "hosszunev": "",
+                "teljesnev": "",
                 "vevo": "",
                 "szallito": "",
                 "megjegyzes": ""
             }
 
     def __str__(self):
-        """Személyi adatok megjelenítése, elsősorban debugoláshoz"""
+        """Szervezeti adatok megjelenítése, elsősorban debugoláshoz"""
         megjegyzes = self._nullazo(self.megjegyzes)
         return "{}{}".format(self.rovidnev, megjegyzes)
 
@@ -27,7 +27,7 @@ class Szervezet:
         return self._ascii_rep(self.listanezet())
 
     def __bool__(self):
-        """Egy személy akkor meghatározott, ha legalább az egyik név adott"""
+        """Egy szervezet akkor meghatározott, ha legalább a rövid neve adott"""
         return bool(self.rovidnev)
 
     @property
@@ -38,7 +38,7 @@ class Szervezet:
     def adatok(self, uj):
         """Új szervezet-osztály alapján módosítja a meglévőt."""
         self._adatok["rovidnev"] = uj.rovidnev
-        self._adatok["hosszunev"] = uj.hosszunev
+        self._adatok["teljesnev"] = uj.teljesnev
         self._adatok["vevo"] = uj.vevo
         self._adatok["szallito"] = uj.szallito
         self._adatok["megjegyzes"] = uj.megjegyzes
@@ -52,8 +52,8 @@ class Szervezet:
         return self._adatok.get("rovidnev")
 
     @property
-    def hosszunev(self):
-        return self._adatok.get("hosszunev")
+    def teljesnev(self):
+        return self._adatok.get("teljesnev")
 
     @property
     def vevo(self):
@@ -62,6 +62,10 @@ class Szervezet:
     @property
     def szallito(self):
         return self._adatok.get("szallito")
+    
+    @property
+    def gyakorisag(self):
+        return self._adatok.get("gyakorisag")
 
     @property
     def megjegyzes(self):

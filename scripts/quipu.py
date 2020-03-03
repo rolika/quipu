@@ -98,7 +98,8 @@ class Quipu(Frame):
         self._szervezet_kon.create("szervezet",
             azonosito="INTEGER PRIMARY KEY", 
             rovidnev="TEXT NOT NULL", 
-            hossznev="TEXT",
+            teljesnev="TEXT",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
 
         self._szervezet_kon.create("telefon",
