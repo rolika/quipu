@@ -90,6 +90,9 @@ class Szervezet:
         """Ellenőrzi, hogy a szervezet szerepel-e az adatbázisban"""
         adatok = copy.copy(self._adatok)  # shallow copy
         adatok.pop("azonosito", None)
+        adatok.pop("vevo", None)
+        adatok.pop("szallito", None)
+        adatok.pop("megjegyzes", None)
         return kon.select("szervezet", logic="AND", **adatok).fetchone()
 
     def _ascii_rep(self, szoveg):
