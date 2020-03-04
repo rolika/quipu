@@ -14,8 +14,6 @@ class SzervezetUrlap(Frame):
 
         self._rovidnev = StringVar()
         self._teljesnev = StringVar()
-        self._vevo = IntVar()
-        self._szallito = IntVar()
         self._megjegyzes = StringVar()
 
         Label(self, text="rövid név").grid(row=0, column=0, sticky=W, padx=2, pady=2)
@@ -25,11 +23,8 @@ class SzervezetUrlap(Frame):
         Label(self, text="teljes név").grid(row=1, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._teljesnev, width=32).grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
-        Checkbutton(self, text="vevő", variable=self._vevo).grid(row=2, column=0, sticky=W, padx=2, pady=2)
-        Checkbutton(self, text="szállító", variable=self._szallito).grid(row=2, column=1, sticky=W, padx=2, pady=2)
-
         Label(self, text="megjegyzés").grid(row=3, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._teljesnev, width=32).grid(row=3, column=1, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self.megejgyzes, width=32).grid(row=3, column=1, sticky=W, padx=2, pady=2)
     
     @property
     def fokusz(self):
@@ -38,16 +33,12 @@ class SzervezetUrlap(Frame):
     def beallit(self, szervezet):
         self._rovidnev.set(szervezet.rovidnev)
         self._teljesnev.set(szervezet._teljesnev)
-        self._vevo.set(szervezet.vevo)
-        self._szallito.set(szervezet.szallito)
         self._megjegyzes.set(szervezet._megjegyzes)
 
     def export(self):
         return Szervezet(
             rovidnev=self._rovidnev.get(),
             teljesnev=self._teljesnev.get(),
-            vevo=self._vevo.get(),
-            szallito=self._szallito.get(),
             megjegyzes=self._megjegyzes.get()
         )
 

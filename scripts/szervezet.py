@@ -1,6 +1,3 @@
-import copy
-
-
 class Szervezet:
     """Szervezet megvalósítása."""
     def __init__(self, **kwargs):
@@ -12,8 +9,9 @@ class Szervezet:
             self._adatok = {
                 "rovidnev": "",
                 "teljesnev": "",
-                "vevo": "",
-                "szallito": "",
+                "gyakorisag": 0,
+                "vevo": 0,
+                "szallito": 0,
                 "megjegyzes": ""
             }
 
@@ -39,6 +37,7 @@ class Szervezet:
         """Új szervezet-osztály alapján módosítja a meglévőt."""
         self._adatok["rovidnev"] = uj.rovidnev
         self._adatok["teljesnev"] = uj.teljesnev
+        self._adatok["gyakorisag"] = uj.gyakorisag
         self._adatok["vevo"] = uj.vevo
         self._adatok["szallito"] = uj.szallito
         self._adatok["megjegyzes"] = uj.megjegyzes
@@ -66,6 +65,14 @@ class Szervezet:
     @property
     def gyakorisag(self):
         return self._adatok.get("gyakorisag")
+    
+    @property
+    def vevo(self):
+        return self._adatok.get("vevo")
+    
+    @property
+    def szallito(self):
+        return self._adatok.get("szallito")
 
     @property
     def megjegyzes(self):
@@ -88,12 +95,7 @@ class Szervezet:
 
     def meglevo(self, kon):
         """Ellenőrzi, hogy a szervezet szerepel-e az adatbázisban"""
-        adatok = copy.copy(self._adatok)  # shallow copy
-        adatok.pop("azonosito", None)
-        adatok.pop("vevo", None)
-        adatok.pop("szallito", None)
-        adatok.pop("megjegyzes", None)
-        return kon.select("szervezet", logic="AND", **adatok).fetchone()
+        return kon.select("szervezet", rovidnev=self.rovidnev, teljesnev=self.teljesnev).fetchone()
 
     def _ascii_rep(self, szoveg):
         """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
