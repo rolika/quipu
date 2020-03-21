@@ -95,7 +95,7 @@ class Szervezet:
 
     def meglevo(self, kon):
         """Ellenőrzi, hogy a szervezet szerepel-e az adatbázisban"""
-        return kon.select("szervezet", rovidnev=self.rovidnev, teljesnev=self.teljesnev).fetchone()
+        return kon.select("szervezet", logic="AND", rovidnev=self.rovidnev, teljesnev=self.teljesnev).fetchone()
 
     def _ascii_rep(self, szoveg):
         """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez

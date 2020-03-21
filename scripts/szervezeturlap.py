@@ -24,7 +24,7 @@ class SzervezetUrlap(Frame):
         Entry(self, textvariable=self._teljesnev, width=32).grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
         Label(self, text="megjegyzés").grid(row=3, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.megejgyzes, width=32).grid(row=3, column=1, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=3, column=1, sticky=W, padx=2, pady=2)
     
     @property
     def fokusz(self):
@@ -32,8 +32,8 @@ class SzervezetUrlap(Frame):
     
     def beallit(self, szervezet):
         self._rovidnev.set(szervezet.rovidnev)
-        self._teljesnev.set(szervezet._teljesnev)
-        self._megjegyzes.set(szervezet._megjegyzes)
+        self._teljesnev.set(szervezet.teljesnev)
+        self._megjegyzes.set(szervezet.megjegyzes)
 
     def export(self):
         return Szervezet(
@@ -69,6 +69,84 @@ class UjSzervezetUrlap(simpledialog.Dialog):
             print("{}: Bejegyzés elmentve.".format(szervezet))
         else:
             print("Nem sikerült elmenteni.")
+
+
+class SzervezetTorloUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        super().__init__(szulo, title="Szervezet törlése")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        szervezet = self._nev_valaszto.elem
+        biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!", parent=self)
+        return szervezet and biztos
+
+    def apply(self):
+        szervezet = self._nev_valaszto.elem
+        self._kon.delete("telefon", szervezet=szervezet.azonosito)
+        self._kon.delete("email", szervezet=szervezet.azonosito)
+        self._kon.delete("cim", szervezet=szervezet.azonosito)
+        self._kon.delete("kontakt", szervezet=szervezet.azonosito)
+        if szervezet.torol(self._kon):
+            print("{}: Bejegyzés törölve.".format(szervezet))
+            self._nev_valaszto.beallit(self._nevsor())
+        else:
+            print("Nem sikerült törölni.")
+
+    def _nevsor(self):
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+
+
+class SzervezetModositoUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        super().__init__(szulo, title="Szervezet módosítása")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenit)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._szervezeturlap = SzervezetUrlap(self)
+        self._szervezeturlap.pack(ipadx=2, ipady=2)
+        self._megjelenit(1)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        szervezet = self._uj_szervezet()
+        if not szervezet:
+            messagebox.showwarning("Hiányos adat!", "Legalább a rövid nevet add meg!", parent=self)
+            return False
+        if szervezet.meglevo(self._kon):
+            messagebox.showwarning("Hiba!", "Ez a szervezet már szerepel az adatbázisban.", parent=self)
+            return False
+        return True
+
+    def apply(self):
+        szervezet = self._uj_szervezet()
+        if szervezet.ment(self._kon):
+            print("{}: Bejegyzés módosítva.".format(szervezet))
+        else:
+            print("Nem sikerült módosítani.")
+        self._nev_valaszto.beallit(self._nevsor())
+        self._megjelenit(1)
+
+    def _nevsor(self):
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+
+    def _megjelenit(self, event):
+        self._szervezeturlap.beallit(self._nev_valaszto.elem or Szervezet())
+
+    def _uj_szervezet(self):
+        szervezet = self._nev_valaszto.elem
+        szervezet.adatok = self._szervezeturlap.export()
+        return szervezet
 
 
 if __name__ == "__main__":
