@@ -149,13 +149,13 @@ class SzervezetTelefonAlmenu(Alapmenu):
         self.kon = kon
 
     def uj(self):
-        szervezeturlap.UjSzervezetTelefonUrlap(self.mb.winfo_toplevel(), self.kon)
+        szervezeturlap.UjTelefonUrlap(self.mb.winfo_toplevel(), self.kon)
 
     def torol(self):
-        szervezeturlap.SzervezetTelefonTorloUrlap(self.mb.winfo_toplevel(), self.kon)
+        szervezeturlap.TelefonTorloUrlap(self.mb.winfo_toplevel(), self.kon)
 
     def modosit(self):
-        szervezeturlap.SzervezetTelefonModositoUrlap(self.mb.winfo_toplevel(), self.kon)
+        szervezeturlap.TelefonModositoUrlap(self.mb.winfo_toplevel(), self.kon)
 
 
 class SzervezetEmailAlmenu(Alapmenu):
@@ -164,13 +164,13 @@ class SzervezetEmailAlmenu(Alapmenu):
         self._kon = kon
     
     def uj(self):
-        szervezeturlap.UjSzervezetEmailUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.UjEmailUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
-        szervezeturlap.SzervezetEmailTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.EmailTorloUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def modosit(self):
-        szervezeturlap.SzervezetEmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.EmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 
 class SzervezetCimAlmenu(Alapmenu):
@@ -179,13 +179,13 @@ class SzervezetCimAlmenu(Alapmenu):
         self._kon = kon
     
     def uj(self):
-        szervezeturlap.UjSzervezetCimUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.UjCimUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
-        szervezeturlap.SzervezetCimTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.CimTorloUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def modosit(self):
-        szervezeturlap.SzervezetCimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.CimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 
 if __name__ == "__main__":

@@ -149,7 +149,7 @@ class SzervezetModositoUrlap(simpledialog.Dialog):
         return szervezet
 
 
-class UjSzervezetTelefonUrlap(simpledialog.Dialog):
+class UjTelefonUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon
         self._telefonszam = None
@@ -182,7 +182,7 @@ class UjSzervezetTelefonUrlap(simpledialog.Dialog):
         return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
 
 
-class SzervezetTelefonTorloUrlap(simpledialog.Dialog):
+class TelefonTorloUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon
         self._telefonszam = None
@@ -221,7 +221,7 @@ class SzervezetTelefonTorloUrlap(simpledialog.Dialog):
         self._telefon_valaszto.beallit(self._telefonszamok())
 
 
-class SzervezetTelefonModositoUrlap(simpledialog.Dialog):
+class TelefonModositoUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon
         self._telefonszam = None
