@@ -1,3 +1,6 @@
+import copy
+
+
 class Szervezet:
     """Szervezet megvalósítása."""
     def __init__(self, **kwargs):
@@ -95,7 +98,9 @@ class Szervezet:
 
     def meglevo(self, kon):
         """Ellenőrzi, hogy a szervezet szerepel-e az adatbázisban"""
-        return kon.select("szervezet", logic="AND", rovidnev=self.rovidnev, teljesnev=self.teljesnev).fetchone()
+        adatok = copy.copy(self._adatok)  # shallow copy
+        adatok.pop("azonosito", None)
+        return kon.select("szervezet", logic="AND", **adatok).fetchone()
 
     def _ascii_rep(self, szoveg):
         """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
