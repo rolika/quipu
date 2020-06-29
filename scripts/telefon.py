@@ -32,6 +32,14 @@ class Telefon(dict):
     @property
     def szemely(self):
         return self._adatok.get("szemely")
+    
+    @property
+    def szervezet(self):
+        return self._adatok.get("szervezet")
+    
+    @szervezet.setter
+    def szervezet(self, szervezet):
+        self._adatok["szervezet"] = szervezet
 
     @szemely.setter
     def szemely(self, szemely):

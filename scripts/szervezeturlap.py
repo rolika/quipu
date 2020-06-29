@@ -25,11 +25,11 @@ class SzervezetUrlap(Frame):
 
         Label(self, text="megjegyzés").grid(row=3, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._megjegyzes, width=32).grid(row=3, column=1, sticky=W, padx=2, pady=2)
-    
+
     @property
     def fokusz(self):
         return self._fokusz
-    
+
     def beallit(self, szervezet):
         self._rovidnev.set(szervezet.rovidnev)
         self._teljesnev.set(szervezet.teljesnev)
@@ -47,7 +47,7 @@ class UjSzervezetUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon
         super().__init__(szulo, title="Új szervezet felvitele")
-    
+
     def body(self, szulo):
         self._szervezeturlap = SzervezetUrlap(self)
         self._szervezeturlap.pack(ipadx=2, ipady=2)
@@ -62,7 +62,7 @@ class UjSzervezetUrlap(simpledialog.Dialog):
             messagebox.showwarning("Hiba!", "Ez a szervezet már szerepel az adatbázisban.")
             return False
         return True
-    
+
     def apply(self):
         szervezet = self._szervezeturlap.export()
         if szervezet.ment(self._kon):
@@ -147,6 +147,134 @@ class SzervezetModositoUrlap(simpledialog.Dialog):
         szervezet = self._nev_valaszto.elem
         szervezet.adatok = self._szervezeturlap.export()
         return szervezet
+
+
+class UjSzervezetTelefonUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        self._telefonszam = None
+        super().__init__(szulo, title="Új telefonszám hozzáadása")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._telefonszam_urlap = TelefonszamUrlap(self)
+        self._telefonszam_urlap.pack(ipadx=2, ipady=2)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        self._telefonszam = self._telefonszam_urlap.export()
+        if not self._telefonszam:
+            messagebox.showwarning("Hiányos adat!", "Add meg a telefonszámot!", parent=self)
+            return False
+        return True
+
+    def apply(self):
+        self._telefonszam.szervezet = self._nev_valaszto.elem.azonosito
+        if self._telefonszam.ment(self._kon):
+            print("Bejegyzés mentve.")
+        else:
+            print("Nem sikerült elmenteni.")
+
+    def _nevsor(self):
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+
+
+class SzervezetTelefonTorloUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        self._telefonszam = None
+        super().__init__(szulo, title="Telefonszám törlése")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._telefon_valaszto = Valaszto("törlendő telefonszám", self._telefonszamok(), self)
+        self._telefon_valaszto.pack(ipadx=2, ipady=2)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        self._telefonszam = self._telefon_valaszto.elem
+        biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
+        return self._telefonszam and biztos
+
+    def apply(self):
+        if self._telefonszam.torol(self._kon):
+            print("Bejegyzés törölve.")
+        else:
+            print("Nem sikerült törölni.")
+        self._elerhetosegek(1)
+
+    def _nevsor(self):
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+
+    def _telefonszamok(self):
+        szervezet = self._nev_valaszto.elem
+        return [Telefon(**telefon) for telefon in self._kon.select("telefon", szervezet=szervezet.azonosito)]
+
+    def _elerhetosegek(self, event):
+        self._telefon_valaszto.beallit(self._telefonszamok())
+
+
+class SzervezetTelefonModositoUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        self._telefonszam = None
+        super().__init__(szulo, title="Telefonszám módosítása")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._telefon_valaszto = Valaszto("módosítandó telefonszam", self._telefonszamok(), self)
+        self._telefon_valaszto.valaszto.bind("<<ComboboxSelected>>", self._kiir_elerhetoseg)
+        self._telefon_valaszto.pack(ipadx=2, ipady=2)
+
+        self._telefonszam_urlap = TelefonszamUrlap(self)
+        self._telefonszam_urlap.pack(ipadx=2, ipady=2)
+        self._kiir_elerhetoseg(1)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        self._telefonszam = self._uj_telefonszam()
+        if not self._telefonszam:
+            messagebox.showwarning("Hiányos adat!", "Add meg a telefonszámot!", parent=self)
+            return False
+        return True
+
+    def apply(self):
+        if self._telefonszam.ment(self._kon):
+            print("Bejegyzés módosítva.")
+        else:
+            print("Nem sikerült módosítani.")
+        self._elerhetosegek(1)
+
+    def _nevsor(self):
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+
+    def _telefonszamok(self):
+        szervezet = self._nev_valaszto.elem
+        return [Telefon(**telefon) for telefon in self._kon.select("telefon", szervezet=szervezet.azonosito)]
+
+    def _elerhetosegek(self, event):
+        self._telefon_valaszto.beallit(self._telefonszamok())
+        self._kiir_elerhetoseg(1)
+
+    def _kiir_elerhetoseg(self, event):
+        self._telefonszam_urlap.beallit(self._telefon_valaszto.elem or Telefon())
+
+    def _uj_telefonszam(self):
+        telefon = self._telefon_valaszto.elem
+        if telefon:
+            telefon.adatok = self._telefonszam_urlap.export()
+        return telefon
 
 
 if __name__ == "__main__":
