@@ -277,6 +277,134 @@ class TelefonModositoUrlap(simpledialog.Dialog):
         return telefon
 
 
+class UjEmailUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        self._emailcim = None
+        super().__init__(szulo, title="Új email-cím hozzáadása")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._emailcim_urlap = EmailcimUrlap(self)
+        self._emailcim_urlap.pack(ipadx=2, ipady=2)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        self._emailcim = self._emailcim_urlap.export()
+        if not self._emailcim:
+            messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
+            return False
+        return True
+
+    def apply(self):
+        self._emailcim.szervezet = self._nev_valaszto.elem.azonosito
+        if self._emailcim.ment(self._kon):
+            print("Bejegyzés mentve.")
+        else:
+            print("Nem sikerült elmenteni.")
+
+    def _nevsor(self):
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+
+
+class EmailTorloUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        self._emailcim = None
+        super().__init__(szulo, title="Email-cím törlése")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._email_valaszto = Valaszto("törlendő email-cím", self._emailcimek(), self)
+        self._email_valaszto.pack(ipadx=2, ipady=2)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        self._emailcim = self._email_valaszto.elem
+        biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
+        return self._emailcim and biztos
+
+    def apply(self):
+        if self._emailcim.torol(self._kon):
+            print("Bejegyzés törölve.")
+        else:
+            print("Nem sikerült törölni.")
+        self._elerhetosegek(1)
+
+    def _nevsor(self):
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+
+    def _emailcimek(self):
+        szervezet = self._nev_valaszto.elem
+        return [Email(**email) for email in self._kon.select("email", szervezet=szervezet.azonosito)]
+
+    def _elerhetosegek(self, event):
+        self._email_valaszto.beallit(self._emailcimek())
+
+
+class EmailModositoUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        self._emailcim = None
+        super().__init__(szulo, title="Email-cím módosítása")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._email_valaszto = Valaszto("módosítandó email-cím", self._emailcimek(), self)
+        self._email_valaszto.valaszto.bind("<<ComboboxSelected>>", self._kiir_elerhetoseg)
+        self._email_valaszto.pack(ipadx=2, ipady=2)
+
+        self._emailcim_urlap = EmailcimUrlap(self)
+        self._emailcim_urlap.pack(ipadx=2, ipady=2)
+        self._kiir_elerhetoseg(1)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        self._emailcim = self._uj_emailcim()
+        if not self._emailcim:
+            messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
+            return False
+        return True
+
+    def apply(self):
+        if self._emailcim.ment(self._kon):
+            print("Bejegyzés módosítva.")
+        else:
+            print("Nem sikerült módosítani.")
+        self._elerhetosegek(1)
+
+    def _nevsor(self):
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+
+    def _emailcimek(self):
+        szervezet = self._nev_valaszto.elem
+        return [Email(**email) for email in self._kon.select("email", szervezet=szervezet.azonosito)]
+
+    def _elerhetosegek(self, event):
+        self._email_valaszto.beallit(self._emailcimek())
+        self._kiir_elerhetoseg(1)
+
+    def _kiir_elerhetoseg(self, event):
+        self._emailcim_urlap.beallit(self._email_valaszto.elem or Email())
+
+    def _uj_emailcim(self):
+        email = self._email_valaszto.elem
+        if email:
+            email.adatok = self._emailcim_urlap.export()
+        return email
+
+
 if __name__ == "__main__":
     sz = SzervezetUrlap()
     sz.pack()

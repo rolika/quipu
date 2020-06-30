@@ -37,6 +37,14 @@ class Email:
         self._adatok["szemely"] = szemely
 
     @property
+    def szervezet(self):
+        return self._adatok.get("szervezet")
+
+    @szervezet.setter
+    def szervezet(self, szervezet):
+        self._adatok["szervezet"] = szervezet
+
+    @property
     def emailcim(self):
         return self._adatok.get("emailcim")
 
