@@ -53,6 +53,14 @@ class Cim:
         self._adatok["szemely"] = szemely
 
     @property
+    def szervezet(self):
+        return self._adatok.get("szervezet")
+
+    @szervezet.setter
+    def szervezet(self, szervezet):
+        self._adatok["szervezet"] = szervezet
+
+    @property
     def orszag(self):
         return self._adatok.get("orszag", "")
 

@@ -405,6 +405,134 @@ class EmailModositoUrlap(simpledialog.Dialog):
         return email
 
 
+class UjCimUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        self._cim = None
+        super().__init__(szulo, title="Új cím hozzáadása")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._cim_urlap = CimUrlap(self)
+        self._cim_urlap.pack(ipadx=2, ipady=2)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        self._cim = self._cim_urlap.export()
+        if not self._cim:
+            messagebox.showwarning("Hiányos adat!", "Legalább a helységet add meg!", parent=self)
+            return False
+        return True
+
+    def apply(self):
+        self._cim.szervezet = self._nev_valaszto.elem.azonosito
+        if self._cim.ment(self._kon):
+            print("Bejegyzés mentve.")
+        else:
+            print("Nem sikerült elmenteni.")
+
+    def _nevsor(self):
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+
+
+class CimTorloUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        self._cim = None
+        super().__init__(szulo, title="Cím törlése")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._cim_valaszto = Valaszto("törlendő cím", self._cimek(), self)
+        self._cim_valaszto.pack(ipadx=2, ipady=2)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        self._cim = self._cim_valaszto.elem
+        biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
+        return self._cim and biztos
+
+    def apply(self):
+        if self._cim.torol(self._kon):
+            print("Bejegyzés törölve.")
+        else:
+            print("Nem sikerült törölni.")
+        self._elerhetosegek(1)
+
+    def _nevsor(self):
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+
+    def _cimek(self):
+        szervezet = self._nev_valaszto.elem
+        return [Cim(**cim) for cim in self._kon.select("cim", szervezet=szervezet.azonosito)]
+
+    def _elerhetosegek(self, event):
+        self._cim_valaszto.beallit(self._cimek())
+
+
+class CimModositoUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon
+        self._cim = None
+        super().__init__(szulo, title="Cím módosítása")
+
+    def body(self, szulo):
+        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
+        self._nev_valaszto.pack(ipadx=2, ipady=2)
+
+        self._cim_valaszto = Valaszto("módosítandó email-cím", self._cimek(), self)
+        self._cim_valaszto.valaszto.bind("<<ComboboxSelected>>", self._kiir_elerhetoseg)
+        self._cim_valaszto.pack(ipadx=2, ipady=2)
+
+        self._cim_urlap = CimUrlap(self)
+        self._cim_urlap.pack(ipadx=2, ipady=2)
+        self._kiir_elerhetoseg(1)
+
+        return self._nev_valaszto.valaszto
+
+    def validate(self):
+        self._cim = self._uj_cim()
+        if not self._cim:
+            messagebox.showwarning("Hiányos adat!", "Legalább a helységet add meg!", parent=self)
+            return False
+        return True
+
+    def apply(self):
+        if self._cim.ment(self._kon):
+            print("Bejegyzés módosítva.")
+        else:
+            print("Nem sikerült módosítani.")
+        self._elerhetosegek(1)
+
+    def _nevsor(self):
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+
+    def _cimek(self):
+        szervezet = self._nev_valaszto.elem
+        return [Cim(**cim) for cim in self._kon.select("cim", szervezet=szervezet.azonosito)]
+
+    def _elerhetosegek(self, event):
+        self._cim_valaszto.beallit(self._cimek())
+        self._kiir_elerhetoseg(1)
+
+    def _kiir_elerhetoseg(self, event):
+        self._cim_urlap.beallit(self._cim_valaszto.elem or Cim())
+
+    def _uj_cim(self):
+        cim = self._cim_valaszto.elem
+        if cim:
+            cim.adatok = self._cim_urlap.export()
+        return cim
+
+
 if __name__ == "__main__":
     sz = SzervezetUrlap()
     sz.pack()
