@@ -98,7 +98,10 @@ class Quipu(Frame):
         self._szervezet_kon.create("szervezet",
             azonosito="INTEGER PRIMARY KEY", 
             rovidnev="TEXT NOT NULL", 
-            hossznev="TEXT",
+            teljesnev="TEXT",
+            gyakorisag="INTEGER DEFAULT 0",
+            vevo="INTEGER DEFAULT 0",
+            szallito="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
 
         self._szervezet_kon.create("telefon",
@@ -124,14 +127,6 @@ class Quipu(Frame):
             postafiok="TEXT", 
             honlap="TEXT", 
             megjegyzes="TEXT")
-        
-        self._szervezet_kon.create("vevo",
-            azonosito="INTEGER PRIMARY KEY",
-            szervezet="INTEGER NOT NULL REFERENCES szervezet")
-        
-        self._szervezet_kon.create("szallito",
-            azonosito="INTEGER PRIMARY KEY",
-            szervezet="INTEGER NOT NULL REFERENCES szervezet")
 
 
 if __name__ == "__main__":
