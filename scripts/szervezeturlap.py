@@ -3,6 +3,7 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from urlap import TelefonszamUrlap, EmailcimUrlap, CimUrlap, Valaszto
 from szervezet import Szervezet
+from szemely import Szemely
 from telefon import Telefon
 from email import Email
 from cim import Cim
@@ -531,6 +532,36 @@ class CimModositoUrlap(simpledialog.Dialog):
         if cim:
             cim.adatok = self._cim_urlap.export()
         return cim
+
+
+class UjKontaktUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None, szemely_kon=None):
+        self._kon = kon
+        self._szemely_kon = szemely_kon
+        super().__init__(szulo, title="Kontaktszemély hozzárendelése")
+    
+    def body(self, szulo):
+        self._szervezetvalaszto = Valaszto("szervezet", self._szervezetnevsor(), self)
+        self._szervezetvalaszto.pack(ipadx=2, ipady=2)
+
+        self._szemelyvalaszto = Valaszto("személy", self._szemelynevsor(), self)
+        self._szemelyvalaszto.pack(ipadx=2, ipady=2)
+    
+    def _szervezetnevsor(self):
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+
+    def _szemelynevsor(self):
+        return sorted(map(lambda szemely: Szemely(**szemely), self._szemely_kon.select("szemely")), key=repr)
+
+
+class KontaktTorloUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None, szemely_kon=None):
+        self._kon = kon
+        self._szemely_kon = szemely_kon
+        super().__init__(szulo, title="Kontaktszemély eltávolítása")
+    
+    def body(self, szulo):
+        pass
 
 
 if __name__ == "__main__":

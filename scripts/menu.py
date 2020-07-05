@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 import szemelyurlap
 import szervezeturlap
 
@@ -15,7 +16,7 @@ class Fomenu(Frame):
 
         # menük
         szemelymenu = SzemelyMenu(szemelymb, szemely_kon)
-        szervezetmenu = SzervezetMenu(szervezetmb, szervezet_kon)
+        szervezetmenu = SzervezetMenu(szervezetmb, szervezet_kon, szemely_kon)
 
         szemelymb.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         szervezetmb.grid(row=0, column=1, sticky=W, ipadx=2, ipady=2)
@@ -36,13 +37,14 @@ class SzemelyMenu(Menu):
 
 
 class SzervezetMenu(Menu):
-    def __init__(self, mb, kon):
+    def __init__(self, mb, kon, szemely_kon=None):
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
         self.add("cascade", label="szervezet", menu=SzervezetAlmenu(kon, mb))
         self.add("cascade", label="telefon", menu=SzervezetTelefonAlmenu(kon, mb))
         self.add("cascade", label="email", menu=SzervezetEmailAlmenu(kon, mb))
         self.add("cascade", label="cím", menu=SzervezetCimAlmenu(kon, mb))
+        self.add("cascade", label="kontaktszemély", menu=SzervezetKontaktAlmenu(kon, mb, szemely_kon))
 
 
 class Alapmenu(Menu):
@@ -186,6 +188,22 @@ class SzervezetCimAlmenu(Alapmenu):
 
     def modosit(self):
         szervezeturlap.CimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+
+
+class SzervezetKontaktAlmenu(Alapmenu):
+    def __init__(self, kon, mb, szemely_kon):
+        super().__init__(mb)
+        self._kon = kon
+        self._szemely_kon = szemely_kon
+    
+    def uj(self):
+        szervezeturlap.UjKontaktUrlap(self.mb.winfo_toplevel(), self._kon, self._szemely_kon)
+
+    def torol(self):
+        szervezeturlap.KontaktTorloUrlap(self.mb.winfo_toplevel(), self._kon, self._szemely_kon)
+
+    def modosit(self):
+        messagebox.showwarning("Kontaktszemély módosítása", "Nem támogatott funckió.", parent=self)
 
 
 if __name__ == "__main__":
