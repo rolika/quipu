@@ -547,6 +547,19 @@ class UjKontaktUrlap(simpledialog.Dialog):
         self._szemelyvalaszto = Valaszto("személy", self._szemelynevsor(), self)
         self._szemelyvalaszto.pack(ipadx=2, ipady=2)
     
+    def validate(self):
+        return True
+    
+    def apply(self):
+        # mindig update, mert minden személy kontaktszemély is egyben
+        szemelyazonosito = self._szemelyvalaszto.elem.azonosito
+        szervezetazonosito = self._szervezetvalaszto.elem.azonosito
+        if self._szemely_kon.update("kontakt", {"szervezet": szervezetazonosito}, azonosito=szemelyazonosito):
+            print("Bejegyzés mentve.")
+            return True
+        print("Nem sikerült elmenteni")
+        return False
+    
     def _szervezetnevsor(self):
         return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
 
