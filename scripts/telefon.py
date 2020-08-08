@@ -1,8 +1,12 @@
-class Telefon(dict):
+import dolog
+
+
+class Telefon(dolog.Dolog):
     """Telefonos elérhetőség megvalósítása."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
+        super().__init__()
         if kwargs:
             self._adatok = dict(kwargs)
         else:
@@ -10,6 +14,7 @@ class Telefon(dict):
                 "telefonszam": "",
                 "megjegyzes": ""
             }
+        self._tabla = "telefon"
 
     def __bool__(self):
         """Telefonszámot kötelező megadni."""
@@ -24,10 +29,6 @@ class Telefon(dict):
         """Új telefon-osztály alapján módosítja a meglévőt."""
         self._adatok["telefonszam"] = telefon.telefonszam
         self._adatok["megjegyzes"] = telefon.megjegyzes
-
-    @property
-    def azonosito(self):
-        return self._adatok.get("azonosito")
 
     @property
     def szemely(self):
@@ -49,21 +50,6 @@ class Telefon(dict):
     def telefonszam(self):
         return self._adatok.get("telefonszam")
 
-    @property
-    def megjegyzes(self):
-        return self._adatok.get("megjegyzes")
-
     def listanezet(self):
         """Elérhetőseg megjelenítése kiválasztáshoz (Combobox)"""
         return "{} ({})".format(self.telefonszam, self.megjegyzes)
-
-    def ment(self, kon):
-        """Menti vagy módosítja az telefon-adatokat"""
-        if self.azonosito:
-            return kon.update("telefon", self._adatok, azonosito=self.azonosito)  # True vagy False
-        else:
-            return kon.insert("telefon", **self._adatok)  # lastrowid vagy None
-
-    def torol(self, kon):
-        """Törli az adatbázisból az telefon-bejegyzést"""
-        return kon.delete("telefon", azonosito=self.azonosito)
