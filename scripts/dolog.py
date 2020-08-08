@@ -7,28 +7,32 @@ class Dolog:
             self._adatok = None
         self._adatok = dict()
         self._tabla = None
-    
+
     def __str__(self):
+        """Adatok megjelenítése, elsősorban debugoláshoz"""
         raise NotImplementedError
 
     def __repr__(self):
+        """Név megjelenítése sorbarendezéshez"""
         raise NotImplementedError
 
     def __bool__(self):
+        """Dolog elegendően meghatározott-e."""
         raise NotImplementedError
-    
+
     @property
     def adatok(self):
         return self._adatok
-    
+
     @adatok.setter
-    def adatok(self, **kwargs):        
+    def adatok(self, uj):
+        """Új dolog-osztály alapján módosítja a meglévő adatokat."""
         raise NotImplementedError
 
     @property
     def tabla(self):
         return self._tabla
-    
+
     @tabla.setter
     def tabla(self, nev):
         self._tabla = nev
@@ -36,7 +40,7 @@ class Dolog:
     @property
     def azonosito(self):
         return self._adatok.get("azonosito")
-    
+
     @property
     def megjegyzes(self):
         return self._adatok.get("megjegyzes")
@@ -61,13 +65,12 @@ class Dolog:
     def torol(self, kon):
         """Törli az adatbázisból a dolog-bejegyzést"""
         return kon.delete(self._tabla, azonosito=self.azonosito)
-    
+
     def _ascii_rep(self, szoveg):
         """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
         szoveg:     string"""
         return szoveg.lower().translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))
-    
+
     def _nullazo(self, attr):
         """Ha hiányzik az adat, nem írjuk ki egyáltalán."""
         return ", {}".format(attr) if attr else ""
-    
