@@ -1,10 +1,6 @@
 class Dolog:
     """Nyilvántartott dolgok alaposztálya."""
-    def __init__(self, **kwargs):
-        if kwargs:
-            self._adatok = dict(kwargs)
-        else:
-            self._adatok = None
+    def __init__(self):
         self._adatok = dict()
         self._tabla = None
 
