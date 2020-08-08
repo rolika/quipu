@@ -1,11 +1,12 @@
-import copy
+import dolog
 
 
-class Szemely:
+class Szemely(dolog.Dolog):
     """Személy megvalósítása."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
+        super().__init__()
         if kwargs:
             self._adatok = dict(kwargs)
         else:  # űrlap mezőinek törléséhez
@@ -16,6 +17,7 @@ class Szemely:
                 "nem": "férfi",
                 "megjegyzes": ""
             }
+        self._tabla = "szemely"
 
     def __str__(self):
         """Személyi adatok megjelenítése, elsősorban debugoláshoz"""
@@ -45,10 +47,6 @@ class Szemely:
         self._adatok["megjegyzes"] = uj.megjegyzes
 
     @property
-    def azonosito(self):
-        return self._adatok.get("azonosito")
-
-    @property
     def elotag(self):
         return self._adatok.get("elotag")
 
@@ -64,48 +62,17 @@ class Szemely:
     def nem(self):
         return self._adatok.get("nem")
 
-    @property
-    def megjegyzes(self):
-        return self._adatok.get("megjegyzes")
-
     def listanezet(self):
         """Személy megjelenítése kiválasztáshoz (Combobox)"""
         megjegyzes = self._nullazo(self.megjegyzes)
         return "{} {} {}{}".format(self.vezeteknev, self.keresztnev, self.elotag, megjegyzes)
 
-    def ment(self, kon):
-        """Menti vagy módosítja a személyi adatokat"""
-        if self.azonosito:
-            return kon.update("szemely", self._adatok, azonosito=self.azonosito)  # True vagy False
-        else:
-            return kon.insert("szemely", **self._adatok)  # lastrowid vagy None
-
-    def torol(self, kon):
-        """Törli az adatbázisból az email-bejegyzést"""
-        return kon.delete("szemely", azonosito=self.azonosito)
-
-    def meglevo(self, kon):
-        """Ellenőrzi, hogy a személy szerepel-e az adatbázisban"""
-        adatok = copy.copy(self._adatok)  # shallow copy
-        adatok.pop("azonosito", None)
-        return kon.select("szemely", logic="AND", **adatok).fetchone()
-
     def megszolitas(self):
         return "Tisztelt {}!".format("Uram" if self.nem == "férfi" else "Hölgyem")
-
-    def _ascii_rep(self, szoveg):
-        """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
-        szoveg:     string"""
-        return szoveg.lower().translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))
-
-    def _nullazo(self, attr):
-        """Ha hiányzik az adat, nem írjuk ki egyáltalán."""
-        return ", {}".format(attr) if attr else ""
 
 
 if __name__ == "__main__":
     """Egyszerű tesztelés"""
-    import tamer
     szemely = Szemely(vezeteknev="Árvíztűrő", keresztnev="Tükörfúrógép")
     print(repr(szemely))  # arvizturo tukorfurogep
     szemely = Szemely(elotag="dr")
@@ -114,8 +81,3 @@ if __name__ == "__main__":
     szemely = Szemely(keresztnev="Roland")
     if szemely:
         print("Elegendő adat.")  # ki kell írnia
-    kon = tamer.Tamer("szemely.db")
-    szemely = Szemely.adatbazisbol(kon.select("szemely").fetchone())
-    print(szemely)  # a lekérdezés első bejegyzését kell kiírnia
-    print(szemely["vezeteknev"])  # lekérdezés első bejegyzésének vezetékneve
-    print(szemely.azonosito)  # lekérdezés első bejegyzésének rowid-je

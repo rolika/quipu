@@ -83,7 +83,7 @@ class UjSzemelyUrlap(simpledialog.Dialog):
         """Override Dialog.apply - helyes adatok feldolgozása"""
         szemely = self._szemelyurlap.export()
         if szemely.ment(self._kon):
-            print("Bejegyzés mentve.")
+            print("{}: Bejegyzés mentve.".format(szemely))
         else:  # adatbázis-hiba visszajelzése
             print("Nem sikerült elmenteni.")
 
@@ -110,7 +110,7 @@ class SzemelyTorloUrlap(simpledialog.Dialog):
         self._kon.delete("cim", szemely=szemely.azonosito)
         self._kon.delete("kontakt", szemely=szemely.azonosito)
         if szemely.torol(self._kon):
-            print("Bejegyzés törölve.")
+            print("{}: Bejegyzés törölve.".format(szemely))
             self._nev_valaszto.beallit(self._nevsor())
         else:
             print("Nem sikerült törölni.")
@@ -147,8 +147,9 @@ class SzemelyModositoUrlap(simpledialog.Dialog):
         return True
 
     def apply(self):
+        szemely = self._uj_szemely()
         if self._szemely.ment(self._kon):
-            print("Bejegyzés módosítva.")
+            print("{}: Bejegyzés módosítva.".format(szemely))
         else:
             print("Nem sikerült módosítani.")
         self._nev_valaszto.beallit(self._nevsor())

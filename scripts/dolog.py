@@ -20,14 +20,6 @@ class Dolog:
         raise NotImplementedError
 
     @property
-    def tabla(self):
-        return self._tabla
-
-    @tabla.setter
-    def tabla(self, nev):
-        self._tabla = nev
-
-    @property
     def azonosito(self):
         return self._adatok.get("azonosito")
 
