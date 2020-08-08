@@ -28,11 +28,11 @@ class Dolog:
         return self._adatok.get("megjegyzes")
 
     def listanezet(self):
-        """Szervezet megjelenítése kiválasztáshoz (Combobox)"""
+        """Dolog megjelenítése kiválasztáshoz (Combobox)"""
         raise NotImplementedError
 
     def meglevo(self, kon):
-        """Ellenőrzi, hogy a szervezet szerepel-e az adatbázisban"""
+        """Ellenőrzi, hogy a dolog szerepel-e az adatbázisban"""
         adatok = copy.copy(self._adatok)  # shallow copy
         adatok.pop("azonosito", None)
         return kon.select(self._tabla, logic="AND", **adatok).fetchone()
