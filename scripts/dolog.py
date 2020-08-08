@@ -1,3 +1,6 @@
+import copy
+
+
 class Dolog:
     """Nyilvántartott dolgok alaposztálya."""
     def __init__(self):
@@ -14,15 +17,6 @@ class Dolog:
 
     def __bool__(self):
         """Dolog elegendően meghatározott-e."""
-        raise NotImplementedError
-
-    @property
-    def adatok(self):
-        return self._adatok
-
-    @adatok.setter
-    def adatok(self, uj):
-        """Új dolog-osztály alapján módosítja a meglévő adatokat."""
         raise NotImplementedError
 
     @property
