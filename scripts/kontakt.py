@@ -9,7 +9,15 @@ class Kontakt(dolog.Dolog):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
         super().__init__()
-        self._adatok = dict(kwargs)  # itt nincs csak konkrét adatokkal példányosítás
+        if kwargs:
+            self._adatok = dict(kwargs)
+        else:
+            self._adatok = {
+                "szemely": 0,
+                "szervezet": 0,
+                "beosztas": "",
+                "megjegyzes": ""
+            }
         self._tabla = "kontakt"
     
     def __repr__(self):
@@ -17,5 +25,13 @@ class Kontakt(dolog.Dolog):
     
     @property
     def szemely(self):
-        return None
+        return self._adatok.get("szemely")
+
+    @property
+    def szervezet(self):
+        return self._adatok.get("szervezet")
+
+    @property
+    def beosztas(self):
+        return self._adatok.get("beosztas")
     

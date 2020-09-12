@@ -564,15 +564,14 @@ class UjKontaktUrlap(simpledialog.Dialog):
         return True
     
     def apply(self):
-        szemelyazonosito = self._szemelyvalaszto.elem.azonosito
-        szervezetazonosito = self._szervezetvalaszto.elem.azonosito
-        if self._szemely_kon.insert("kontakt", szemely=szemelyazonosito,
-                                               szervezet=szervezetazonosito,
-                                               beosztas=self._beosztas.get(),
-                                               megjegyzes=self._megjegyzes.get()):
+        kontakt = Kontakt(szemely=self._szemelyvalaszto.elem.azonosito,
+                          szervezet=self._szervezetvalaszto.elem.azonosito,
+                          beosztas=self._beosztas.get(),
+                          megjegyzes=self._megjegyzes.get())
+        if kontakt.ment(self._szemely_kon):
             print("Bejegyzés mentve.")
             return True
-        print("Nem sikerült elmenteni")
+        print("Nem sikerült elmenteni.")
         return False
     
     def _szervezetnevsor(self):
@@ -581,14 +580,13 @@ class UjKontaktUrlap(simpledialog.Dialog):
     def _szemelynevsor(self):
         szervezetazonosito = self._szervezetvalaszto.elem.azonosito
         szervezethez_nem_rendelt_szemelyek = self._szemely_kon.execute("""
-            SELECT szemely.*
-            FROM szemely, kontakt
-            WHERE kontakt.szervezet <> ? AND kontakt.szemely = szemely.azonosito;
+            SELECT * FROM szemely WHERE azonosito NOT IN (SELECT szemely FROM kontakt WHERE szervezet = ?);
         """, (szervezetazonosito, ))
         return sorted(map(lambda szemely: Szemely(**szemely), szervezethez_nem_rendelt_szemelyek), key=repr)
     
     def _megjelenit(self, event):
         self._szemelyvalaszto.beallit(self._szemelynevsor())
+        
 
 
 class KontaktTorloUrlap(simpledialog.Dialog):
