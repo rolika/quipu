@@ -7,6 +7,7 @@ from szemely import Szemely
 from telefon import Telefon
 from email import Email
 from cim import Cim
+from kontakt import Kontakt
 
 
 class SzervezetUrlap(Frame):
@@ -542,19 +543,33 @@ class UjKontaktUrlap(simpledialog.Dialog):
     
     def body(self, szulo):
         self._szervezetvalaszto = Valaszto("szervezet", self._szervezetnevsor(), self)
+        self._szervezetvalaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenit)
         self._szervezetvalaszto.pack(ipadx=2, ipady=2)
 
         self._szemelyvalaszto = Valaszto("személy", self._szemelynevsor(), self)
         self._szemelyvalaszto.pack(ipadx=2, ipady=2)
+
+        self._beosztas = StringVar()
+        beosztas = ("műszaki előkészítő", "képviselő", "projektvezető", "építésvezető", "csoportvezető")
+        self._beosztas.set(beosztas[0])
+        OptionMenu(self, self._beosztas, *beosztas).pack(ipadx=2, ipady=2)
+
+        self._megjegyzes = StringVar()
+        Label(self, text="megjegyzés").pack(ipadx=2, ipady=2)
+        Entry(self, textvariable=self._megjegyzes, width=32).pack(ipadx=2, ipady=2)
+
+        return self._szervezetvalaszto
     
     def validate(self):
         return True
     
     def apply(self):
-        # mindig update, mert minden személy kontaktszemély is egyben
         szemelyazonosito = self._szemelyvalaszto.elem.azonosito
         szervezetazonosito = self._szervezetvalaszto.elem.azonosito
-        if self._szemely_kon.update("kontakt", {"szervezet": szervezetazonosito}, azonosito=szemelyazonosito):
+        if self._szemely_kon.insert("kontakt", szemely=szemelyazonosito,
+                                               szervezet=szervezetazonosito,
+                                               beosztas=self._beosztas.get(),
+                                               megjegyzes=self._megjegyzes.get()):
             print("Bejegyzés mentve.")
             return True
         print("Nem sikerült elmenteni")
@@ -564,7 +579,16 @@ class UjKontaktUrlap(simpledialog.Dialog):
         return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
 
     def _szemelynevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self._szemely_kon.select("szemely")), key=repr)
+        szervezetazonosito = self._szervezetvalaszto.elem.azonosito
+        szervezethez_nem_rendelt_szemelyek = self._szemely_kon.execute("""
+            SELECT szemely.*
+            FROM szemely, kontakt
+            WHERE kontakt.szervezet <> ? AND kontakt.szemely = szemely.azonosito;
+        """, (szervezetazonosito, ))
+        return sorted(map(lambda szemely: Szemely(**szemely), szervezethez_nem_rendelt_szemelyek), key=repr)
+    
+    def _megjelenit(self, event):
+        self._szemelyvalaszto.beallit(self._szemelynevsor())
 
 
 class KontaktTorloUrlap(simpledialog.Dialog):

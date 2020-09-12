@@ -49,12 +49,12 @@ class Quipu(Frame):
             azonosito="INTEGER PRIMARY KEY",
             elotag="TEXT",
             vezeteknev="TEXT NOT NULL",
-            keresztnev="TEXT NOT NULL", 
+            keresztnev="TEXT NOT NULL",
             nem="TEXT NOT NULL",
             megjegyzes="TEXT")
 
         self._szemely_kon.create("telefon",
-            azonosito="INTEGER PRIMARY KEY", 
+            azonosito="INTEGER PRIMARY KEY",
             szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
             telefonszam="TEXT NOT NULL",
             megjegyzes="TEXT")
@@ -68,19 +68,21 @@ class Quipu(Frame):
         self._szemely_kon.create("cim",
             azonosito="INTEGER PRIMARY KEY",
             szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            orszag="TEXT DEFAULT 'H'", 
-            iranyitoszam="TEXT", 
-            helyseg="TEXT NOT NULL", 
-            utca="TEXT", 
-            hrsz="TEXT", 
-            postafiok="TEXT", 
-            honlap="TEXT", 
+            orszag="TEXT DEFAULT 'H'",
+            iranyitoszam="TEXT",
+            helyseg="TEXT NOT NULL",
+            utca="TEXT",
+            hrsz="TEXT",
+            postafiok="TEXT",
+            honlap="TEXT",
             megjegyzes="TEXT")
 
-        self._szemely_kon.create("kontakt", 
+        self._szemely_kon.create("kontakt",
             azonosito="INTEGER PRIMARY KEY",
-            szemely="INTEGER NOT NULL REFERENCES szemely", 
-            szervezet="INTEGER", 
+            szemely="INTEGER NOT NULL REFERENCES szemely",
+            szervezet="INTEGER DEFAULT 0",
+            beosztas="TEXT",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
 
         self._szemely_kon.executescript("""
@@ -90,14 +92,14 @@ class Quipu(Frame):
                     INSERT INTO kontakt(szemely) VALUES(last_insert_rowid());
                 END;
         """)
-    
+
     def _init_szervezet_db(self):
         """Szervezet adatbázis inicializálása"""
         self._szervezet_kon = tamer.Tamer("szervezet.db")
 
         self._szervezet_kon.create("szervezet",
-            azonosito="INTEGER PRIMARY KEY", 
-            rovidnev="TEXT NOT NULL", 
+            azonosito="INTEGER PRIMARY KEY",
+            rovidnev="TEXT NOT NULL",
             teljesnev="TEXT",
             gyakorisag="INTEGER DEFAULT 0",
             vevo="INTEGER DEFAULT 0",
@@ -105,7 +107,7 @@ class Quipu(Frame):
             megjegyzes="TEXT")
 
         self._szervezet_kon.create("telefon",
-            azonosito="INTEGER PRIMARY KEY", 
+            azonosito="INTEGER PRIMARY KEY",
             szervezet="INTEGER NOT NULL REFERENCES szervezet",
             telefonszam="TEXT NOT NULL",
             megjegyzes="TEXT")
@@ -119,13 +121,13 @@ class Quipu(Frame):
         self._szervezet_kon.create("cim",
             azonosito="INTEGER PRIMARY KEY",
             szervezet="INTEGER NOT NULL REFERENCES szervezet",
-            orszag="TEXT DEFAULT 'H'", 
-            iranyitoszam="TEXT", 
-            helyseg="TEXT NOT NULL", 
-            utca="TEXT", 
-            hrsz="TEXT", 
-            postafiok="TEXT", 
-            honlap="TEXT", 
+            orszag="TEXT DEFAULT 'H'",
+            iranyitoszam="TEXT",
+            helyseg="TEXT NOT NULL",
+            utca="TEXT",
+            hrsz="TEXT",
+            postafiok="TEXT",
+            honlap="TEXT",
             megjegyzes="TEXT")
 
 

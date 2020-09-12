@@ -1,4 +1,6 @@
-import Dolog
+import dolog
+import szemely
+import szervezet
 
 
 class Kontakt(dolog.Dolog):
@@ -9,4 +11,11 @@ class Kontakt(dolog.Dolog):
         super().__init__()
         self._adatok = dict(kwargs)  # itt nincs csak konkrét adatokkal példányosítás
         self._tabla = "kontakt"
+    
+    def __repr__(self):
+        return "Roli"
+    
+    @property
+    def szemely(self):
+        return None
     

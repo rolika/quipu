@@ -1,5 +1,4 @@
 from tkinter import *
-from tkinter import messagebox
 import szemelyurlap
 import szervezeturlap
 
@@ -203,7 +202,7 @@ class SzervezetKontaktAlmenu(Alapmenu):
         szervezeturlap.KontaktTorloUrlap(self.mb.winfo_toplevel(), self._kon, self._szemely_kon)
 
     def modosit(self):
-        messagebox.showwarning("Kontaktszemély módosítása", "Nem támogatott funckió.", parent=self)
+        pass
 
 
 if __name__ == "__main__":
