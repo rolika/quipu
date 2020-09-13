@@ -202,7 +202,7 @@ class SzervezetKontaktAlmenu(Alapmenu):
         szervezeturlap.KontaktTorloUrlap(self.mb.winfo_toplevel(), self._kon, self._szemely_kon)
 
     def modosit(self):
-        pass
+        szervezeturlap.KontaktModositoUrlap(self.mb.winfo_toplevel(), self._kon, self._szemely_kon)
 
 
 if __name__ == "__main__":

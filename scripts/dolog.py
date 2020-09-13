@@ -22,6 +22,10 @@ class Dolog:
     @property
     def azonosito(self):
         return self._adatok.get("azonosito")
+    
+    @azonosito.setter
+    def azonosito(self, azonosito):
+        self._adatok["azonosito"] = azonosito
 
     @property
     def megjegyzes(self):
