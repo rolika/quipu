@@ -5,6 +5,7 @@ from tkinter.ttk import Combobox
 from telefon import Telefon
 from email import Email
 from cim import Cim
+from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS
 
 
 class TelefonszamUrlap(Frame):
@@ -13,13 +14,12 @@ class TelefonszamUrlap(Frame):
 
         self._telefonszam = StringVar()
         self._megjegyzes = StringVar()
-        megjegyzes = ("alapértelmezett", "munkahelyi", "privát")
-        self._megjegyzes.set(megjegyzes[0])
+        self._megjegyzes.set(ELERHETOSEG_TIPUS[0])
 
         Label(self, text="telefonszám").grid(row=0, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._telefonszam, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
         Label(self, text="megjegyzés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        OptionMenu(self, self._megjegyzes, *megjegyzes).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self._megjegyzes, *ELERHETOSEG_TIPUS).grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
     def beallit(self, telefon):
         self._telefonszam.set(telefon.telefonszam)
@@ -35,13 +35,12 @@ class EmailcimUrlap(Frame):
 
         self._emailcim = StringVar()
         self._megjegyzes = StringVar()
-        megjegyzes = ("alapértelmezett", "munkahelyi", "privát")
-        self._megjegyzes.set(megjegyzes[0])
+        self._megjegyzes.set(ELERHETOSEG_TIPUS[0])
 
         Label(self, text="email-cím").grid(row=0, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._emailcim, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
         Label(self, text="megjegyzés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        OptionMenu(self, self._megjegyzes, *megjegyzes).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self._megjegyzes, *ELERHETOSEG_TIPUS).grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
     def beallit(self, email):
         self._emailcim.set(email.emailcim)
@@ -76,8 +75,7 @@ class CimUrlap(Frame):
             "Románia": "RO"
         }
         self._orszag.set("Magyarország")
-        megjegyzesek = ("alapértelmezett", "székhely", "telephely", "levelezési cím", "lakhely", "tartózkodási hely")
-        self._megjegyzes.set(megjegyzesek[0])
+        self._megjegyzes.set(CIM_TIPUS[0])
 
         Label(self, text="ország").grid(row=0, column=0, sticky=W, padx=2, pady=2)
         OptionMenu(self, self._orszag, *self._orszagok.keys()).grid(row=0, column=1, sticky=W, padx=2, pady=2)
@@ -96,7 +94,7 @@ class CimUrlap(Frame):
         Label(self, text="honlap").grid(row=6, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._honlap, width=32).grid(row=6, column=1, sticky=W, padx=2, pady=2)
         Label(self, text="megjegyzés").grid(row=7, column=0, sticky=W, padx=2, pady=2)
-        OptionMenu(self, self._megjegyzes, *megjegyzesek).grid(row=7, column=1, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self._megjegyzes, *CIM_TIPUS).grid(row=7, column=1, sticky=W, padx=2, pady=2)
 
     def beallit(self, cim):
         self._orszag.set(self._kodbol_orszag(cim.orszag))

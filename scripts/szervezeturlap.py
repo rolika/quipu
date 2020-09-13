@@ -8,6 +8,7 @@ from telefon import Telefon
 from email import Email
 from cim import Cim
 from kontakt import Kontakt
+from konstans import BEOSZTAS
 
 
 class SzervezetUrlap(Frame):
@@ -550,9 +551,8 @@ class UjKontaktUrlap(simpledialog.Dialog):
         self._szemelyvalaszto.pack(ipadx=2, ipady=2)
 
         self._beosztas = StringVar()
-        beosztas = ("műszaki előkészítő", "képviselő", "projektvezető", "építésvezető", "csoportvezető")
-        self._beosztas.set(beosztas[0])
-        OptionMenu(self, self._beosztas, *beosztas).pack(ipadx=2, ipady=2)
+        self._beosztas.set(BEOSZTAS[0])
+        OptionMenu(self, self._beosztas, *BEOSZTAS).pack(ipadx=2, ipady=2)
 
         self._megjegyzes = StringVar()
         Label(self, text="megjegyzés").pack(ipadx=2, ipady=2)
@@ -647,9 +647,8 @@ class KontaktModositoUrlap(simpledialog.Dialog):
         self._szemelyvalaszto.pack(ipadx=2, ipady=2)
 
         self._beosztas = StringVar()
-        beosztas = ("műszaki előkészítő", "képviselő", "projektvezető", "építésvezető", "csoportvezető")
-        self._beosztas.set(beosztas[0])
-        OptionMenu(self, self._beosztas, *beosztas).pack(ipadx=2, ipady=2)
+        self._beosztas.set(BEOSZTAS[0])
+        OptionMenu(self, self._beosztas, *BEOSZTAS).pack(ipadx=2, ipady=2)
 
         self._megjegyzes = StringVar()
         Label(self, text="megjegyzés").pack(ipadx=2, ipady=2)
