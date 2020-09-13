@@ -635,6 +635,7 @@ class KontaktModositoUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None, szemely_kon=None):
         self._kon = kon
         self._szemely_kon = szemely_kon
+        self._kontakt = None
         super().__init__(szulo, title="Kontaktszemély módosítása")
 
     def body(self, szulo):
@@ -660,17 +661,15 @@ class KontaktModositoUrlap(simpledialog.Dialog):
         return True
 
     def apply(self):
-        kontakt = Kontakt(szemely=self._szemelyvalaszto.elem.azonosito,
-                          szervezet=self._szervezetvalaszto.elem.azonosito,
-                          beosztas=self._beosztas.get(),
-                          megjegyzes=self._megjegyzes.get())
-        azonosito = Kontakt(**(self._szemely_kon.select("kontakt", "azonosito", logic="AND",
-                                                       szemely=self._szemelyvalaszto.elem.azonosito,
-                                                       szervezet=self._szervezetvalaszto.elem.azonosito).fetchone())).azonosito
-        kontakt.azonosito = azonosito
-        if kontakt.ment(self._szemely_kon):
-            print("Bejegyzés módosítva.")
-            return True
+        szemely = self._szemelyvalaszto.elem
+        if szemely and self._kontakt:
+            self._kontakt.adatok = Kontakt(szemely=szemely.azonosito,
+                                           szervezet=self._szervezetvalaszto.elem.azonosito,
+                                           beosztas=self._beosztas.get(),
+                                           megjegyzes=self._megjegyzes.get())
+            if self._kontakt.ment(self._szemely_kon):
+                print("Bejegyzés módosítva.")
+                return True
         print("Nem sikerült módosítani.")
         return False
 
@@ -687,15 +686,15 @@ class KontaktModositoUrlap(simpledialog.Dialog):
     def _megjelenit(self, event):
         self._szemelyvalaszto.beallit(self._szemelynevsor())
         self._reszletek(1)
-    
+
     def _reszletek(self, event):
         szemely = self._szemelyvalaszto.elem
         if szemely:
-            kontakt = Kontakt(**(self._szemely_kon.select("kontakt", logic="AND",
-                                                        szemely=szemely.azonosito,
-                                                        szervezet=self._szervezetvalaszto.elem.azonosito).fetchone()))
-            self._beosztas.set(kontakt.beosztas)
-            self._megjegyzes.set(kontakt.megjegyzes)
+            szervezet=self._szervezetvalaszto.elem.azonosito
+            kontakt = self._szemely_kon.select("kontakt", szemely=szemely.azonosito, logic="AND", szervezet=szervezet)
+            self._kontakt = Kontakt(**(kontakt.fetchone()))
+            self._beosztas.set(self._kontakt.beosztas)
+            self._megjegyzes.set(self._kontakt.megjegyzes)
 
 
 if __name__ == "__main__":

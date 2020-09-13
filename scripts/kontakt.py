@@ -20,8 +20,16 @@ class Kontakt(dolog.Dolog):
             }
         self._tabla = "kontakt"
     
-    def __repr__(self):
-        return "Roli"
+    @property
+    def adatok(self):
+        return self._adatok
+    
+    @adatok.setter
+    def adatok(self, kontakt):
+        self._adatok["szemely"] = kontakt.szemely
+        self._adatok["szervezet"] = kontakt.szervezet
+        self._adatok["beosztas"] = kontakt.beosztas
+        self._adatok["megjegyzes"] = kontakt.megjegyzes
     
     @property
     def szemely(self):
