@@ -540,7 +540,7 @@ class UjKontaktUrlap(simpledialog.Dialog):
         self._kon = kon
         self._szemely_kon = szemely_kon
         super().__init__(szulo, title="Kontaktszemély hozzárendelése")
-    
+
     def body(self, szulo):
         self._szervezetvalaszto = Valaszto("szervezet", self._szervezetnevsor(), self)
         self._szervezetvalaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenit)
@@ -559,10 +559,10 @@ class UjKontaktUrlap(simpledialog.Dialog):
         Entry(self, textvariable=self._megjegyzes, width=32).pack(ipadx=2, ipady=2)
 
         return self._szervezetvalaszto
-    
+
     def validate(self):
         return True
-    
+
     def apply(self):
         kontakt = Kontakt(szemely=self._szemelyvalaszto.elem.azonosito,
                           szervezet=self._szervezetvalaszto.elem.azonosito,
@@ -573,7 +573,7 @@ class UjKontaktUrlap(simpledialog.Dialog):
             return True
         print("Nem sikerült elmenteni.")
         return False
-    
+
     def _szervezetnevsor(self):
         return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
 
@@ -583,10 +583,9 @@ class UjKontaktUrlap(simpledialog.Dialog):
             SELECT * FROM szemely WHERE azonosito NOT IN (SELECT szemely FROM kontakt WHERE szervezet = ?);
         """, (szervezetazonosito, ))
         return sorted(map(lambda szemely: Szemely(**szemely), szervezethez_nem_rendelt_szemelyek), key=repr)
-    
+
     def _megjelenit(self, event):
         self._szemelyvalaszto.beallit(self._szemelynevsor())
-        
 
 
 class KontaktTorloUrlap(simpledialog.Dialog):
@@ -594,9 +593,40 @@ class KontaktTorloUrlap(simpledialog.Dialog):
         self._kon = kon
         self._szemely_kon = szemely_kon
         super().__init__(szulo, title="Kontaktszemély eltávolítása")
-    
+
     def body(self, szulo):
-        pass
+        self._szervezetvalaszto = Valaszto("szervezet", self._szervezetnevsor(), self)
+        self._szervezetvalaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenit)
+        self._szervezetvalaszto.pack(ipadx=2, ipady=2)
+
+        self._szemelyvalaszto = Valaszto("személy", self._szemelynevsor(), self)
+        self._szemelyvalaszto.pack(ipadx=2, ipady=2)
+
+    def validate(self):
+        return messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
+
+    def apply(self):
+        kontakt = Kontakt(**(self._szemely_kon.select("kontakt", logic="AND",
+                                                       szemely=self._szemelyvalaszto.elem.azonosito,
+                                                       szervezet=self._szervezetvalaszto.elem.azonosito).fetchone()))
+        if kontakt.torol(self._szemely_kon):
+            print("Bejegyzés törölve.")
+            return True
+        print("Nem sikerült törölni.")
+        return False
+
+    def _szervezetnevsor(self):
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+
+    def _szemelynevsor(self):
+        szervezetazonosito = self._szervezetvalaszto.elem.azonosito
+        szervezethez_rendelt_szemelyek = self._szemely_kon.execute("""
+            SELECT * FROM szemely WHERE azonosito IN (SELECT szemely FROM kontakt WHERE szervezet = ?);
+        """, (szervezetazonosito, ))
+        return sorted(map(lambda szemely: Szemely(**szemely), szervezethez_rendelt_szemelyek), key=repr)
+
+    def _megjelenit(self, event):
+        self._szemelyvalaszto.beallit(self._szemelynevsor())
 
 
 if __name__ == "__main__":
