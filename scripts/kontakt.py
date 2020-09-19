@@ -20,6 +20,9 @@ class Kontakt(dolog.Dolog):
             }
         self._tabla = "kontakt"
     
+    def __bool__(self):
+        return True
+    
     @property
     def adatok(self):
         return self._adatok
