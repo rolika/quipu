@@ -585,9 +585,9 @@ class UjKontaktUrlap(simpledialog.Dialog):
                           megjegyzes=self._megjegyzes.get())
         if kontakt.ment(self._szemely_kon):
             print("Bejegyzés mentve.")
-            return True
-        print("Nem sikerült elmenteni.")
-        return False
+        else:
+            print("Nem sikerült elmenteni.")
+            return False
 
     def _szervezetnevsor(self):
         return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
@@ -631,10 +631,8 @@ class KontaktTorloUrlap(simpledialog.Dialog):
                                                        szervezet=self._szervezetvalaszto.elem.azonosito).fetchone()))
         if kontakt.torol(self._szemely_kon):
             print("Bejegyzés törölve.")
-            return True
         else:
             print("Nem sikerült törölni.")
-            return False
 
     def _szervezetnevsor(self):
         return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
@@ -690,9 +688,8 @@ class KontaktModositoUrlap(simpledialog.Dialog):
                                            megjegyzes=self._megjegyzes.get())
             if self._kontakt.ment(self._szemely_kon):
                 print("Bejegyzés módosítva.")
-                return True
+                return
         print("Nem sikerült módosítani.")
-        return False
 
     def _szervezetnevsor(self):
         return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
