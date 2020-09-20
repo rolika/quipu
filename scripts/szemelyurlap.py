@@ -558,7 +558,7 @@ class UjKontaktUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None, szervezet_kon=None):
         self._kon = kon
         self._szervezet_kon = szervezet_kon
-        self._szervezet_kon.attach("szemely.db", "szemely")
+        self._szervezet_kon.attach(szemely="szemely.db")
         super().__init__(szulo, title="Szervezet hozzárendelése")
 
     def body(self, szulo):

@@ -373,12 +373,11 @@ class Tamer(sqlite3.Connection):
             return None
     
 
-    def attach(self, filename, schemaname):
+    def attach(self, **kwargs):
         """Add another database file to the current database connection.
 
         Args:
-            filename:   string containing a database filename
-            schemaname: reference name of the database file
+            kwargs: schemaname=filename key-value pairs
         
         Returns:
             boolean value depending on wether the attach was successful or not
@@ -388,18 +387,19 @@ class Tamer(sqlite3.Connection):
         """
         try:
             with self:
-                self.execute("""ATTACH DATABASE ? AS ?""", (filename, schemaname))
+                for schemaname, filename in kwargs.items():
+                    self.execute("""ATTACH DATABASE ? AS ?;""", (filename, schemaname))
             return True        
         except sqlite3.Error as err:
             print("Couldn't attach database:", err, file=sys.stderr)
             return False
     
 
-    def detach(self, schemaname):
+    def detach(self, *schemanames):
         """Detach an additional database connection previously attached using the ATTACH statement.
 
         Args:            
-            schemaname: reference name of the database file
+            schemanames:    reference name(s) of the database file
         
         Returns:
             boolean value depending on wether the detach was successful or not
@@ -409,7 +409,8 @@ class Tamer(sqlite3.Connection):
         """
         try:
             with self:
-                self.execute("""DETACH DATABASE ?""", (schemaname, ))
+                for schemaname in schemanames:
+                    self.execute("""DETACH DATABASE ?;""", (schemaname, ))
             return True        
         except sqlite3.Error as err:
             print("Couldn't detach database:", err, file=sys.stderr)
