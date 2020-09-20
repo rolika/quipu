@@ -570,10 +570,11 @@ class CimModositoUrlap(simpledialog.Dialog):
 
 
 class UjKontaktUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, szemely_kon=None, szervezet_kon=None):
+    def __init__(self, szulo, szemely_kon=None, szervezet_kon=None, kontakt_kon=None):
         self._szemely_kon = szemely_kon
         self._szervezet_kon = szervezet_kon
-        self._szervezet_kon.attach(szemely="szemely.db")
+        self._kontakt_kon = kontakt_kon
+        self._szemely_kon.attach(szervezet="szervezet.db", kontakt="kontakt.db")
         super().__init__(szulo, title="Szervezet hozzárendelése")
 
     def body(self, szulo):
@@ -602,18 +603,18 @@ class UjKontaktUrlap(simpledialog.Dialog):
                           szervezet=self._szervezetvalaszto.elem.azonosito,
                           beosztas=self._beosztas.get(),
                           megjegyzes=self._megjegyzes.get())
-        if kontakt.ment(self._szemely_kon):
+        if kontakt.ment(self._kontakt_kon):
             print("Bejegyzés mentve.")
         else:
             print("Nem sikerült elmenteni.")
-        self._szervezet_kon.detach("szemely")
+        self._szemely_kon.detach("szervezet", "kontakt")
 
     def _szemelynevsor(self):
         return sorted(map(lambda szemely: Szemely(**szemely), self._szemely_kon.select("szemely")), key=repr)
 
     def _szervezetnevsor(self):
         szemelyazonosito = self._szemelyvalaszto.elem.azonosito
-        szemelyhez_nem_rendelt_szervezetek = self._szervezet_kon.execute("""
+        szemelyhez_nem_rendelt_szervezetek = self._szemely_kon.execute("""
             SELECT * FROM szervezet WHERE azonosito NOT IN (SELECT szervezet FROM kontakt WHERE szemely = ?);
         """, (szemelyazonosito, ))
         return sorted(map(lambda szervezet: Szervezet(**szervezet), szemelyhez_nem_rendelt_szervezetek), key=repr)
