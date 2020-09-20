@@ -3,10 +3,10 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from urlap import TelefonszamUrlap, EmailcimUrlap, CimUrlap, Valaszto
 from szervezet import Szervezet
-from szemely import Szemely
 from telefon import Telefon
 from email import Email
 from cim import Cim
+from szemely import Szemely
 from kontakt import Kontakt
 from konstans import BEOSZTAS
 
@@ -587,7 +587,6 @@ class UjKontaktUrlap(simpledialog.Dialog):
             print("Bejegyzés mentve.")
         else:
             print("Nem sikerült elmenteni.")
-            return False
 
     def _szervezetnevsor(self):
         return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)

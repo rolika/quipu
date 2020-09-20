@@ -6,6 +6,9 @@ from szemely import Szemely
 from telefon import Telefon
 from email import Email
 from cim import Cim
+from szervezet import Szervezet
+from kontakt import Kontakt
+from konstans import BEOSZTAS
 
 
 class SzemelyUrlap(Frame):
@@ -549,6 +552,59 @@ class CimModositoUrlap(simpledialog.Dialog):
         if cim:
             cim.adatok = self._cim_urlap.export()
         return cim
+
+
+class UjKontaktUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None, szervezet_kon=None):
+        self._kon = kon
+        self._szervezet_kon = szervezet_kon
+        self._szervezet_kon.attach("szemely.db", "szemely")
+        super().__init__(szulo, title="Szervezet hozzárendelése")
+
+    def body(self, szulo):
+        self._szemelyvalaszto = Valaszto("személy", self._szemelynevsor(), self)
+        self._szemelyvalaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenit)
+        self._szemelyvalaszto.pack(ipadx=2, ipady=2)
+
+        self._szervezetvalaszto = Valaszto("szervezet", self._szervezetnevsor(), self)
+        self._szervezetvalaszto.pack(ipadx=2, ipady=2)
+
+        self._beosztas = StringVar()
+        self._beosztas.set(BEOSZTAS[0])
+        OptionMenu(self, self._beosztas, *BEOSZTAS).pack(ipadx=2, ipady=2)
+
+        self._megjegyzes = StringVar()
+        Label(self, text="megjegyzés").pack(ipadx=2, ipady=2)
+        Entry(self, textvariable=self._megjegyzes, width=32).pack(ipadx=2, ipady=2)
+
+        return self._szemelyvalaszto
+
+    def validate(self):
+        return True
+
+    def apply(self):
+        kontakt = Kontakt(szemely=self._szemelyvalaszto.elem.azonosito,
+                          szervezet=self._szervezetvalaszto.elem.azonosito,
+                          beosztas=self._beosztas.get(),
+                          megjegyzes=self._megjegyzes.get())
+        if kontakt.ment(self._kon):
+            print("Bejegyzés mentve.")
+        else:
+            print("Nem sikerült elmenteni.")
+        self._szervezet_kon.detach("szemely")
+
+    def _szemelynevsor(self):
+        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
+
+    def _szervezetnevsor(self):
+        szemelyazonosito = self._szemelyvalaszto.elem.azonosito
+        szemelyhez_nem_rendelt_szervezetek = self._szervezet_kon.execute("""
+            SELECT * FROM szervezet WHERE azonosito NOT IN (SELECT szervezet FROM kontakt WHERE szemely = ?);
+        """, (szemelyazonosito, ))
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), szemelyhez_nem_rendelt_szervezetek), key=repr)
+
+    def _megjelenit(self, event):
+        self._szervezetvalaszto.beallit(self._szervezetnevsor())
 
 
 if __name__ == "__main__":

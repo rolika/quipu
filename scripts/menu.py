@@ -14,7 +14,7 @@ class Fomenu(Frame):
         raktarmb = Menubutton(self, text="Raktár", width=10)
 
         # menük
-        szemelymenu = SzemelyMenu(szemelymb, szemely_kon)
+        szemelymenu = SzemelyMenu(szemelymb, szemely_kon, szervezet_kon)
         szervezetmenu = SzervezetMenu(szervezetmb, szervezet_kon, szemely_kon)
 
         szemelymb.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
@@ -26,13 +26,14 @@ class Fomenu(Frame):
 
 
 class SzemelyMenu(Menu):
-    def __init__(self, mb, kon):
+    def __init__(self, mb, kon, szervezet_kon=None):
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
         self.add("cascade", label="személy", menu=SzemelyAlmenu(kon, mb))
         self.add("cascade", label="telefon", menu=TelefonAlmenu(kon, mb))
         self.add("cascade", label="email", menu=EmailAlmenu(kon, mb))
         self.add("cascade", label="cím", menu=CimAlmenu(kon, mb))
+        self.add("cascade", label="kontaktszemély", menu=SzemelyKontaktAlmenu(kon, mb, szervezet_kon))
 
 
 class SzervezetMenu(Menu):
@@ -203,6 +204,22 @@ class SzervezetKontaktAlmenu(Alapmenu):
 
     def modosit(self):
         szervezeturlap.KontaktModositoUrlap(self.mb.winfo_toplevel(), self._kon, self._szemely_kon)
+
+
+class SzemelyKontaktAlmenu(Alapmenu):
+    def __init__(self, kon, mb, szervezet_kon):
+        super().__init__(mb)
+        self._kon = kon
+        self._szervezet_kon = szervezet_kon
+    
+    def uj(self):
+        szemelyurlap.UjKontaktUrlap(self.mb.winfo_toplevel(), self._kon, self._szervezet_kon)
+
+    def torol(self):
+        szemelyurlap.KontaktTorloUrlap(self.mb.winfo_toplevel(), self._kon, self._szervezet_kon)
+
+    def modosit(self):
+        szemelyurlap.KontaktModositoUrlap(self.mb.winfo_toplevel(), self._kon, self._szervezet_kon)
 
 
 if __name__ == "__main__":

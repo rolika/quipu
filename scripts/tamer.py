@@ -371,6 +371,49 @@ class Tamer(sqlite3.Connection):
         except sqlite3.Error as err:
             print("Couldn't retrieve table names:", err, file=sys.stderr)
             return None
+    
+
+    def attach(self, filename, schemaname):
+        """Add another database file to the current database connection.
+
+        Args:
+            filename:   string containing a database filename
+            schemaname: reference name of the database file
+        
+        Returns:
+            boolean value depending on wether the attach was successful or not
+        
+        Reading:
+            https://sqlite.org/lang_attach.html
+        """
+        try:
+            with self:
+                self.execute("""ATTACH DATABASE ? AS ?""", (filename, schemaname))
+            return True        
+        except sqlite3.Error as err:
+            print("Couldn't attach database:", err, file=sys.stderr)
+            return False
+    
+
+    def detach(self, schemaname):
+        """Detach an additional database connection previously attached using the ATTACH statement.
+
+        Args:            
+            schemaname: reference name of the database file
+        
+        Returns:
+            boolean value depending on wether the detach was successful or not
+        
+        Reading:
+            https://sqlite.org/lang_detach.html
+        """
+        try:
+            with self:
+                self.execute("""DETACH DATABASE ?""", (schemaname, ))
+            return True        
+        except sqlite3.Error as err:
+            print("Couldn't detach database:", err, file=sys.stderr)
+            return False
 
 
     @staticmethod
