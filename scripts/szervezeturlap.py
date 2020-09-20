@@ -687,6 +687,7 @@ class KontaktModositoUrlap(simpledialog.Dialog):
                                            megjegyzes=self._megjegyzes.get())
             if self._kontakt.ment(self._szemely_kon):
                 print("Bejegyzés módosítva.")
+                self._megjelenit(1)
                 return
         print("Nem sikerült módosítani.")
 
