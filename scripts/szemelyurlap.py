@@ -574,7 +574,6 @@ class UjKontaktUrlap(simpledialog.Dialog):
         self._szemely_kon = szemely_kon
         self._szervezet_kon = szervezet_kon
         self._kontakt_kon = kontakt_kon
-        self._szemely_kon.attach(szervezet="szervezet.db", kontakt="kontakt.db")
         super().__init__(szulo, title="Szervezet hozzárendelése")
 
     def body(self, szulo):
@@ -607,7 +606,6 @@ class UjKontaktUrlap(simpledialog.Dialog):
             print("Bejegyzés mentve.")
         else:
             print("Nem sikerült elmenteni.")
-        self._szemely_kon.detach("szervezet", "kontakt")
 
     def _szemelynevsor(self):
         return sorted(map(lambda szemely: Szemely(**szemely), self._szemely_kon.select("szemely")), key=repr)

@@ -198,13 +198,19 @@ class SzervezetKontaktAlmenu(Alapmenu):
         self._kontakt_kon = kontakt_kon
     
     def uj(self):
+        self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
         szervezeturlap.UjKontaktUrlap(self.mb.winfo_toplevel(), self._szervezet_kon, self._szemely_kon, self._kontakt_kon)
+        self._szervezet_kon.detach("szemely", "kontakt")
 
     def torol(self):
+        self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
         szervezeturlap.KontaktTorloUrlap(self.mb.winfo_toplevel(), self._szervezet_kon, self._szemely_kon, self._kontakt_kon)
+        self._szervezet_kon.detach("szemely", "kontakt")
 
     def modosit(self):
+        self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
         szervezeturlap.KontaktModositoUrlap(self.mb.winfo_toplevel(), self._szervezet_kon, self._szemely_kon, self._kontakt_kon)
+        self._szervezet_kon.detach("szemely", "kontakt")
 
 
 class SzemelyKontaktAlmenu(Alapmenu):
@@ -215,13 +221,19 @@ class SzemelyKontaktAlmenu(Alapmenu):
         self._kontakt_kon = kontakt_kon
     
     def uj(self):
+        self._szemely_kon.attach(szervezet="szervezet.db", kontakt="kontakt.db")
         szemelyurlap.UjKontaktUrlap(self.mb.winfo_toplevel(), self._szemely_kon, self._szervezet_kon, self._kontakt_kon)
+        self._szemely_kon.detach("szervezet", "kontakt")
 
     def torol(self):
+        self._szemely_kon.attach(szervezet="szervezet.db", kontakt="kontakt.db")
         szemelyurlap.KontaktTorloUrlap(self.mb.winfo_toplevel(), self._szemely_kon, self._szervezet_kon, self._kontakt_kon)
+        self._szemely_kon.detach("szervezet", "kontakt")
 
     def modosit(self):
+        self._szemely_kon.attach(szervezet="szervezet.db", kontakt="kontakt.db")
         szemelyurlap.KontaktModositoUrlap(self.mb.winfo_toplevel(), self._szemely_kon, self._szervezet_kon, self._kontakt_kon)
+        self._szemely_kon.detach("szervezet", "kontakt")
 
 
 if __name__ == "__main__":

@@ -556,7 +556,6 @@ class UjKontaktUrlap(simpledialog.Dialog):
         self._szervezet_kon = szervezet_kon
         self._szemely_kon = szemely_kon
         self._kontakt_kon = kontakt_kon
-        self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
         super().__init__(szulo, title="Kontaktszemély hozzárendelése")
 
     def body(self, szulo):
@@ -589,7 +588,6 @@ class UjKontaktUrlap(simpledialog.Dialog):
             print("Bejegyzés mentve.")
         else:
             print("Nem sikerült elmenteni.")
-        self._szervezet_kon.detach("szemely", "kontakt")
 
     def _szervezetnevsor(self):
         return sorted(map(lambda szervezet: Szervezet(**szervezet), self._szervezet_kon.select("szervezet")), key=repr)
@@ -610,7 +608,6 @@ class KontaktTorloUrlap(simpledialog.Dialog):
         self._szervezet_kon= szervezet_kon
         self._szemely_kon = szemely_kon
         self._kontakt_kon = kontakt_kon
-        self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
         super().__init__(szulo, title="Kontaktszemély eltávolítása")
 
     def body(self, szulo):
@@ -637,7 +634,6 @@ class KontaktTorloUrlap(simpledialog.Dialog):
             print("Bejegyzés törölve.")
         else:
             print("Nem sikerült törölni.")
-        self._szervezet_kon.detach("szemely", "kontakt")
 
     def _szervezetnevsor(self):
         return sorted(map(lambda szervezet: Szervezet(**szervezet), self._szervezet_kon.select("szervezet")), key=repr)
@@ -658,7 +654,6 @@ class KontaktModositoUrlap(simpledialog.Dialog):
         self._szervezet_kon = szervezet_kon
         self._szemely_kon = szemely_kon
         self._kontakt_kon = kontakt_kon
-        self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
         self._kontakt = None
         super().__init__(szulo, title="Kontaktszemély módosítása")
 
@@ -698,7 +693,6 @@ class KontaktModositoUrlap(simpledialog.Dialog):
                 self._megjelenit(1)
                 return
         print("Nem sikerült módosítani.")
-        self._szervezet_kon.detach("szemely", "kontakt")
 
     def _szervezetnevsor(self):
         return sorted(map(lambda szervezet: Szervezet(**szervezet), self._szervezet_kon.select("szervezet")), key=repr)
