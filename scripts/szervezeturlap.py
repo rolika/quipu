@@ -552,9 +552,11 @@ class CimModositoUrlap(simpledialog.Dialog):
 
 
 class UjKontaktUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None, szemely_kon=None):
-        self._kon = kon
+    def __init__(self, szulo, szervezet_kon=None, szemely_kon=None, kontakt_kon=None):
+        self._szervezet_kon = szervezet_kon
         self._szemely_kon = szemely_kon
+        self._kontakt_kon = kontakt_kon
+        self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
         super().__init__(szulo, title="Kontaktszemély hozzárendelése")
 
     def body(self, szulo):
@@ -583,17 +585,18 @@ class UjKontaktUrlap(simpledialog.Dialog):
                           szervezet=self._szervezetvalaszto.elem.azonosito,
                           beosztas=self._beosztas.get(),
                           megjegyzes=self._megjegyzes.get())
-        if kontakt.ment(self._szemely_kon):
+        if kontakt.ment(self._kontakt_kon):
             print("Bejegyzés mentve.")
         else:
             print("Nem sikerült elmenteni.")
+        self._szervezet_kon.detach("szemely", "kontakt")
 
     def _szervezetnevsor(self):
-        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._szervezet_kon.select("szervezet")), key=repr)
 
     def _szemelynevsor(self):
         szervezetazonosito = self._szervezetvalaszto.elem.azonosito
-        szervezethez_nem_rendelt_szemelyek = self._szemely_kon.execute("""
+        szervezethez_nem_rendelt_szemelyek = self._szervezet_kon.execute("""
             SELECT * FROM szemely WHERE azonosito NOT IN (SELECT szemely FROM kontakt WHERE szervezet = ?);
         """, (szervezetazonosito, ))
         return sorted(map(lambda szemely: Szemely(**szemely), szervezethez_nem_rendelt_szemelyek), key=repr)
@@ -603,9 +606,11 @@ class UjKontaktUrlap(simpledialog.Dialog):
 
 
 class KontaktTorloUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None, szemely_kon=None):
-        self._kon = kon
+    def __init__(self, szulo, szervezet_kon=None, szemely_kon=None, kontakt_kon=None):
+        self._szervezet_kon= szervezet_kon
         self._szemely_kon = szemely_kon
+        self._kontakt_kon = kontakt_kon
+        self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
         super().__init__(szulo, title="Kontaktszemély eltávolítása")
 
     def body(self, szulo):
@@ -625,20 +630,21 @@ class KontaktTorloUrlap(simpledialog.Dialog):
             return False
 
     def apply(self):
-        kontakt = Kontakt(**(self._szemely_kon.select("kontakt", logic="AND",
+        kontakt = Kontakt(**(self._kontakt_kon.select("kontakt", logic="AND",
                                                        szemely=self._szemelyvalaszto.elem.azonosito,
                                                        szervezet=self._szervezetvalaszto.elem.azonosito).fetchone()))
-        if kontakt.torol(self._szemely_kon):
+        if kontakt.torol(self._kontakt_kon):
             print("Bejegyzés törölve.")
         else:
             print("Nem sikerült törölni.")
+        self._szervezet_kon.detach("szemely", "kontakt")
 
     def _szervezetnevsor(self):
-        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._szervezet_kon.select("szervezet")), key=repr)
 
     def _szemelynevsor(self):
         szervezetazonosito = self._szervezetvalaszto.elem.azonosito
-        szervezethez_rendelt_szemelyek = self._szemely_kon.execute("""
+        szervezethez_rendelt_szemelyek = self._szervezet_kon.execute("""
             SELECT * FROM szemely WHERE azonosito IN (SELECT szemely FROM kontakt WHERE szervezet = ?);
         """, (szervezetazonosito, ))
         return sorted(map(lambda szemely: Szemely(**szemely), szervezethez_rendelt_szemelyek), key=repr)
@@ -648,9 +654,11 @@ class KontaktTorloUrlap(simpledialog.Dialog):
 
 
 class KontaktModositoUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None, szemely_kon=None):
-        self._kon = kon
+    def __init__(self, szulo, szervezet_kon=None, szemely_kon=None, kontakt_kon=None):
+        self._szervezet_kon = szervezet_kon
         self._szemely_kon = szemely_kon
+        self._kontakt_kon = kontakt_kon
+        self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
         self._kontakt = None
         super().__init__(szulo, title="Kontaktszemély módosítása")
 
@@ -685,18 +693,19 @@ class KontaktModositoUrlap(simpledialog.Dialog):
                                            szervezet=self._szervezetvalaszto.elem.azonosito,
                                            beosztas=self._beosztas.get(),
                                            megjegyzes=self._megjegyzes.get())
-            if self._kontakt.ment(self._szemely_kon):
+            if self._kontakt.ment(self._kontakt_kon):
                 print("Bejegyzés módosítva.")
                 self._megjelenit(1)
                 return
         print("Nem sikerült módosítani.")
+        self._szervezet_kon.detach("szemely", "kontakt")
 
     def _szervezetnevsor(self):
-        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
+        return sorted(map(lambda szervezet: Szervezet(**szervezet), self._szervezet_kon.select("szervezet")), key=repr)
 
     def _szemelynevsor(self):
         szervezetazonosito = self._szervezetvalaszto.elem.azonosito
-        szervezethez_rendelt_szemelyek = self._szemely_kon.execute("""
+        szervezethez_rendelt_szemelyek = self._szervezet_kon.execute("""
             SELECT * FROM szemely WHERE azonosito IN (SELECT szemely FROM kontakt WHERE szervezet = ?);
         """, (szervezetazonosito, ))
         return sorted(map(lambda szemely: Szemely(**szemely), szervezethez_rendelt_szemelyek), key=repr)
@@ -709,7 +718,7 @@ class KontaktModositoUrlap(simpledialog.Dialog):
         szemely = self._szemelyvalaszto.elem
         if szemely:
             szervezet=self._szervezetvalaszto.elem.azonosito
-            kontakt = self._szemely_kon.select("kontakt", szemely=szemely.azonosito, logic="AND", szervezet=szervezet)
+            kontakt = self._kontakt_kon.select("kontakt", szemely=szemely.azonosito, logic="AND", szervezet=szervezet)
             self._kontakt = Kontakt(**(kontakt.fetchone()))
             self._beosztas.set(self._kontakt.beosztas)
             self._megjegyzes.set(self._kontakt.megjegyzes)

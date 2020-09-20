@@ -4,7 +4,7 @@ import szervezeturlap
 
 
 class Fomenu(Frame):
-    def __init__(self, master=None, szemely_kon=None, szervezet_kon=None, **kw):
+    def __init__(self, master=None, szemely_kon=None, szervezet_kon=None, kontakt_kon=None, **kw):
         super().__init__(master=master, **kw)
 
         # főmenü
@@ -14,8 +14,8 @@ class Fomenu(Frame):
         raktarmb = Menubutton(self, text="Raktár", width=10)
 
         # menük
-        szemelymenu = SzemelyMenu(szemelymb, szemely_kon, szervezet_kon)
-        szervezetmenu = SzervezetMenu(szervezetmb, szervezet_kon, szemely_kon)
+        szemelymenu = SzemelyMenu(szemelymb, szemely_kon, szervezet_kon, kontakt_kon)
+        szervezetmenu = SzervezetMenu(szervezetmb, szervezet_kon, szemely_kon, kontakt_kon)
 
         szemelymb.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         szervezetmb.grid(row=0, column=1, sticky=W, ipadx=2, ipady=2)
@@ -26,25 +26,25 @@ class Fomenu(Frame):
 
 
 class SzemelyMenu(Menu):
-    def __init__(self, mb, kon, szervezet_kon=None):
+    def __init__(self, mb, szemely_kon, szervezet_kon, kontakt_kon):
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
-        self.add("cascade", label="személy", menu=SzemelyAlmenu(kon, mb))
-        self.add("cascade", label="telefon", menu=TelefonAlmenu(kon, mb))
-        self.add("cascade", label="email", menu=EmailAlmenu(kon, mb))
-        self.add("cascade", label="cím", menu=CimAlmenu(kon, mb))
-        self.add("cascade", label="kontaktszemély", menu=SzemelyKontaktAlmenu(kon, mb, szervezet_kon))
+        self.add("cascade", label="személy", menu=SzemelyAlmenu(szemely_kon, mb))
+        self.add("cascade", label="telefon", menu=TelefonAlmenu(szemely_kon, mb))
+        self.add("cascade", label="email", menu=EmailAlmenu(szemely_kon, mb))
+        self.add("cascade", label="cím", menu=CimAlmenu(szemely_kon, mb))
+        self.add("cascade", label="kontaktszemély", menu=SzemelyKontaktAlmenu(szemely_kon, mb, szervezet_kon, kontakt_kon))
 
 
 class SzervezetMenu(Menu):
-    def __init__(self, mb, kon, szemely_kon=None):
+    def __init__(self, mb, szervezet_kon, szemely_kon, kontakt_kon):
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
-        self.add("cascade", label="szervezet", menu=SzervezetAlmenu(kon, mb))
-        self.add("cascade", label="telefon", menu=SzervezetTelefonAlmenu(kon, mb))
-        self.add("cascade", label="email", menu=SzervezetEmailAlmenu(kon, mb))
-        self.add("cascade", label="cím", menu=SzervezetCimAlmenu(kon, mb))
-        self.add("cascade", label="kontaktszemély", menu=SzervezetKontaktAlmenu(kon, mb, szemely_kon))
+        self.add("cascade", label="szervezet", menu=SzervezetAlmenu(szervezet_kon, mb))
+        self.add("cascade", label="telefon", menu=SzervezetTelefonAlmenu(szervezet_kon, mb))
+        self.add("cascade", label="email", menu=SzervezetEmailAlmenu(szervezet_kon, mb))
+        self.add("cascade", label="cím", menu=SzervezetCimAlmenu(szervezet_kon, mb))
+        self.add("cascade", label="kontaktszemély", menu=SzervezetKontaktAlmenu(szervezet_kon, mb, szemely_kon, kontakt_kon))
 
 
 class Alapmenu(Menu):
@@ -73,153 +73,155 @@ class Alapmenu(Menu):
 class SzemelyAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
-        self._kon = kon
+        self._szemely_kon = kon
 
     def uj(self):
-        szemelyurlap.UjSzemelyUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.UjSzemelyUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
 
     def torol(self):
-        szemelyurlap.SzemelyTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.SzemelyTorloUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
 
     def modosit(self):
-        szemelyurlap.SzemelyModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.SzemelyModositoUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
 
 
 class TelefonAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
-        self.kon = kon
+        self._szemely_kon = kon
 
     def uj(self):
-        szemelyurlap.UjTelefonUrlap(self.mb.winfo_toplevel(), self.kon)
+        szemelyurlap.UjTelefonUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
 
     def torol(self):
-        szemelyurlap.TelefonTorloUrlap(self.mb.winfo_toplevel(), self.kon)
+        szemelyurlap.TelefonTorloUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
 
     def modosit(self):
-        szemelyurlap.TelefonModositoUrlap(self.mb.winfo_toplevel(), self.kon)
+        szemelyurlap.TelefonModositoUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
 
 
 class EmailAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
-        self._kon = kon
+        self._szemely_kon = kon
     
     def uj(self):
-        szemelyurlap.UjEmailUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.UjEmailUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
 
     def torol(self):
-        szemelyurlap.EmailTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.EmailTorloUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
 
     def modosit(self):
-        szemelyurlap.EmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.EmailModositoUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
 
 
 class CimAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
-        self._kon = kon
+        self._szemely_kon = kon
     
     def uj(self):
-        szemelyurlap.UjCimUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.UjCimUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
 
     def torol(self):
-        szemelyurlap.CimTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.CimTorloUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
 
     def modosit(self):
-        szemelyurlap.CimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.CimModositoUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
 
 
 class SzervezetAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
-        self._kon = kon
+        self._szervezet_kon = kon
 
     def uj(self):
-        szervezeturlap.UjSzervezetUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.UjSzervezetUrlap(self.mb.winfo_toplevel(), self._szervezet_kon)
 
     def torol(self):
-        szervezeturlap.SzervezetTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.SzervezetTorloUrlap(self.mb.winfo_toplevel(), self._szervezet_kon)
 
     def modosit(self):
-        szervezeturlap.SzervezetModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.SzervezetModositoUrlap(self.mb.winfo_toplevel(), self._szervezet_kon)
 
 
 class SzervezetTelefonAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
-        self.kon = kon
+        self._szervezet_kon = kon
 
     def uj(self):
-        szervezeturlap.UjTelefonUrlap(self.mb.winfo_toplevel(), self.kon)
+        szervezeturlap.UjTelefonUrlap(self.mb.winfo_toplevel(), self._szervezet_kon)
 
     def torol(self):
-        szervezeturlap.TelefonTorloUrlap(self.mb.winfo_toplevel(), self.kon)
+        szervezeturlap.TelefonTorloUrlap(self.mb.winfo_toplevel(), self._szervezet_kon)
 
     def modosit(self):
-        szervezeturlap.TelefonModositoUrlap(self.mb.winfo_toplevel(), self.kon)
+        szervezeturlap.TelefonModositoUrlap(self.mb.winfo_toplevel(), self._szervezet_kon)
 
 
 class SzervezetEmailAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
-        self._kon = kon
+        self._szervezet_kon = kon
     
     def uj(self):
-        szervezeturlap.UjEmailUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.UjEmailUrlap(self.mb.winfo_toplevel(), self._szervezet_kon)
 
     def torol(self):
-        szervezeturlap.EmailTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.EmailTorloUrlap(self.mb.winfo_toplevel(), self._szervezet_kon)
 
     def modosit(self):
-        szervezeturlap.EmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.EmailModositoUrlap(self.mb.winfo_toplevel(), self._szervezet_kon)
 
 
 class SzervezetCimAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
-        self._kon = kon
+        self._szervezet_kon = kon
     
     def uj(self):
-        szervezeturlap.UjCimUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.UjCimUrlap(self.mb.winfo_toplevel(), self._szervezet_kon)
 
     def torol(self):
-        szervezeturlap.CimTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.CimTorloUrlap(self.mb.winfo_toplevel(), self._szervezet_kon)
 
     def modosit(self):
-        szervezeturlap.CimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.CimModositoUrlap(self.mb.winfo_toplevel(), self._szervezet_kon)
 
 
 class SzervezetKontaktAlmenu(Alapmenu):
-    def __init__(self, kon, mb, szemely_kon):
+    def __init__(self, szervezet_kon, mb, szemely_kon, kontakt_kon):
         super().__init__(mb)
-        self._kon = kon
+        self._szervezet_kon = szervezet_kon
         self._szemely_kon = szemely_kon
+        self._kontakt_kon = kontakt_kon
     
     def uj(self):
-        szervezeturlap.UjKontaktUrlap(self.mb.winfo_toplevel(), self._kon, self._szemely_kon)
+        szervezeturlap.UjKontaktUrlap(self.mb.winfo_toplevel(), self._szervezet_kon, self._szemely_kon, self._kontakt_kon)
 
     def torol(self):
-        szervezeturlap.KontaktTorloUrlap(self.mb.winfo_toplevel(), self._kon, self._szemely_kon)
+        szervezeturlap.KontaktTorloUrlap(self.mb.winfo_toplevel(), self._szervezet_kon, self._szemely_kon, self._kontakt_kon)
 
     def modosit(self):
-        szervezeturlap.KontaktModositoUrlap(self.mb.winfo_toplevel(), self._kon, self._szemely_kon)
+        szervezeturlap.KontaktModositoUrlap(self.mb.winfo_toplevel(), self._szervezet_kon, self._szemely_kon, self._kontakt_kon)
 
 
 class SzemelyKontaktAlmenu(Alapmenu):
-    def __init__(self, kon, mb, szervezet_kon):
+    def __init__(self, szemely_kon, mb, szervezet_kon, kontakt_kon):
         super().__init__(mb)
-        self._kon = kon
+        self._szemely_kon = szemely_kon
         self._szervezet_kon = szervezet_kon
+        self._kontakt_kon = kontakt_kon
     
     def uj(self):
-        szemelyurlap.UjKontaktUrlap(self.mb.winfo_toplevel(), self._kon, self._szervezet_kon)
+        szemelyurlap.UjKontaktUrlap(self.mb.winfo_toplevel(), self._szemely_kon, self._szervezet_kon, self._kontakt_kon)
 
     def torol(self):
-        szemelyurlap.KontaktTorloUrlap(self.mb.winfo_toplevel(), self._kon, self._szervezet_kon)
+        szemelyurlap.KontaktTorloUrlap(self.mb.winfo_toplevel(), self._szemely_kon, self._szervezet_kon, self._kontakt_kon)
 
     def modosit(self):
-        szemelyurlap.KontaktModositoUrlap(self.mb.winfo_toplevel(), self._kon, self._szervezet_kon)
+        szemelyurlap.KontaktModositoUrlap(self.mb.winfo_toplevel(), self._szemely_kon, self._szervezet_kon, self._kontakt_kon)
 
 
 if __name__ == "__main__":
