@@ -8,7 +8,7 @@ from email import Email
 from cim import Cim
 from szemely import Szemely
 from kontakt import Kontakt
-from konstans import BEOSZTAS
+from konstans import BEOSZTAS, JOGI_MAGAN
 
 
 class SzervezetUrlap(Frame):
@@ -86,6 +86,8 @@ class SzervezetTorloUrlap(simpledialog.Dialog):
 
     def validate(self):
         szervezet = self._nev_valaszto.elem
+        if szervezet.rovidnev in JOGI_MAGAN:
+            return False  # nem engedem törölni a speciális esetet
         biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!", parent=self)
         return szervezet and biztos
 
@@ -122,6 +124,8 @@ class SzervezetModositoUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
+        if self._nev_valaszto.elem.rovidnev in JOGI_MAGAN:
+            return False  # nem engedem módosítani a speciális esetet
         szervezet = self._uj_szervezet()
         if not szervezet:
             messagebox.showwarning("Hiányos adat!", "Legalább a rövid nevet add meg!", parent=self)
@@ -168,6 +172,8 @@ class UjTelefonUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
+        if self._nev_valaszto.elem.rovidnev in JOGI_MAGAN:
+            return False  # nem engedem módosítani a speciális esetet
         self._telefonszam = self._telefonszam_urlap.export()
         if not self._telefonszam:
             messagebox.showwarning("Hiányos adat!", "Add meg a telefonszámot!", parent=self)
@@ -301,6 +307,8 @@ class UjEmailUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
+        if self._nev_valaszto.elem.rovidnev in JOGI_MAGAN:
+            return False  # nem engedem módosítani a speciális esetet
         self._emailcim = self._emailcim_urlap.export()
         if not self._emailcim:
             messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
@@ -434,6 +442,8 @@ class UjCimUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
+        if self._nev_valaszto.elem.rovidnev in JOGI_MAGAN:
+            return False  # nem engedem módosítani a speciális esetet
         self._cim = self._cim_urlap.export()
         if not self._cim:
             messagebox.showwarning("Hiányos adat!", "Legalább a helységet add meg!", parent=self)

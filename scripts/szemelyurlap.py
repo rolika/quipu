@@ -8,7 +8,7 @@ from email import Email
 from cim import Cim
 from szervezet import Szervezet
 from kontakt import Kontakt
-from konstans import BEOSZTAS
+from konstans import BEOSZTAS, JOGI_MAGAN
 
 
 class SzemelyUrlap(Frame):
@@ -103,6 +103,8 @@ class SzemelyTorloUrlap(simpledialog.Dialog):
 
     def validate(self):
         szemely = self._nev_valaszto.elem
+        if szemely.vezeteknev in JOGI_MAGAN:
+            return False  # nem engedem törölni a speciális esetet
         biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!", parent=self)
         return szemely and biztos
 
@@ -140,6 +142,8 @@ class SzemelyModositoUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
+        if self._nev_valaszto.elem.vezeteknev in JOGI_MAGAN:
+            return False  # nem engedem módosítani a speciális esetet
         self._szemely = self._uj_szemely()
         if not self._szemely:
             messagebox.showwarning("Hiányos adat!", "Legalább az egyik nevet add meg!", parent=self)
@@ -186,6 +190,8 @@ class UjTelefonUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
+        if self._nev_valaszto.elem.vezeteknev in JOGI_MAGAN:
+            return False  # nem engedem módosítani a speciális esetet
         self._telefonszam = self._telefonszam_urlap.export()
         if not self._telefonszam:
             messagebox.showwarning("Hiányos adat!", "Add meg a telefonszámot!", parent=self)
@@ -223,7 +229,7 @@ class TelefonTorloUrlap(simpledialog.Dialog):
         self._telefonszam = self._telefon_valaszto.elem
         if self._telefonszam:
             biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
-        return self._telefonszam and biztos
+        return self._telefonszam and biztos  # rövidzárlat miatt a biztos nem értékelődik ki, ha a telefonszám nem igaz 
 
     def apply(self):
         if self._telefonszam.torol(self._kon):
@@ -319,6 +325,8 @@ class UjEmailUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
+        if self._nev_valaszto.elem.vezeteknev in JOGI_MAGAN:
+            return False  # nem engedem módosítani a speciális esetet
         self._emailcim = self._emailcim_urlap.export()
         if not self._emailcim:
             messagebox.showwarning("Hiányos adat!", "Add meg az email-címet!", parent=self)
@@ -356,7 +364,7 @@ class EmailTorloUrlap(simpledialog.Dialog):
         self._emailcim = self._email_valaszto.elem
         if self._emailcim:
             biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
-        return self._emailcim and biztos
+        return self._emailcim and biztos  # rövidzárlat miatt a biztos nem értékelődik ki, ha az emailcím nem igaz
 
     def apply(self):
         if self._emailcim.torol(self._kon):
@@ -452,6 +460,8 @@ class UjCimUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
+        if self._nev_valaszto.elem.vezeteknev in JOGI_MAGAN:
+            return False  # nem engedem módosítani a speciális esetet
         self._cim = self._cim_urlap.export()
         if not self._cim:
             messagebox.showwarning("Hiányos adat!", "Legalább a helységet add meg!", parent=self)
@@ -489,7 +499,7 @@ class CimTorloUrlap(simpledialog.Dialog):
         self._cim = self._cim_valaszto.elem
         if self._cim:
             biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
-        return self._cim and biztos
+        return self._cim and biztos  # rövidzárlat miatt a biztos nem értékelődik ki, ha a cím nem igaz
 
     def apply(self):
         if self._cim.torol(self._kon):

@@ -26,8 +26,6 @@ SOFTWARE.
 
 from tkinter import *
 import tamer
-import sqlite3
-import urlap
 import menu
 
 
