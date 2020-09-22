@@ -1,8 +1,12 @@
-class Cim:
+import dolog
+
+
+class Cim(dolog.Dolog):
     """Cím megvalósítása"""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
+        super().__init__()
         if kwargs:
             self._adatok = dict(kwargs)
         else:  # űrlap mezőinek törléséhez
@@ -16,6 +20,7 @@ class Cim:
                 "honlap": "",
                 "megjegyzes": ""
             }
+        self._tabla = "cim"
 
     def __str__(self):
         return "{}-{} {}, {}".format(self.orszag, self.iranyitoszam, self.helyseg, self.utca)
@@ -39,10 +44,6 @@ class Cim:
         self._adatok["postafiok"] = cim.postafiok
         self._adatok["honlap"] = cim.honlap
         self._adatok["megjegyzes"] = cim.megjegyzes
-
-    @property
-    def azonosito(self):
-        return self._adatok.get("azonosito")
 
     @property
     def szemely(self):
@@ -88,23 +89,8 @@ class Cim:
     def honlap(self):
         return self._adatok.get("honlap", "")
 
-    @property
-    def megjegyzes(self):
-        return self._adatok.get("megjegyzes", "")
-
     def listanezet(self):
         return str(self)
-
-    def ment(self, kon):
-        """Menti vagy módosítja a címadatokat"""
-        if self.azonosito:
-            return kon.update("cim", self._adatok, azonosito=self.azonosito)  # True vagy False
-        else:
-            return kon.insert("cim", **self._adatok)  # lastrowid vagy None
-
-    def torol(self, kon):
-        """Törli az adatbázisból a cím-bejegyzést"""
-        return kon.delete("cim", azonosito=self.azonosito)
 
 
 if __name__ == "__main__":

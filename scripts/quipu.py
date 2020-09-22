@@ -26,8 +26,6 @@ SOFTWARE.
 
 from tkinter import *
 import tamer
-import sqlite3
-import urlap
 import menu
 
 
@@ -37,7 +35,8 @@ class Quipu(Frame):
         super().__init__(master=master, **kwargs)
         self._init_szemely_db()
         self._init_szervezet_db()
-        menu.Fomenu(self, self._szemely_kon, self._szervezet_kon)
+        self._init_kontakt_db()
+        menu.Fomenu(self, self._szemely_kon, self._szervezet_kon, self._kontakt_kon)
         self.grid()
         self.mainloop()
 
@@ -49,12 +48,12 @@ class Quipu(Frame):
             azonosito="INTEGER PRIMARY KEY",
             elotag="TEXT",
             vezeteknev="TEXT NOT NULL",
-            keresztnev="TEXT NOT NULL", 
+            keresztnev="TEXT NOT NULL",
             nem="TEXT NOT NULL",
             megjegyzes="TEXT")
 
         self._szemely_kon.create("telefon",
-            azonosito="INTEGER PRIMARY KEY", 
+            azonosito="INTEGER PRIMARY KEY",
             szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
             telefonszam="TEXT NOT NULL",
             megjegyzes="TEXT")
@@ -68,36 +67,22 @@ class Quipu(Frame):
         self._szemely_kon.create("cim",
             azonosito="INTEGER PRIMARY KEY",
             szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            orszag="TEXT DEFAULT 'H'", 
-            iranyitoszam="TEXT", 
-            helyseg="TEXT NOT NULL", 
-            utca="TEXT", 
-            hrsz="TEXT", 
-            postafiok="TEXT", 
-            honlap="TEXT", 
+            orszag="TEXT DEFAULT 'H'",
+            iranyitoszam="TEXT",
+            helyseg="TEXT NOT NULL",
+            utca="TEXT",
+            hrsz="TEXT",
+            postafiok="TEXT",
+            honlap="TEXT",
             megjegyzes="TEXT")
 
-        self._szemely_kon.create("kontakt", 
-            azonosito="INTEGER PRIMARY KEY",
-            szemely="INTEGER NOT NULL REFERENCES szemely", 
-            szervezet="INTEGER", 
-            megjegyzes="TEXT")
-
-        self._szemely_kon.executescript("""
-            -- automatikusan add hozzá a kontaktszemélyhez is
-            CREATE TRIGGER IF NOT EXISTS kntkt AFTER INSERT ON szemely
-                BEGIN
-                    INSERT INTO kontakt(szemely) VALUES(last_insert_rowid());
-                END;
-        """)
-    
     def _init_szervezet_db(self):
         """Szervezet adatbázis inicializálása"""
         self._szervezet_kon = tamer.Tamer("szervezet.db")
 
         self._szervezet_kon.create("szervezet",
-            azonosito="INTEGER PRIMARY KEY", 
-            rovidnev="TEXT NOT NULL", 
+            azonosito="INTEGER PRIMARY KEY",
+            rovidnev="TEXT NOT NULL",
             teljesnev="TEXT",
             gyakorisag="INTEGER DEFAULT 0",
             vevo="INTEGER DEFAULT 0",
@@ -105,7 +90,7 @@ class Quipu(Frame):
             megjegyzes="TEXT")
 
         self._szervezet_kon.create("telefon",
-            azonosito="INTEGER PRIMARY KEY", 
+            azonosito="INTEGER PRIMARY KEY",
             szervezet="INTEGER NOT NULL REFERENCES szervezet",
             telefonszam="TEXT NOT NULL",
             megjegyzes="TEXT")
@@ -119,13 +104,24 @@ class Quipu(Frame):
         self._szervezet_kon.create("cim",
             azonosito="INTEGER PRIMARY KEY",
             szervezet="INTEGER NOT NULL REFERENCES szervezet",
-            orszag="TEXT DEFAULT 'H'", 
-            iranyitoszam="TEXT", 
-            helyseg="TEXT NOT NULL", 
-            utca="TEXT", 
-            hrsz="TEXT", 
-            postafiok="TEXT", 
-            honlap="TEXT", 
+            orszag="TEXT DEFAULT 'H'",
+            iranyitoszam="TEXT",
+            helyseg="TEXT NOT NULL",
+            utca="TEXT",
+            hrsz="TEXT",
+            postafiok="TEXT",
+            honlap="TEXT",
+            megjegyzes="TEXT")
+
+    def _init_kontakt_db(self):
+        self._kontakt_kon = tamer.Tamer("kontakt.db")
+
+        self._kontakt_kon.create("kontakt",
+            azonosito="INTEGER PRIMARY KEY",
+            szemely="INTEGER",
+            szervezet="INTEGER",
+            beosztas="TEXT",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
 
 

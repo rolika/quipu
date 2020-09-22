@@ -1,8 +1,12 @@
-class Email:
+import dolog
+
+
+class Email(dolog.Dolog):
     """Email-elérhetőség megvalósítása."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
+        super().__init__()
         if kwargs:
             self._adatok = dict(kwargs)
         else:
@@ -10,6 +14,7 @@ class Email:
                 "emailcim": "",
                 "megjegyzes": ""
             }
+        self._tabla = "email"
 
     def __bool__(self):
         return bool(self.emailcim)
@@ -23,10 +28,6 @@ class Email:
         """Új email-osztály alapján módosítja a meglévőt."""
         self._adatok["emailcim"] = email.emailcim
         self._adatok["megjegyzes"] = email.megjegyzes
-
-    @property
-    def azonosito(self):
-        return self._adatok.get("azonosito")
 
     @property
     def szemely(self):
@@ -48,22 +49,6 @@ class Email:
     def emailcim(self):
         return self._adatok.get("emailcim")
 
-    @property
-    def megjegyzes(self):
-        return self._adatok.get("megjegyzes")
-
     def listanezet(self):
         """Elérhetőseg megjelenítése kiválasztáshoz (Combobox)"""
         return "{} ({})".format(self.emailcim, self.megjegyzes)
-
-    def ment(self, kon):
-        """Menti vagy módosítja az emailcím-adatokat"""
-        if self.azonosito:
-            return kon.update("email", self._adatok, azonosito=self.azonosito)  # True vagy False
-        else:
-            return kon.insert("email", **self._adatok)  # lastrowid vagy None
-
-    def torol(self, kon):
-        """Törli az adatbázisból az email-bejegyzést"""
-        return kon.delete("email", azonosito=self.azonosito)
-
