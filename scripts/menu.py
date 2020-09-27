@@ -1,10 +1,11 @@
 from tkinter import *
 import szemelyurlap
 import szervezeturlap
+import projekturlap
 
 
 class Fomenu(Frame):
-    def __init__(self, master=None, szemely_kon=None, szervezet_kon=None, kontakt_kon=None, **kw):
+    def __init__(self, master=None, szemely_kon=None, szervezet_kon=None, kontakt_kon=None, projekt_kon=None, **kw):
         super().__init__(master=master, **kw)
 
         # főmenü
@@ -16,6 +17,7 @@ class Fomenu(Frame):
         # menük
         szemelymenu = SzemelyMenu(szemelymb, szemely_kon, szervezet_kon, kontakt_kon)
         szervezetmenu = SzervezetMenu(szervezetmb, szervezet_kon, szemely_kon, kontakt_kon)
+        projektmenu = ProjektMenu(projektmb, projekt_kon)
 
         szemelymb.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         szervezetmb.grid(row=0, column=1, sticky=W, ipadx=2, ipady=2)
@@ -45,6 +47,14 @@ class SzervezetMenu(Menu):
         self.add("cascade", label="email", menu=SzervezetEmailAlmenu(szervezet_kon, mb))
         self.add("cascade", label="cím", menu=SzervezetCimAlmenu(szervezet_kon, mb))
         self.add("cascade", label="kontaktszemély", menu=SzervezetKontaktAlmenu(szervezet_kon, mb, szemely_kon, kontakt_kon))
+
+class ProjektMenu(Menu):
+    def __init__(self, mb, projekt_kon):
+        super().__init__(mb, tearoff=0)
+        mb["menu"] = self
+        self.add("cascade", label="projekt", menu=ProjektAlmenu(projekt_kon, mb))
+        self.add("cascade", label="munkarész", menu=MunkareszAlmenu(projekt_kon, mb))
+        self.add("cascade", label="cím", menu=MunkareszCimAlmenu(projekt_kon, mb))
 
 
 class Alapmenu(Menu):
@@ -252,6 +262,51 @@ class SzemelyKontaktAlmenu(Alapmenu):
                                           self._szervezet_kon,
                                           self._kontakt_kon)
         self._szemely_kon.detach("szervezet", "kontakt")
+
+
+class ProjektAlmenu(Alapmenu):
+    def __init__(self, kon, mb):
+        super().__init__(mb)
+        self._projekt_kon = kon
+
+    def uj(self):
+        projekturlap.UjProjektUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
+
+    def torol(self):
+        projekturlap.ProjektTorloUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
+
+    def modosit(self):
+        projekturlap.ProjektModositoUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
+
+
+class MunkareszAlmenu(Alapmenu):
+    def __init__(self, kon, mb):
+        super().__init__(mb)
+        self._projekt_kon = kon
+
+    def uj(self):
+        projekturlap.UjMunkareszUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
+
+    def torol(self):
+        projekturlap.MunkareszTorloUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
+
+    def modosit(self):
+        projekturlap.MunkareszModositoUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
+
+
+class MunkareszCimAlmenu(Alapmenu):
+    def __init__(self, kon, mb):
+        super().__init__(mb)
+        self._projekt_kon = kon
+
+    def uj(self):
+        projekturlap.UjMunkareszCimUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
+
+    def torol(self):
+        projekturlap.MunkareszCimTorloUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
+
+    def modosit(self):
+        projekturlap.MunkareszCimModositoUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
 
 
 if __name__ == "__main__":
