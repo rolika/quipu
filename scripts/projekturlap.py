@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
-from tkinter.ttk import Labelframe
+from tkinter.ttk import Combobox, Labelframe
 from urlap import CimUrlap
 from cim import Cim
 from konstans import JELLEG, MUNKARESZ
@@ -17,15 +17,21 @@ class UjProjektUrlap(simpledialog.Dialog):
     
     def body(self, szulo):
 
-        megnevezes = Frame(self)
-        Label(megnevezes, text="projekt neve").pack(side=LEFT, padx=2, pady=2)
-        Entry(megnevezes, textvariable=self._megnevezes, width=32).pack(side=LEFT, padx=2, pady=2)
-        megnevezes.pack(padx=2, pady=2)
+        megnevezes = LabelFrame(self, text="projekt neve")
+        nev = Entry(megnevezes, textvariable=self._megnevezes)
+        nev.pack(fill=X, padx=2, pady=2)
+        megnevezes.pack(fill=X, padx=2, pady=2)
 
         cim = LabelFrame(self, text="projekt címe")
         self._cim_urlap = CimUrlap(cim)
         self._cim_urlap.pack(ipadx=2, ipady=2)
         cim.pack(padx=2, pady=2)
+
+        munkaresz = LabelFrame(self, text="munkarész")
+        self._munkaresz = StringVar()
+        self._munkaresz.set(MUNKARESZ[0])
+        Combobox(self, textvariable=self._munkaresz, values=MUNKARESZ).pack(fill=X, padx=2, pady=2)
+        munkaresz.pack(fill=X, padx=2, pady=2)
 
         jelleg = LabelFrame(self, text="projekt jellege")
         self._jelleg = StringVar()
@@ -33,6 +39,7 @@ class UjProjektUrlap(simpledialog.Dialog):
         OptionMenu(jelleg, self._jelleg, *JELLEG).pack(fill=X, ipadx=2, ipady=2)
         jelleg.pack(fill=X, padx=2, pady=2)
 
+        nev.focus_set()
 
 
 class ProjektTorloUrlap(simpledialog.Dialog):
