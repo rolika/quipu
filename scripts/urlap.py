@@ -74,9 +74,7 @@ class CimUrlap(Frame):
         Combobox(self, textvariable=self._megye, values=MEGYE).grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
         Label(self, text="irányítószám").grid(row=2, column=0, sticky=W, padx=2, pady=2)
-        iranyitoszam = Entry(self, textvariable=self._iranyitoszam, width=8)
-        iranyitoszam.grid(row=2, column=1, sticky=W, padx=2, pady=2)
-        iranyitoszam.focus_set()
+        Entry(self, textvariable=self._iranyitoszam, width=8).grid(row=2, column=1, sticky=W, padx=2, pady=2)
 
         Label(self, text="helység").grid(row=3, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._helyseg, width=32).grid(row=3, column=1, sticky=W, padx=2, pady=2)
