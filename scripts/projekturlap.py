@@ -12,6 +12,9 @@ class UjProjektUrlap(simpledialog.Dialog):
         # super() előtt kell legyenek
         self._kon = kon 
         self._megnevezes = StringVar()
+        self._munkaresz = StringVar()
+        self._jelleg = StringVar()
+        self._megjegyzes = StringVar()
 
         super().__init__(szulo, title="Új projekt felvitele")
     
@@ -28,18 +31,26 @@ class UjProjektUrlap(simpledialog.Dialog):
         cim.pack(padx=2, pady=2)
 
         munkaresz = LabelFrame(self, text="munkarész")
-        self._munkaresz = StringVar()
         self._munkaresz.set(MUNKARESZ[0])
-        Combobox(self, textvariable=self._munkaresz, values=MUNKARESZ).pack(fill=X, padx=2, pady=2)
+        Combobox(munkaresz, textvariable=self._munkaresz, values=MUNKARESZ).pack(fill=X, padx=2, pady=2)
         munkaresz.pack(fill=X, padx=2, pady=2)
 
-        jelleg = LabelFrame(self, text="projekt jellege")
-        self._jelleg = StringVar()
+        jelleg = LabelFrame(self, text="jelleg")
         self._jelleg.set(JELLEG[0])
         OptionMenu(jelleg, self._jelleg, *JELLEG).pack(fill=X, ipadx=2, ipady=2)
         jelleg.pack(fill=X, padx=2, pady=2)
 
+        megjegyzes = LabelFrame(self, text="megjegyzés")
+        Entry(megjegyzes, textvariable=self._megjegyzes).pack(fill=X, padx=2, pady=2)
+        megjegyzes.pack(fill=X, padx=2, pady=2)
+
         nev.focus_set()
+    
+    def validate(self):
+        pass
+
+    def apply(self):
+        pass
 
 
 class ProjektTorloUrlap(simpledialog.Dialog):
