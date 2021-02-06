@@ -3,6 +3,7 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox, Labelframe
 from urlap import CimUrlap
+from projekt import Projekt
 from cim import Cim
 from konstans import JELLEG, MUNKARESZ
 
@@ -10,14 +11,14 @@ from konstans import JELLEG, MUNKARESZ
 class UjProjektUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         # super() előtt kell legyenek
-        self._kon = kon 
+        self._kon = kon
         self._megnevezes = StringVar()
         self._munkaresz = StringVar()
         self._jelleg = StringVar()
         self._megjegyzes = StringVar()
 
         super().__init__(szulo, title="Új projekt felvitele")
-    
+
     def body(self, szulo):
 
         megnevezes = LabelFrame(self, text="projekt neve")
@@ -45,12 +46,31 @@ class UjProjektUrlap(simpledialog.Dialog):
         megjegyzes.pack(fill=X, padx=2, pady=2)
 
         nev.focus_set()
-    
+
     def validate(self):
-        pass
+        """ A projekt meghatározott, ha:
+        - adott a megnevezése;
+        - a címből legalább a helység;
+        - munkarész (alapértelmezés miatt mindenképpen kap értéket);
+        - jelleg (detto)."""
+        if not self.export():
+            messagebox.showwarning("Hiányos adat!", "Legalább a nevet, a helységet és a munkarészt add meg!",
+                                   parent=self)
+            return False
+        return True
+
 
     def apply(self):
         pass
+
+    def export(self):
+        return Projekt(
+            megnevezes=self._megnevezes.get(),
+            cim=self._cim_urlap.export(),
+            munkaresz=self._munkaresz.get(),
+            jelleg=self._jelleg.get(),
+            megjegyzes=self._megjegyzes.get()
+        )
 
 
 class ProjektTorloUrlap(simpledialog.Dialog):
