@@ -1,11 +1,10 @@
 from tkinter import *
-from tkinter import messagebox
-from tkinter import simpledialog
 from tkinter.ttk import Combobox
 from telefon import Telefon
 from email import Email
 from cim import Cim
-from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS, ORSZAG, MEGYE
+from munkaresz import Munkaresz
+from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS, ORSZAG, MEGYE, MUNKARESZ
 
 
 class TelefonszamUrlap(Frame):
@@ -82,7 +81,7 @@ class CimUrlap(Frame):
         Label(self, text="utca, házszám").grid(row=4, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._utca, width=32).grid(row=4, column=1, sticky=W, padx=2, pady=2)
 
-        Label(self, text="helyrajzi szám").grid(row=5, column=0, sticky=W, padx=2, pady=2)        
+        Label(self, text="helyrajzi szám").grid(row=5, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._hrsz, width=8).grid(row=5, column=1, sticky=W, padx=2, pady=2)
 
         Label(self, text="postafiók").grid(row=6, column=0, sticky=W, padx=2, pady=2)
@@ -116,7 +115,7 @@ class CimUrlap(Frame):
             honlap=self._honlap.get(),
             megjegyzes=self._megjegyzes.get()
         )
-    
+
     def _kodbol_orszag(self, kod):
         for orszagnev, orszagkod in ORSZAG.items():
             if orszagkod == kod:
@@ -149,3 +148,33 @@ class Valaszto(LabelFrame):
             return self._valasztek[self._valaszto.current()]
         except IndexError:
             return None
+
+
+class MunkareszUrlap(Frame):
+    def __init__(self, master=None, **kw):
+        super().__init__(master=master, **kw)
+
+        self._megnevezes = StringVar()
+        self._enaplo = IntVar()
+        self._megjegyzes = StringVar()
+
+        Label(self, text="megnevezés").grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        Combobox(self, textvariable=self._megnevezes, values=MUNKARESZ).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="e-napló").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        Checkbutton(self, variable=self._enaplo).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="megjegyzés").grid(row=2, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=2, column=1, sticky=W, padx=2, pady=2)
+
+    def beallit(self, munkaresz):
+        self._megnevezes.set(munkaresz.megnevezes)
+        self._enaplo.set(munkaresz.enaplo)
+        self._megjegyzes.set(munkaresz.megjegyzes)
+
+    def export(self):
+        return Munkaresz(
+            megnevezes=self._megnevezes.get(),
+            enaplo=self._enaplo.get(),
+            megjegyzes=self._megjegyzes.get()
+        )

@@ -1,10 +1,9 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
-from tkinter.ttk import Combobox, Labelframe
-from urlap import CimUrlap
+from tkinter.ttk import Combobox, LabelFrame
+from urlap import CimUrlap, MunkareszUrlap
 from projekt import Projekt
-from cim import Cim
 from konstans import JELLEG, MUNKARESZ
 
 
@@ -13,7 +12,6 @@ class UjProjektUrlap(simpledialog.Dialog):
         # super() előtt kell legyenek
         self._kon = kon
         self._megnevezes = StringVar()
-        self._munkaresz = StringVar()
         self._jelleg = StringVar()
         self._megjegyzes = StringVar()
 
@@ -32,8 +30,8 @@ class UjProjektUrlap(simpledialog.Dialog):
         cim.pack(padx=2, pady=2)
 
         munkaresz = LabelFrame(self, text="munkarész")
-        self._munkaresz.set(MUNKARESZ[0])
-        Combobox(munkaresz, textvariable=self._munkaresz, values=MUNKARESZ).pack(fill=X, padx=2, pady=2)
+        self._munkaresz_urlap = MunkareszUrlap(munkaresz)
+        self._munkaresz_urlap.pack(ipadx=2, ipady=2)
         munkaresz.pack(fill=X, padx=2, pady=2)
 
         jelleg = LabelFrame(self, text="jelleg")
@@ -48,17 +46,11 @@ class UjProjektUrlap(simpledialog.Dialog):
         nev.focus_set()
 
     def validate(self):
-        """ A projekt meghatározott, ha:
-        - adott a megnevezése;
-        - a címből legalább a helység;
-        - munkarész (alapértelmezés miatt mindenképpen kap értéket);
-        - jelleg (detto)."""
         if not self.export():
             messagebox.showwarning("Hiányos adat!", "Legalább a nevet, a helységet és a munkarészt add meg!",
                                    parent=self)
             return False
         return True
-
 
     def apply(self):
         pass
@@ -67,7 +59,7 @@ class UjProjektUrlap(simpledialog.Dialog):
         return Projekt(
             megnevezes=self._megnevezes.get(),
             cim=self._cim_urlap.export(),
-            munkaresz=self._munkaresz.get(),
+            munkaresz=self._munkaresz_urlap.export(),
             jelleg=self._jelleg.get(),
             megjegyzes=self._megjegyzes.get()
         )

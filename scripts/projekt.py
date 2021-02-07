@@ -1,7 +1,7 @@
-import dolog
+from dolog import Dolog
 
 
-class Projekt(dolog.Dolog):
+class Projekt(Dolog):
     """Projekt megvalósítása."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
@@ -11,7 +11,7 @@ class Projekt(dolog.Dolog):
             self._adatok = dict(kwargs)
             self._adatok["gyakorisag"] = 0
         else:
-            self._adatok ={
+            self._adatok = {
                 "megnevezes": "",
                 "gyakorisag": 0,
                 "megjegyzes": ""
@@ -19,7 +19,11 @@ class Projekt(dolog.Dolog):
         self._tabla = "projekt"
 
     def __bool__(self):
-        """Egy projekt meghatározott, ha ismert legalább a neve és helye (helység)"""
+        """ A projekt meghatározott, ha adott:
+        - a megnevezése;
+        - a címből legalább a helység;
+        - a munkarész ;
+        A jelleg alapértelmezés miatt mindenképpen kap értéket."""
         return bool(self.megnevezes) and bool(self.cim) and bool(self.munkaresz)
 
     @property
@@ -55,6 +59,6 @@ class Projekt(dolog.Dolog):
     def gyakorisag(self):
         return self._adatok.get("gyakorisag")
 
-    def gyakori(self):
+    def hozzanyul(self):
         self._adatok["gyakorisag"] += 1
 
