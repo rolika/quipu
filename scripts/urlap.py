@@ -4,7 +4,8 @@ from telefon import Telefon
 from email import Email
 from cim import Cim
 from munkaresz import Munkaresz
-from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS, ORSZAG, MEGYE, MUNKARESZ
+from jelleg import Jelleg
+from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS, ORSZAG, MEGYE, MUNKARESZ, JELLEG
 
 
 class TelefonszamUrlap(Frame):
@@ -176,5 +177,29 @@ class MunkareszUrlap(Frame):
         return Munkaresz(
             megnevezes=self._megnevezes.get(),
             enaplo=self._enaplo.get(),
+            megjegyzes=self._megjegyzes.get()
+        )
+
+class JellegUrlap(Frame):
+    def __init__(self, master=None, **kw):
+        super().__init__(master=master, **kw)
+
+        self._megnevezes = StringVar()
+        self._megjegyzes = StringVar()
+
+        Label(self, text="megnevezés").grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self._megnevezes, *JELLEG).grid(row=0, column=1, sticky=EW, padx=2, pady=2)
+        self._megnevezes.set(JELLEG[0])
+
+        Label(self, text="megjegyzés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+
+    def beallit(self, jelleg):
+        self._megnevezes.set(jelleg.megnevezes)
+        self._megjegyzes.set(jelleg.megjegyzes)
+
+    def export(self):
+        return Jelleg(
+            megnevezes=self._megnevezes.get(),
             megjegyzes=self._megjegyzes.get()
         )

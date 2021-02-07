@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox, LabelFrame
-from urlap import CimUrlap, MunkareszUrlap
+from urlap import CimUrlap, MunkareszUrlap, JellegUrlap
 from projekt import Projekt
 from konstans import JELLEG, MUNKARESZ
 
@@ -35,8 +35,8 @@ class UjProjektUrlap(simpledialog.Dialog):
         munkaresz.pack(fill=X, padx=2, pady=2)
 
         jelleg = LabelFrame(self, text="jelleg")
-        self._jelleg.set(JELLEG[0])
-        OptionMenu(jelleg, self._jelleg, *JELLEG).pack(fill=X, ipadx=2, ipady=2)
+        self._jelleg_urlap = JellegUrlap(jelleg)
+        self._jelleg_urlap.pack(ipadx=2, ipady=2)
         jelleg.pack(fill=X, padx=2, pady=2)
 
         megjegyzes = LabelFrame(self, text="megjegyzés")
@@ -60,7 +60,7 @@ class UjProjektUrlap(simpledialog.Dialog):
             megnevezes=self._megnevezes.get(),
             cim=self._cim_urlap.export(),
             munkaresz=self._munkaresz_urlap.export(),
-            jelleg=self._jelleg.get(),
+            jelleg=self._jelleg_urlap.export(),
             megjegyzes=self._megjegyzes.get()
         )
 
