@@ -2,26 +2,104 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox, LabelFrame
-from urlap import CimUrlap, MunkareszUrlap, JellegUrlap
+from urlap import CimUrlap
 from projekt import Projekt
+from munkaresz import Munkaresz
+from jelleg import Jelleg
 from konstans import JELLEG, MUNKARESZ
+
+
+class ProjektUrlap(Frame):
+    def __init__(self, master=None, **kw):
+        super().__init__(master=master, **kw)
+
+        self._megnevezes = StringVar()
+        self._megjegyzes = StringVar()
+
+        Label(self, text="megnevezés").grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._megnevezes, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="megjegyzés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+
+    def beallit(self, projekt):
+        self._megnevezes.set(projekt.megnevezes)
+        self._megjegyzes.set(projekt.megjegyzes)
+
+    def export(self):
+        return Projekt(
+            megnevezes=self._megnevezes.get(),
+            megjegyzes=self._megjegyzes.get()
+        )
+
+
+class MunkareszUrlap(Frame):
+    def __init__(self, master=None, **kw):
+        super().__init__(master=master, **kw)
+
+        self._megnevezes = StringVar()
+        self._enaplo = IntVar()
+        self._megjegyzes = StringVar()
+
+        Label(self, text="megnevezés").grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        Combobox(self, textvariable=self._megnevezes, values=MUNKARESZ).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="e-napló").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        Checkbutton(self, variable=self._enaplo).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="megjegyzés").grid(row=2, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=2, column=1, sticky=W, padx=2, pady=2)
+
+    def beallit(self, munkaresz):
+        self._megnevezes.set(munkaresz.megnevezes)
+        self._enaplo.set(munkaresz.enaplo)
+        self._megjegyzes.set(munkaresz.megjegyzes)
+
+    def export(self):
+        return Munkaresz(
+            megnevezes=self._megnevezes.get(),
+            enaplo=self._enaplo.get(),
+            megjegyzes=self._megjegyzes.get()
+        )
+
+
+class JellegUrlap(Frame):
+    def __init__(self, master=None, **kw):
+        super().__init__(master=master, **kw)
+
+        self._megnevezes = StringVar()
+        self._megjegyzes = StringVar()
+
+        Label(self, text="megnevezés").grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self._megnevezes, *JELLEG).grid(row=0, column=1, sticky=EW, padx=2, pady=2)
+        self._megnevezes.set(JELLEG[0])
+
+        Label(self, text="megjegyzés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+
+    def beallit(self, jelleg):
+        self._megnevezes.set(jelleg.megnevezes)
+        self._megjegyzes.set(jelleg.megjegyzes)
+
+    def export(self):
+        return Jelleg(
+            megnevezes=self._megnevezes.get(),
+            megjegyzes=self._megjegyzes.get()
+        )
 
 
 class UjProjektUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         # super() előtt kell legyenek
         self._kon = kon
-        self._megnevezes = StringVar()
-        self._jelleg = StringVar()
-        self._megjegyzes = StringVar()
 
         super().__init__(szulo, title="Új projekt felvitele")
 
     def body(self, szulo):
 
         megnevezes = LabelFrame(self, text="projekt neve")
-        nev = Entry(megnevezes, textvariable=self._megnevezes)
-        nev.pack(fill=X, padx=2, pady=2)
+        self._projekt_urlap = ProjektUrlap(megnevezes)
+        self._projekt_urlap.pack(ipadx=2, ipady=2)
         megnevezes.pack(fill=X, padx=2, pady=2)
 
         cim = LabelFrame(self, text="projekt címe")
@@ -39,30 +117,41 @@ class UjProjektUrlap(simpledialog.Dialog):
         self._jelleg_urlap.pack(ipadx=2, ipady=2)
         jelleg.pack(fill=X, padx=2, pady=2)
 
-        megjegyzes = LabelFrame(self, text="megjegyzés")
-        Entry(megjegyzes, textvariable=self._megjegyzes).pack(fill=X, padx=2, pady=2)
-        megjegyzes.pack(fill=X, padx=2, pady=2)
-
-        nev.focus_set()
+        megnevezes.focus_set()
 
     def validate(self):
-        if not self.export():
+        projekt = self._projekt_urlap.export()
+        cim = self._cim_urlap.export()
+        munkaresz = self._munkaresz_urlap.export()
+        jelleg = self._jelleg_urlap.export()
+        if not (projekt or cim or munkaresz):
             messagebox.showwarning("Hiányos adat!", "Legalább a nevet, a helységet és a munkarészt add meg!",
                                    parent=self)
             return False
         return True
 
     def apply(self):
-        pass
 
-    def export(self):
-        return Projekt(
-            megnevezes=self._megnevezes.get(),
-            cim=self._cim_urlap.export(),
-            munkaresz=self._munkaresz_urlap.export(),
-            jelleg=self._jelleg_urlap.export(),
-            megjegyzes=self._megjegyzes.get()
-        )
+        projekt = self._projekt_urlap.export()
+        if not (projekt_azonosito := projekt.ment(self._kon)):
+            print("Nem sikerült elmenteni!")
+            return
+
+        munkaresz = self._munkaresz_urlap.export()
+        munkaresz.projekt = projekt_azonosito
+        if not (munkaresz_azonosito := munkaresz.ment(self._kon)):
+            print("A munkarészt nem sikerült elmenteni!")
+            return
+
+        cim = self._cim_urlap.export()
+        cim.munkaresz = munkaresz_azonosito
+        jelleg = self._jelleg_urlap.export()
+        jelleg.munkaresz = munkaresz_azonosito
+        if not (cim.ment(self._kon) and jelleg.ment(self._kon)):
+            print("A címet/jelleget nem sikerült elmenteni!")
+            return
+
+        print("Bejegyzés mentve.")
 
 
 class ProjektTorloUrlap(simpledialog.Dialog):

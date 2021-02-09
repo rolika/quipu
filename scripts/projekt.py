@@ -9,7 +9,6 @@ class Projekt(Dolog):
         super().__init__()
         if kwargs:
             self._adatok = dict(kwargs)
-            self._adatok["gyakorisag"] = 0
         else:
             self._adatok = {
                 "megnevezes": "",
@@ -19,12 +18,8 @@ class Projekt(Dolog):
         self._tabla = "projekt"
 
     def __bool__(self):
-        """ A projekt meghatározott, ha adott:
-        - a megnevezése;
-        - a címből legalább a helység;
-        - a munkarész ;
-        A jelleg alapértelmezés miatt mindenképpen kap értéket."""
-        return bool(self.megnevezes) and bool(self.cim) and bool(self.munkaresz)
+        """ A projekt meghatározott, ha adott a megnevezése."""
+        return bool(self.megnevezes)
 
     @property
     def adatok(self):
@@ -33,9 +28,6 @@ class Projekt(Dolog):
     @adatok.setter
     def adatok(self, projekt):
         self._adatok["megnevezes"] = projekt.megnevezes
-        self._adatok["cim"] = projekt.cim
-        self._adatok["munkaresz"] = projekt.munkaresz
-        self._adatok["jelleg"] = projekt.jelleg
         self._adatok["gyakorisag"] = projekt.gyakorisag
         self._adatok["megjegyzes"] = projekt.megjegyzes
 
@@ -44,21 +36,8 @@ class Projekt(Dolog):
         return self._adatok.get("megnevezes")
 
     @property
-    def cim(self):
-        return self._adatok.get("cim")
-
-    @property
-    def munkaresz(self):
-        return self._adatok.get("munkaresz")
-
-    @property
-    def jelleg(self):
-        return self._adatok.get("jelleg")
-
-    @property
     def gyakorisag(self):
         return self._adatok.get("gyakorisag")
 
     def hozzanyul(self):
         self._adatok["gyakorisag"] += 1
-

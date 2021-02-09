@@ -64,6 +64,14 @@ class Cim(dolog.Dolog):
         self._adatok["szervezet"] = szervezet
 
     @property
+    def munkaresz(self):
+        return self._adatok.get("munkaresz")
+    
+    @munkaresz.setter
+    def munkaresz(self, munkaresz):
+        self._adatok["munkaresz"] = munkaresz
+
+    @property
     def orszag(self):
         return self._adatok.get("orszag", "")
     

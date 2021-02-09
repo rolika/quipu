@@ -165,7 +165,7 @@ class Quipu(Frame):
         projekt_kon.create("jelleg",
             azonosito="INTEGER PRIMARY KEY",
             munkaresz="INTEGER NOT NULL REFERENCES munkaresz",
-            jelleg="TEXT NOT NULL",
+            megnevezes="TEXT NOT NULL",
             megjegyzes="TEXT")
         
         return projekt_kon

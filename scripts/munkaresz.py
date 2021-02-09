@@ -35,3 +35,11 @@ class Munkaresz(Dolog):
     @property
     def enaplo(self):
         return self._adatok.get("enaplo")
+
+    @property
+    def projekt(self):
+        return self._adatok.get("projekt")
+
+    @projekt.setter
+    def projekt(self, projekt):
+        self._adatok["projekt"] = projekt

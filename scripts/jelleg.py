@@ -29,3 +29,11 @@ class Jelleg(Dolog):
     @property
     def megnevezes(self):
         return self._adatok.get("megnevezes")
+
+    @property
+    def munkaresz(self):
+        return self._adatok.get("munkaresz")
+
+    @munkaresz.setter
+    def munkaresz(self, munkaresz):
+        self._adatok["munkaresz"] = munkaresz
