@@ -124,10 +124,20 @@ class UjProjektUrlap(simpledialog.Dialog):
         cim = self._cim_urlap.export()
         munkaresz = self._munkaresz_urlap.export()
         jelleg = self._jelleg_urlap.export()
-        if not (projekt or cim or munkaresz):
+
+        if not (projekt and cim and munkaresz):
             messagebox.showwarning("Hiányos adat!", "Legalább a nevet, a helységet és a munkarészt add meg!",
                                    parent=self)
             return False
+
+        if projekt.meglevo(self._kon)\
+            and cim.meglevo(self._kon)\
+                and munkaresz.meglevo(self._kon)\
+                    and jelleg.meglevo(self._kon):
+            messagebox.showwarning("Létező projekt!", "Különböztesd meg megjegyzésben!",
+                                   parent=self)
+            return False
+        
         return True
 
     def apply(self):
