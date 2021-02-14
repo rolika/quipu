@@ -139,6 +139,8 @@ class Quipu(Frame):
         projekt_kon.create("projekt",
             azonosito="INTEGER PRIMARY KEY",
             megnevezes="TEXT NOT NULL",
+            ev="INTEGER NOT NULL",
+            szam="INTEGER NOT NULL",
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
         

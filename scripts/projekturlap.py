@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox, LabelFrame
+from datetime import date
 from urlap import CimUrlap
 from projekt import Projekt
 from munkaresz import Munkaresz
@@ -13,14 +14,19 @@ class ProjektUrlap(Frame):
     def __init__(self, master=None, **kw):
         super().__init__(master=master, **kw)
 
+        self._projektszam = StringVar()
         self._megnevezes = StringVar()
         self._megjegyzes = StringVar()
 
-        Label(self, text="megnevezés").grid(row=0, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._megnevezes, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="projektszám").grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._projektszam, width=8, state=DISABLED)\
+            .grid(row=0, column=1, sticky=W, padx=2, pady=2)
 
-        Label(self, text="megjegyzés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="megnevezés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._megnevezes, width=32).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="megjegyzés").grid(row=2, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=2, column=1, sticky=W, padx=2, pady=2)
 
     def beallit(self, projekt):
         self._megnevezes.set(projekt.megnevezes)
@@ -31,6 +37,14 @@ class ProjektUrlap(Frame):
             megnevezes=self._megnevezes.get(),
             megjegyzes=self._megjegyzes.get()
         )
+    
+    @property
+    def projektszam(self):
+        return self._projektszam.get()
+    
+    @projektszam.setter
+    def projektszam(self, szam):
+        self._projektszam.set(szam)
 
 
 class MunkareszUrlap(Frame):
@@ -92,6 +106,8 @@ class UjProjektUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         # super() előtt kell legyenek
         self._kon = kon
+        self._ev = date.today().strftime("%y")
+        self._szam = self._kovetkezo_projektszam()
 
         super().__init__(szulo, title="Új projekt felvitele")
 
@@ -100,6 +116,7 @@ class UjProjektUrlap(simpledialog.Dialog):
         megnevezes = LabelFrame(self, text="projekt neve")
         self._projekt_urlap = ProjektUrlap(megnevezes)
         self._projekt_urlap.pack(ipadx=2, ipady=2)
+        self._projekt_urlap.projektszam = "{}/{}".format(self._ev, self._szam)
         megnevezes.pack(fill=X, padx=2, pady=2)
 
         cim = LabelFrame(self, text="projekt címe")
@@ -143,6 +160,10 @@ class UjProjektUrlap(simpledialog.Dialog):
     def apply(self):
 
         projekt = self._projekt_urlap.export()
+        projekt.ev = self._ev
+        projekt.szam = self._szam
+        projekt.gyakorisag = 0
+
         if not (projekt_azonosito := projekt.ment(self._kon)):
             print("Nem sikerült elmenteni!")
             return
@@ -162,7 +183,10 @@ class UjProjektUrlap(simpledialog.Dialog):
             return
 
         print("Bejegyzés mentve.")
-
+    
+    def _kovetkezo_projektszam(self):
+        utolso = self._kon.select("projekt", "szam", ev=self._ev, orderby="szam", ordering="DESC").fetchone()
+        return utolso["szam"] + 1 if utolso["szam"] else 1
 
 class ProjektTorloUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
