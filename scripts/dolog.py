@@ -59,4 +59,4 @@ class Dolog:
 
     def _nullazo(self, attr):
         """Ha hiányzik az adat, nem írjuk ki egyáltalán."""
-        return ", {}".format(attr) if attr else ""
+        return " ({})".format(attr) if attr else ""

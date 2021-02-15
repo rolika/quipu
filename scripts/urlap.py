@@ -5,7 +5,7 @@ from email import Email
 from cim import Cim
 from munkaresz import Munkaresz
 from jelleg import Jelleg
-from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS, ORSZAG, MEGYE, MUNKARESZ, JELLEG
+from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS, ORSZAG, MEGYE
 
 
 class TelefonszamUrlap(Frame):

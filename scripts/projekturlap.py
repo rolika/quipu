@@ -1,9 +1,10 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
+import operator
 from tkinter.ttk import Combobox, LabelFrame
 from datetime import date
-from urlap import CimUrlap
+from urlap import CimUrlap, Valaszto
 from projekt import Projekt
 from munkaresz import Munkaresz
 from jelleg import Jelleg
@@ -23,7 +24,8 @@ class ProjektUrlap(Frame):
             .grid(row=0, column=1, sticky=W, padx=2, pady=2)
 
         Label(self, text="megnevezés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._megnevezes, width=32).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+        self._fokusz = Entry(self, textvariable=self._megnevezes, width=32)
+        self._fokusz.grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
         Label(self, text="megjegyzés").grid(row=2, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._megjegyzes, width=32).grid(row=2, column=1, sticky=W, padx=2, pady=2)
@@ -45,6 +47,10 @@ class ProjektUrlap(Frame):
     @projektszam.setter
     def projektszam(self, szam):
         self._projektszam.set(szam)
+
+    @property
+    def fokusz(self):
+        return self._fokusz
 
 
 class MunkareszUrlap(Frame):
@@ -134,7 +140,7 @@ class UjProjektUrlap(simpledialog.Dialog):
         self._jelleg_urlap.pack(ipadx=2, ipady=2)
         jelleg.pack(fill=X, padx=2, pady=2)
 
-        megnevezes.focus_set()
+        return self._projekt_urlap.fokusz
 
     def validate(self):
         projekt = self._projekt_urlap.export()
@@ -193,6 +199,30 @@ class ProjektTorloUrlap(simpledialog.Dialog):
         self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Projekt törlése")
 
+    def body(self, szulo):
+        self._projekt_valaszto = Valaszto("megnevezés", self._nevsor(), self)
+        self._projekt_valaszto.pack(ipadx=2, ipady=2)
+        return self._projekt_valaszto.valaszto
+    
+    def validate(self):
+        return messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!", parent=self)
+    
+    def apply(self):
+        projekt = self._projekt_valaszto.elem
+        munkareszek = self._kon.select("munkaresz", "projekt", projekt=projekt.azonosito)
+        self._kon.delete("munkaresz", projekt=projekt.azonosito)
+        for munkaresz in munkareszek:
+            self._kon.delete("cim", munkaresz=munkaresz["azonosito"])
+            self._kon.delete("jelleg", munkaresz=munkaresz["azonosito"])
+        if projekt.torol(self._kon):
+            print("{}: Bejegyzés törölve.".format(projekt))
+            self._projekt_valaszto.beallit(self._nevsor())
+        else:
+            print("Nem sikerült törölni.")
+    
+    def _nevsor(self):
+        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
+                      key=lambda elem: (elem.gyakorisag, repr(elem)))
 
 class ProjektModositoUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):

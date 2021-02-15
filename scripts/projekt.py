@@ -1,5 +1,4 @@
 from dolog import Dolog
-from konstans import PROJEKT_NAGYSAGREND
 
 
 class Projekt(Dolog):
@@ -20,10 +19,21 @@ class Projekt(Dolog):
             }
         self._tabla = "projekt"
         self._elvalaszto = "/"
+    
+    def __str__(self):
+        """Projekt kiíratása emberi használatra"""
+        return "{}/{} {}{}".format(self.ev, self.szam, self.megnevezes, self._nullazo(self.megjegyzes))
+    
+    def __repr__(self):
+        """Projekt elnevezése sorbarendezéshez"""
+        return "{}{}{}{}".format(self.ev, self.szam, self._ascii_rep(self.megnevezes), self._ascii_rep(self.megjegyzes))
 
     def __bool__(self):
         """ A projekt meghatározott, ha adott a megnevezése."""
         return bool(self.megnevezes)
+    
+    def listanezet(self):
+        return str(self)
 
     @property
     def adatok(self):
@@ -64,28 +74,5 @@ class Projekt(Dolog):
     @gyakorisag.setter
     def gyakorisag(self, ertek):
         self._adatok["gyakorisag"] = ertek
-    
-    @property
-    def elvalaszto(self):
-        return self._elvalaszto
-    
-    @elvalaszto.setter
-    def elvalaszto(self, jel):
-        self._elvalaszto = jel
-    
-    @property
-    def projektszam(self):
-        """Projektszám ábrázolása:
-        - emberi használatra: pl. 21/13 (mint szöveg)
-        - filenévnek, sorbarendezéshez: 21_013 (mint szöveg)
-        """
-        if self._elvalaszto == "/":
-            formatum = "{}{}{}"
-        elif self._elvalaszto == "_":
-            formatum = "{{}}{{}}{{:0{}}}".format(PROJEKT_NAGYSAGREND)
-        return formatum.format(self.ev, self._elvalaszto, self.szam)
-
-    def hozzaer(self):
-        self._adatok["gyakorisag"] += 1
     
 

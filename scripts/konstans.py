@@ -20,4 +20,4 @@ ORSZAG = {
             "USA": "USA",
             "Románia": "RO"
         }
-PROJEKT_NAGYSAGREND = 3  # projektek számának nagyságrendje, tíz hatványa -1 (többet is kezel, de akkor hibásan formáz)
+        
