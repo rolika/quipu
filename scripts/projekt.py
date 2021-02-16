@@ -42,9 +42,6 @@ class Projekt(Dolog):
     @adatok.setter
     def adatok(self, projekt):
         self._adatok["megnevezes"] = projekt.megnevezes
-        self._adatok["ev"] = projekt.ev
-        self._adatok["szam"] = projekt.szam
-        self._adatok["gyakorisag"] = projekt.gyakorisag
         self._adatok["megjegyzes"] = projekt.megjegyzes
 
     @property

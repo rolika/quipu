@@ -31,6 +31,7 @@ class ProjektUrlap(Frame):
         Entry(self, textvariable=self._megjegyzes, width=32).grid(row=2, column=1, sticky=W, padx=2, pady=2)
 
     def beallit(self, projekt):
+        self._projektszam.set("{}/{}".format(projekt.ev, projekt.szam))
         self._megnevezes.set(projekt.megnevezes)
         self._megjegyzes.set(projekt.megjegyzes)
 
@@ -200,7 +201,7 @@ class ProjektTorloUrlap(simpledialog.Dialog):
         super().__init__(szulo, title="Projekt törlése")
 
     def body(self, szulo):
-        self._projekt_valaszto = Valaszto("megnevezés", self._nevsor(), self)
+        self._projekt_valaszto = Valaszto("megnevezés", self._projekt_nevsor(), self)
         self._projekt_valaszto.pack(ipadx=2, ipady=2)
         return self._projekt_valaszto.valaszto
     
@@ -225,9 +226,9 @@ class ProjektTorloUrlap(simpledialog.Dialog):
             print("Nem sikerült törölni.")
         else:
             print("{}: Bejegyzés törölve.".format(projekt))
-            self._projekt_valaszto.beallit(self._nevsor())
+            self._projekt_valaszto.beallit(self._projekt_nevsor())
     
-    def _nevsor(self):
+    def _projekt_nevsor(self):
         return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
                       key=lambda elem: (elem.gyakorisag, repr(elem)))
 
@@ -235,6 +236,44 @@ class ProjektModositoUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Projekt módosítása")
+    
+    def body(self, szulo):
+        self._projekt_valaszto = Valaszto("megnevezés", self._projekt_nevsor(), self)
+        self._projekt_valaszto.valaszto.bind("<<ComboboxSelected>>", self._projekt_megjelenit)
+        self._projekt_valaszto.pack(ipadx=2, ipady=2)
+
+        megnevezes = LabelFrame(self, text="projekt neve")
+        self._projekt_urlap = ProjektUrlap(megnevezes)
+        self._projekt_urlap.pack(ipadx=2, ipady=2)
+        self._projekt_megjelenit(1)
+        megnevezes.pack(fill=X, padx=2, pady=2)
+
+        return self._projekt_valaszto.valaszto
+    
+    def validate(self):
+        """Ezen a ponton a projektek a projektszám miatt mindenképpen küldönbözni fognak egymástól."""
+        return True
+
+    def apply(self):
+        projekt = self._modositott_projekt()
+        if projekt.ment(self._kon):
+            print("{}: Bejegyzés módosítva.".format(projekt))
+        else:
+            print("Nem sikerült módosítani.")
+        self._projekt_valaszto.beallit(self._projekt_nevsor())
+        self._projekt_megjelenit(1)
+    
+    def _projekt_nevsor(self):
+        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
+                      key=lambda elem: (elem.gyakorisag, repr(elem)))
+    
+    def _projekt_megjelenit(self, event):
+        self._projekt_urlap.beallit(self._projekt_valaszto.elem or Projekt())
+
+    def _modositott_projekt(self):
+        projekt = self._projekt_valaszto.elem
+        projekt.adatok = self._projekt_urlap.export()
+        return projekt
 
 
 class UjMunkareszUrlap(simpledialog.Dialog):
