@@ -1,7 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
-import operator
 from tkinter.ttk import Combobox, LabelFrame
 from datetime import date
 from urlap import CimUrlap, Valaszto
@@ -264,6 +263,24 @@ class MunkareszCimModositoUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Cím módosítása")
+
+
+class UjJellegUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon  # super() előtt kell legyen
+        super().__init__(szulo, title="Új jelleg felvitele")
+
+
+class JellegTorloUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon  # super() előtt kell legyen
+        super().__init__(szulo, title="Jelleg törlése")
+
+
+class JellegModositoUrlap(simpledialog.Dialog):
+    def __init__(self, szulo, kon=None):
+        self._kon = kon  # super() előtt kell legyen
+        super().__init__(szulo, title="Jelleg módosítása")
 
 
 if __name__== "__main__":
