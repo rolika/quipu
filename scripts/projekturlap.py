@@ -6,6 +6,7 @@ from datetime import date
 from urlap import CimUrlap, Valaszto
 from projekt import Projekt
 from munkaresz import Munkaresz
+from cim import Cim
 from jelleg import Jelleg
 from konstans import JELLEG, MUNKARESZ
 
@@ -207,17 +208,24 @@ class ProjektTorloUrlap(simpledialog.Dialog):
         return messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!", parent=self)
     
     def apply(self):
+        hiba = False
         projekt = self._projekt_valaszto.elem
-        munkareszek = self._kon.select("munkaresz", "projekt", projekt=projekt.azonosito)
-        self._kon.delete("munkaresz", projekt=projekt.azonosito)
-        for munkaresz in munkareszek:
-            self._kon.delete("cim", munkaresz=munkaresz["azonosito"])
-            self._kon.delete("jelleg", munkaresz=munkaresz["azonosito"])
-        if projekt.torol(self._kon):
+        for munkaresz in map(lambda mr: Munkaresz(**mr), self._kon.select("munkaresz", projekt=projekt.azonosito)):
+            for cim in map(lambda cm: Cim(**cm), self._kon.select("cim", munkaresz=munkaresz.azonosito)):
+                if not cim.torol(self._kon):
+                    hiba = True
+            for jelleg in map(lambda jg: Jelleg(**jg), self._kon.select("jelleg", munkaresz=munkaresz.azonosito)):
+                if not jelleg.torol(self._kon):
+                    hiba = True
+            if not munkaresz.torol(self._kon):
+                hiba = True
+        if not projekt.torol(self._kon):
+            hiba = True
+        if hiba:
+            print("Nem sikerült törölni.")
+        else:
             print("{}: Bejegyzés törölve.".format(projekt))
             self._projekt_valaszto.beallit(self._nevsor())
-        else:
-            print("Nem sikerült törölni.")
     
     def _nevsor(self):
         return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
