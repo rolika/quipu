@@ -375,12 +375,6 @@ class MunkareszModositoUrlap(simpledialog.Dialog):
         super().__init__(szulo, title="Munkarész módosítása")
 
 
-class UjMunkareszCimUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
-        self._kon = kon  # super() előtt kell legyen
-        super().__init__(szulo, title="Új cím felvitele")
-
-
 class MunkareszCimTorloUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon  # super() előtt kell legyen
@@ -391,12 +385,6 @@ class MunkareszCimModositoUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Cím módosítása")
-
-
-class UjJellegUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
-        self._kon = kon  # super() előtt kell legyen
-        super().__init__(szulo, title="Új jelleg felvitele")
 
 
 class JellegTorloUrlap(simpledialog.Dialog):
