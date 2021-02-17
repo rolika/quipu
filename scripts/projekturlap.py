@@ -40,11 +40,11 @@ class ProjektUrlap(Frame):
             megnevezes=self._megnevezes.get(),
             megjegyzes=self._megjegyzes.get()
         )
-    
+
     @property
     def projektszam(self):
         return self._projektszam.get()
-    
+
     @projektszam.setter
     def projektszam(self, szam):
         self._projektszam.set(szam)
@@ -161,7 +161,7 @@ class UjProjektUrlap(simpledialog.Dialog):
             messagebox.showwarning("Létező projekt!", "Különböztesd meg megjegyzésben!",
                                    parent=self)
             return False
-        
+
         return True
 
     def apply(self):
@@ -190,7 +190,7 @@ class UjProjektUrlap(simpledialog.Dialog):
             return
 
         print("Bejegyzés mentve.")
-    
+
     def _kovetkezo_projektszam(self):
         utolso = self._kon.select("projekt", "szam", ev=self._ev, orderby="szam", ordering="DESC").fetchone()
         return utolso["szam"] + 1 if utolso["szam"] else 1
@@ -201,13 +201,13 @@ class ProjektTorloUrlap(simpledialog.Dialog):
         super().__init__(szulo, title="Projekt törlése")
 
     def body(self, szulo):
-        self._projekt_valaszto = Valaszto("megnevezés", self._projekt_nevsor(), self)
+        self._projekt_valaszto = Valaszto("projekt", self._projekt_nevsor(), self)
         self._projekt_valaszto.pack(ipadx=2, ipady=2)
         return self._projekt_valaszto.valaszto
-    
+
     def validate(self):
         return messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!", parent=self)
-    
+
     def apply(self):
         hiba = False
         projekt = self._projekt_valaszto.elem
@@ -227,7 +227,7 @@ class ProjektTorloUrlap(simpledialog.Dialog):
         else:
             print("{}: Bejegyzés törölve.".format(projekt))
             self._projekt_valaszto.beallit(self._projekt_nevsor())
-    
+
     def _projekt_nevsor(self):
         return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
                       key=lambda elem: (elem.gyakorisag, repr(elem)))
@@ -236,7 +236,7 @@ class ProjektModositoUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Projekt módosítása")
-    
+
     def body(self, szulo):
         self._projekt_valaszto = Valaszto("megnevezés", self._projekt_nevsor(), self)
         self._projekt_valaszto.valaszto.bind("<<ComboboxSelected>>", self._projekt_megjelenit)
@@ -249,7 +249,7 @@ class ProjektModositoUrlap(simpledialog.Dialog):
         megnevezes.pack(fill=X, padx=2, pady=2)
 
         return self._projekt_valaszto.valaszto
-    
+
     def validate(self):
         """Ezen a ponton a projektek a projektszám miatt mindenképpen küldönbözni fognak egymástól."""
         return True
@@ -262,11 +262,11 @@ class ProjektModositoUrlap(simpledialog.Dialog):
             print("Nem sikerült módosítani.")
         self._projekt_valaszto.beallit(self._projekt_nevsor())
         self._projekt_megjelenit(1)
-    
+
     def _projekt_nevsor(self):
         return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
                       key=lambda elem: (elem.gyakorisag, repr(elem)))
-    
+
     def _projekt_megjelenit(self, event):
         self._projekt_urlap.beallit(self._projekt_valaszto.elem or Projekt())
 
@@ -280,6 +280,43 @@ class UjMunkareszUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Új munkarész felvitele")
+
+    def body(self, szulo):
+        self._projekt_valaszto = Valaszto("projekt", self._projekt_nevsor(), self)
+        self._projekt_valaszto.pack(ipadx=2, ipady=2)
+
+        munkaresz = LabelFrame(self, text="munkarész")
+        self._munkaresz_urlap = MunkareszUrlap(munkaresz)
+        self._munkaresz_urlap.pack(ipadx=2, ipady=2)
+        munkaresz.pack(fill=X, padx=2, pady=2)
+
+        return self._projekt_valaszto.valaszto
+
+    def validate(self):
+        munkaresz = self._munkaresz_urlap.export()
+
+        if not munkaresz:
+            messagebox.showwarning("Hiányos adat!", "Legalább a nevet add meg!", parent=self)
+            return False
+
+        if munkaresz.meglevo(self._kon):
+            messagebox.showwarning("Létező munkarész!", "Különböztesd meg megjegyzésben!", parent=self)
+            return False
+
+        return True
+
+    def apply(self):
+        projekt = self._projekt_valaszto.elem
+        munkaresz = self._munkaresz_urlap.export()
+        munkaresz.projekt = projekt.azonosito
+        if munkaresz.ment(self._kon):
+            print("Bejegyzés mentve.")
+        else:
+            print("Nem sikerült elmenteni!")
+
+    def _projekt_nevsor(self):
+        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
+                      key=lambda elem: (elem.gyakorisag, repr(elem)))
 
 
 class MunkareszTorloUrlap(simpledialog.Dialog):
