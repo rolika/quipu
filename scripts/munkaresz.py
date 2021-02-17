@@ -15,8 +15,17 @@ class Munkaresz(Dolog):
             }
         self._tabla = "munkaresz"
 
+    def __str__(self):
+        return "{}{}".format(self.megnevezes, self._nullazo(self.megjegyzes))
+
+    def __repr__(self):
+        return self._ascii_rep("{}{}".format(self.megnevezes, self._nullazo(self.megjegyzes)))
+
     def __bool__(self):
         return bool(self.megnevezes)
+
+    def listanezet(self):
+        return str(self)
 
     @property
     def adatok(self):
