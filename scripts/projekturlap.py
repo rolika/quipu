@@ -158,7 +158,7 @@ class UjProjektUrlap(simpledialog.Dialog):
             and cim.meglevo(self._kon)\
                 and munkaresz.meglevo(self._kon)\
                     and jelleg.meglevo(self._kon):
-            messagebox.showwarning("Létező projekt!", "Különböztesd meg megjegyzésben!",
+            messagebox.showwarning("Létező projekt!", "Pontosítsd!",
                                    parent=self)
             return False
 
@@ -176,7 +176,7 @@ class UjProjektUrlap(simpledialog.Dialog):
             return
 
         munkaresz = self._munkaresz_urlap.export()
-        munkaresz.projekt = projekt_azonosito
+        munkaresz.projekt = projekt.azonosito
         if not (munkaresz_azonosito := munkaresz.ment(self._kon)):
             print("A munkarészt nem sikerült elmenteni!")
             return
@@ -285,6 +285,7 @@ class UjMunkareszUrlap(simpledialog.Dialog):
 
     def body(self, szulo):
         self._projekt_valaszto = Valaszto("projekt", self._projektek(), self)
+        self._projekt_valaszto.valaszto.bind("<<ComboboxSelected>>", self._cim_megjelenit)
         self._projekt_valaszto.pack(ipadx=2, ipady=2)
 
         munkaresz = LabelFrame(self, text="munkarész")
@@ -292,17 +293,30 @@ class UjMunkareszUrlap(simpledialog.Dialog):
         self._munkaresz_urlap.pack(ipadx=2, ipady=2)
         munkaresz.pack(fill=X, padx=2, pady=2)
 
+        cim = LabelFrame(self, text="munkarész címe")
+        self._cim_urlap = CimUrlap(cim)
+        self._cim_urlap.pack(ipadx=2, ipady=2)
+        self._cim_megjelenit(1)
+        cim.pack(padx=2, pady=2)
+
+        jelleg = LabelFrame(self, text="munkarész jellege")
+        self._jelleg_urlap = JellegUrlap(jelleg)
+        self._jelleg_urlap.pack(ipadx=2, ipady=2)
+        jelleg.pack(fill=X, padx=2, pady=2)
+
         return self._projekt_valaszto.valaszto
 
     def validate(self):
         munkaresz = self._munkaresz_urlap.export()
+        cim = self._cim_urlap.export()
+        jelleg = self._jelleg_urlap.export()
 
         if not munkaresz:
             messagebox.showwarning("Hiányos adat!", "Legalább a nevet add meg!", parent=self)
             return False
 
-        if munkaresz.meglevo(self._kon):
-            messagebox.showwarning("Létező munkarész!", "Különböztesd meg megjegyzésben!", parent=self)
+        if munkaresz.meglevo(self._kon) and cim.meglevo(self._kon) and jelleg.meglevo(self._kon):
+            messagebox.showwarning("Létező munkarész!", "Pontosítsd!", parent=self)
             return False
 
         return True
@@ -311,14 +325,34 @@ class UjMunkareszUrlap(simpledialog.Dialog):
         projekt = self._projekt_valaszto.elem
         munkaresz = self._munkaresz_urlap.export()
         munkaresz.projekt = projekt.azonosito
-        if munkaresz.ment(self._kon):
-            print("Bejegyzés mentve.")
-        else:
-            print("Nem sikerült elmenteni!")
+
+        munkaresz = self._munkaresz_urlap.export()
+        munkaresz.projekt = projekt.azonosito
+        if not (munkaresz_azonosito := munkaresz.ment(self._kon)):
+            print("A munkarészt nem sikerült elmenteni!")
+            return
+
+        cim = self._cim_urlap.export()
+        cim.munkaresz = munkaresz_azonosito
+        jelleg = self._jelleg_urlap.export()
+        jelleg.munkaresz = munkaresz_azonosito
+        if not (cim.ment(self._kon) and jelleg.ment(self._kon)):
+            print("A címet/jelleget nem sikerült elmenteni!")
+            return
+
+        print("Bejegyzés mentve.")
 
     def _projektek(self):
         return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
                       key=lambda elem: (elem.gyakorisag, repr(elem)))
+    
+    def _cim_megjelenit(self, event):
+        projekt = self._projekt_valaszto.elem
+        if (munkaresz := self._kon.select("munkaresz", projekt=projekt.azonosito).fetchone())\
+            and (cim := self._kon.select("cim", munkaresz=Munkaresz(**munkaresz).azonosito).fetchone()):
+            self._cim_urlap.beallit(Cim(**cim))
+        else:
+            self._cim_urlap.beallit(Cim())
 
 
 class MunkareszTorloUrlap(simpledialog.Dialog):
