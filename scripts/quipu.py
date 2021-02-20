@@ -33,18 +33,19 @@ class Quipu(Frame):
     """ Fő alkalmazás """
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
-        self._init_szemely_db()
-        self._init_szervezet_db()
-        self._init_kontakt_db()
-        menu.Fomenu(self, self._szemely_kon, self._szervezet_kon, self._kontakt_kon)
+        szemely_kon = self._init_szemely_db()
+        szervezet_kon = self._init_szervezet_db()
+        kontakt_kon = self._init_kontakt_db()
+        projekt_kon = self._init_projekt_db()
+        menu.Fomenu(self, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon)
         self.grid()
         self.mainloop()
 
     def _init_szemely_db(self):
         """ Személy adatbázis inicializálása  """
-        self._szemely_kon = tamer.Tamer("szemely.db")
+        szemely_kon = tamer.Tamer("szemely.db")
 
-        self._szemely_kon.create("szemely",
+        szemely_kon.create("szemely",
             azonosito="INTEGER PRIMARY KEY",
             elotag="TEXT",
             vezeteknev="TEXT NOT NULL",
@@ -52,22 +53,23 @@ class Quipu(Frame):
             nem="TEXT NOT NULL",
             megjegyzes="TEXT")
 
-        self._szemely_kon.create("telefon",
+        szemely_kon.create("telefon",
             azonosito="INTEGER PRIMARY KEY",
             szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
             telefonszam="TEXT NOT NULL",
             megjegyzes="TEXT")
 
-        self._szemely_kon.create("email",
+        szemely_kon.create("email",
             azonosito="INTEGER PRIMARY KEY",
             szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
             emailcim="TEXT NOT NULL",
             megjegyzes="TEXT")
 
-        self._szemely_kon.create("cim",
+        szemely_kon.create("cim",
             azonosito="INTEGER PRIMARY KEY",
             szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
             orszag="TEXT DEFAULT 'H'",
+            megye="TEXT",
             iranyitoszam="TEXT",
             helyseg="TEXT NOT NULL",
             utca="TEXT",
@@ -76,11 +78,13 @@ class Quipu(Frame):
             honlap="TEXT",
             megjegyzes="TEXT")
 
+        return szemely_kon
+
     def _init_szervezet_db(self):
         """Szervezet adatbázis inicializálása"""
-        self._szervezet_kon = tamer.Tamer("szervezet.db")
+        szervezet_kon = tamer.Tamer("szervezet.db")
 
-        self._szervezet_kon.create("szervezet",
+        szervezet_kon.create("szervezet",
             azonosito="INTEGER PRIMARY KEY",
             rovidnev="TEXT NOT NULL",
             teljesnev="TEXT",
@@ -89,22 +93,23 @@ class Quipu(Frame):
             szallito="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
 
-        self._szervezet_kon.create("telefon",
+        szervezet_kon.create("telefon",
             azonosito="INTEGER PRIMARY KEY",
             szervezet="INTEGER NOT NULL REFERENCES szervezet",
             telefonszam="TEXT NOT NULL",
             megjegyzes="TEXT")
 
-        self._szervezet_kon.create("email",
+        szervezet_kon.create("email",
             azonosito="INTEGER PRIMARY KEY",
             szervezet="INTEGER NOT NULL REFERENCES szervezet",
             emailcim="TEXT NOT NULL",
             megjegyzes="TEXT")
 
-        self._szervezet_kon.create("cim",
+        szervezet_kon.create("cim",
             azonosito="INTEGER PRIMARY KEY",
             szervezet="INTEGER NOT NULL REFERENCES szervezet",
             orszag="TEXT DEFAULT 'H'",
+            megye="TEXT",
             iranyitoszam="TEXT",
             helyseg="TEXT NOT NULL",
             utca="TEXT",
@@ -113,16 +118,60 @@ class Quipu(Frame):
             honlap="TEXT",
             megjegyzes="TEXT")
 
-    def _init_kontakt_db(self):
-        self._kontakt_kon = tamer.Tamer("kontakt.db")
+        return szervezet_kon
 
-        self._kontakt_kon.create("kontakt",
+    def _init_kontakt_db(self):
+        kontakt_kon = tamer.Tamer("kontakt.db")
+
+        kontakt_kon.create("kontakt",
             azonosito="INTEGER PRIMARY KEY",
             szemely="INTEGER",
             szervezet="INTEGER",
             beosztas="TEXT",
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
+
+        return kontakt_kon
+
+    def _init_projekt_db(self):
+        projekt_kon = tamer.Tamer("projekt.db")
+
+        projekt_kon.create("projekt",
+            azonosito="INTEGER PRIMARY KEY",
+            megnevezes="TEXT NOT NULL",
+            rovidnev="TEXT",
+            ev="INTEGER NOT NULL",
+            szam="INTEGER NOT NULL",
+            gyakorisag="INTEGER DEFAULT 0",
+            megjegyzes="TEXT")
+
+        projekt_kon.create("munkaresz",
+            azonosito="INTEGER PRIMARY KEY",
+            projekt="INTEGER NOT NULL REFERENCES projekt",
+            megnevezes="TEXT NOT NULL",
+            enaplo="INTEGER",
+            megjegyzes="TEXT")
+
+        projekt_kon.create("cim",
+            azonosito="INTEGER PRIMARY KEY",
+            munkaresz="INTEGER NOT NULL REFERENCES munkaresz",
+            orszag="TEXT DEFAULT 'H'",
+            megye="TEXT",
+            iranyitoszam="TEXT",
+            helyseg="TEXT NOT NULL",
+            utca="TEXT",
+            hrsz="TEXT",
+            postafiok="TEXT",
+            honlap="TEXT",
+            megjegyzes="TEXT")
+
+        projekt_kon.create("jelleg",
+            azonosito="INTEGER PRIMARY KEY",
+            munkaresz="INTEGER NOT NULL REFERENCES munkaresz",
+            megnevezes="TEXT NOT NULL",
+            megjegyzes="TEXT")
+
+        return projekt_kon
 
 
 if __name__ == "__main__":

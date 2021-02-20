@@ -12,6 +12,7 @@ class Cim(dolog.Dolog):
         else:  # űrlap mezőinek törléséhez
             self._adatok = {
                 "orszag": "",
+                "megye": "",
                 "iranyitoszam": "",
                 "helyseg": "",
                 "utca": "",
@@ -23,7 +24,7 @@ class Cim(dolog.Dolog):
         self._tabla = "cim"
 
     def __str__(self):
-        return "{}-{} {}, {}".format(self.orszag, self.iranyitoszam, self.helyseg, self.utca)
+        return "{}-{} {}, {}".format(self.orszag, self.megye, self.iranyitoszam, self.helyseg, self.utca)
 
     def __bool__(self):
         """Egy cím akkor meghatározott, ha legalább a helység adott"""
@@ -38,6 +39,7 @@ class Cim(dolog.Dolog):
         """Új cím-osztály alapján módosítja a meglévőt."""
         self._adatok["orszag"] = cim.orszag
         self._adatok["iranyitoszam"] = cim.iranyitoszam
+        self._adatok["megye"] = cim.megye
         self._adatok["helyseg"] = cim.helyseg
         self._adatok["utca"] = cim.utca
         self._adatok["hrsz"] = cim.hrsz
@@ -62,8 +64,20 @@ class Cim(dolog.Dolog):
         self._adatok["szervezet"] = szervezet
 
     @property
+    def munkaresz(self):
+        return self._adatok.get("munkaresz")
+    
+    @munkaresz.setter
+    def munkaresz(self, munkaresz):
+        self._adatok["munkaresz"] = munkaresz
+
+    @property
     def orszag(self):
         return self._adatok.get("orszag", "")
+    
+    @property
+    def megye(self):
+        return self._adatok.get("megye", "")
 
     @property
     def iranyitoszam(self):

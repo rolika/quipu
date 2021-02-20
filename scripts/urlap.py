@@ -1,11 +1,11 @@
 from tkinter import *
-from tkinter import messagebox
-from tkinter import simpledialog
 from tkinter.ttk import Combobox
 from telefon import Telefon
 from email import Email
 from cim import Cim
-from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS
+from munkaresz import Munkaresz
+from jelleg import Jelleg
+from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS, ORSZAG, MEGYE
 
 
 class TelefonszamUrlap(Frame):
@@ -55,6 +55,8 @@ class CimUrlap(Frame):
         super().__init__(master=master, **kw)
 
         self._orszag = StringVar()
+        self._megye = StringVar()
+        self._megye.set("")
         self._iranyitoszam = StringVar()
         self._helyseg = StringVar()
         self._utca = StringVar()
@@ -62,42 +64,39 @@ class CimUrlap(Frame):
         self._postafiok = StringVar()
         self._honlap = StringVar()
         self._megjegyzes = StringVar()
-
-        self._orszagok = {
-            "Magyarország": "H",
-            "Németország": "D",
-            "Ausztria": "A",
-            "Svájc": "CH",
-            "Hollandia": "NL",
-            "Szlovákia": "SK",
-            "Csehország": "CZ",
-            "USA": "USA",
-            "Románia": "RO"
-        }
         self._orszag.set("Magyarország")
         self._megjegyzes.set(CIM_TIPUS[0])
 
         Label(self, text="ország").grid(row=0, column=0, sticky=W, padx=2, pady=2)
-        OptionMenu(self, self._orszag, *self._orszagok.keys()).grid(row=0, column=1, sticky=W, padx=2, pady=2)
-        Label(self, text="irányítószám").grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        iranyitoszam = Entry(self, textvariable=self._iranyitoszam, width=8)
-        iranyitoszam.grid(row=1, column=1, sticky=W, padx=2, pady=2)
-        iranyitoszam.focus_set()
-        Label(self, text="helység").grid(row=2, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._helyseg, width=32).grid(row=2, column=1, sticky=W, padx=2, pady=2)
-        Label(self, text="utca, házszám").grid(row=3, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._utca, width=32).grid(row=3, column=1, sticky=W, padx=2, pady=2)
-        Label(self, text="helyrajzi szám").grid(row=4, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._hrsz, width=8).grid(row=4, column=1, sticky=W, padx=2, pady=2)
-        Label(self, text="postafiók").grid(row=5, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._postafiok, width=8).grid(row=5, column=1, sticky=W, padx=2, pady=2)
-        Label(self, text="honlap").grid(row=6, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._honlap, width=32).grid(row=6, column=1, sticky=W, padx=2, pady=2)
-        Label(self, text="megjegyzés").grid(row=7, column=0, sticky=W, padx=2, pady=2)
-        OptionMenu(self, self._megjegyzes, *CIM_TIPUS).grid(row=7, column=1, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self._orszag, *ORSZAG.keys()).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="megye").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        Combobox(self, textvariable=self._megye, values=MEGYE).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="irányítószám").grid(row=2, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._iranyitoszam, width=8).grid(row=2, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="helység").grid(row=3, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._helyseg, width=32).grid(row=3, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="utca, házszám").grid(row=4, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._utca, width=32).grid(row=4, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="helyrajzi szám").grid(row=5, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._hrsz, width=8).grid(row=5, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="postafiók").grid(row=6, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._postafiok, width=8).grid(row=6, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="honlap").grid(row=7, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._honlap, width=32).grid(row=7, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="megjegyzés").grid(row=8, column=0, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self._megjegyzes, *CIM_TIPUS).grid(row=8, column=1, sticky=W, padx=2, pady=2)
 
     def beallit(self, cim):
         self._orszag.set(self._kodbol_orszag(cim.orszag))
+        self._megye.set(cim.megye)
         self._iranyitoszam.set(cim.iranyitoszam)
         self._helyseg.set(cim.helyseg)
         self._utca.set(cim.utca)
@@ -108,7 +107,8 @@ class CimUrlap(Frame):
 
     def export(self):
         return Cim(
-            orszag=self._orszagok[self._orszag.get()],
+            orszag=ORSZAG[self._orszag.get()],
+            megye=self._megye.get(),
             iranyitoszam=self._iranyitoszam.get(),
             helyseg=self._helyseg.get(),
             utca=self._utca.get(),
@@ -117,9 +117,9 @@ class CimUrlap(Frame):
             honlap=self._honlap.get(),
             megjegyzes=self._megjegyzes.get()
         )
-    
+
     def _kodbol_orszag(self, kod):
-        for orszagnev, orszagkod in self._orszagok.items():
+        for orszagnev, orszagkod in ORSZAG.items():
             if orszagkod == kod:
                 return orszagnev  # mindig lesz találat
 
@@ -128,7 +128,7 @@ class Valaszto(LabelFrame):
     def __init__(self, cimke, valasztek, master=None, **kw):
         super().__init__(master=master, text=cimke, **kw)
         self._valasztek = valasztek
-        self._valaszto = Combobox(self, width=32)
+        self._valaszto = Combobox(self, width=42)
         self.beallit(valasztek)
         self._valaszto.grid()
 

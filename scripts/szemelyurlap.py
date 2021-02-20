@@ -530,7 +530,7 @@ class CimModositoUrlap(simpledialog.Dialog):
         self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
         self._nev_valaszto.pack(ipadx=2, ipady=2)
 
-        self._cim_valaszto = Valaszto("módosítandó email-cím", self._cimek(), self)
+        self._cim_valaszto = Valaszto("módosítandó cím", self._cimek(), self)
         self._cim_valaszto.valaszto.bind("<<ComboboxSelected>>", self._kiir_elerhetoseg)
         self._cim_valaszto.pack(ipadx=2, ipady=2)
 
