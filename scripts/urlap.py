@@ -96,6 +96,7 @@ class CimUrlap(Frame):
 
     def beallit(self, cim):
         self._orszag.set(self._kodbol_orszag(cim.orszag))
+        self._megye.set(cim.megye)
         self._iranyitoszam.set(cim.iranyitoszam)
         self._helyseg.set(cim.helyseg)
         self._utca.set(cim.utca)
@@ -127,7 +128,7 @@ class Valaszto(LabelFrame):
     def __init__(self, cimke, valasztek, master=None, **kw):
         super().__init__(master=master, text=cimke, **kw)
         self._valasztek = valasztek
-        self._valaszto = Combobox(self, width=32)
+        self._valaszto = Combobox(self, width=42)
         self.beallit(valasztek)
         self._valaszto.grid()
 

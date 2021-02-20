@@ -32,10 +32,10 @@ class Munkaresz(Dolog):
         return self._adatok
 
     @adatok.setter
-    def adatok(self, projekt):
-        self._adatok["megnevezes"] = projekt.megnevezes
-        self._adatok["enaplo"] = projekt.cim
-        self._adatok["megjegyzes"] = projekt.megjegyzes
+    def adatok(self, uj):
+        self._adatok["megnevezes"] = uj.megnevezes
+        self._adatok["enaplo"] = uj.enaplo
+        self._adatok["megjegyzes"] = uj.megjegyzes
 
     @property
     def megnevezes(self):

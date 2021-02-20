@@ -414,29 +414,88 @@ class MunkareszModositoUrlap(simpledialog.Dialog):
         self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Munkarész módosítása")
 
+    def body(self, szulo):
+        self._projekt_valaszto = Valaszto("projekt", self._projektek(), self)
+        self._projekt_valaszto.valaszto.bind("<<ComboboxSelected>>", self._munkaresz_kivalaszt)
+        self._projekt_valaszto.pack(ipadx=2, ipady=2)
 
-class MunkareszCimTorloUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
-        self._kon = kon  # super() előtt kell legyen
-        super().__init__(szulo, title="Cím törlése")
+        self._munkaresz_valaszto = Valaszto("munkarész", self._munkareszek(), self)
+        self._munkaresz_valaszto.valaszto.bind("<<ComboboxSelected>>", self._munkaresz_megjelenit)
+        self._munkaresz_valaszto.pack(ipadx=2, ipady=2)
 
+        munkaresz = LabelFrame(self, text="munkarész")
+        self._munkaresz_urlap = MunkareszUrlap(munkaresz)
+        self._munkaresz_urlap.pack(ipadx=2, ipady=2)
+        munkaresz.pack(fill=X, padx=2, pady=2)
 
-class MunkareszCimModositoUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
-        self._kon = kon  # super() előtt kell legyen
-        super().__init__(szulo, title="Cím módosítása")
+        cim = LabelFrame(self, text="munkarész címe")
+        self._cim_urlap = CimUrlap(cim)
+        self._cim_urlap.pack(ipadx=2, ipady=2)
+        cim.pack(padx=2, pady=2)
 
+        jelleg = LabelFrame(self, text="munkarész jellege")
+        self._jelleg_urlap = JellegUrlap(jelleg)
+        self._jelleg_urlap.pack(ipadx=2, ipady=2)
+        jelleg.pack(fill=X, padx=2, pady=2)
 
-class JellegTorloUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
-        self._kon = kon  # super() előtt kell legyen
-        super().__init__(szulo, title="Jelleg törlése")
+        self._munkaresz_kivalaszt(1)
+        return self._projekt_valaszto.valaszto
 
+    def validate(self):
+        munkaresz = self._munkaresz_urlap.export()
+        cim = self._cim_urlap.export()
+        jelleg = self._jelleg_urlap.export()
 
-class JellegModositoUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
-        self._kon = kon  # super() előtt kell legyen
-        super().__init__(szulo, title="Jelleg módosítása")
+        if not munkaresz:
+            messagebox.showwarning("Hiányos adat!", "Legalább a nevet add meg!", parent=self)
+            return False
+
+        if munkaresz.meglevo(self._kon) and cim.meglevo(self._kon) and jelleg.meglevo(self._kon):
+            messagebox.showwarning("Létező munkarész!", "Pontosítsd!", parent=self)
+            return False
+
+        return True
+
+    def apply(self):
+        munkaresz, cim, jelleg = self._modositott_munkaresz()
+        if munkaresz.ment(self._kon) and cim.ment(self._kon) and jelleg.ment(self._kon):
+            print("Bejegyzés mentve.")
+        else:
+            print("Nem sikerült elmenteni!")
+
+    def _projektek(self):
+        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
+                      key=lambda elem: (elem.gyakorisag, repr(elem)))
+    
+    def _munkareszek(self):
+        projekt = self._projekt_valaszto.elem
+        return sorted(map(lambda munkaresz: Munkaresz(**munkaresz),
+                          self._kon.select("munkaresz", projekt=projekt.azonosito)), key=repr)
+    
+    def _munkaresz_kivalaszt(self, event):
+        self._munkaresz_valaszto.beallit(self._munkareszek())
+        self._munkaresz_megjelenit(1)
+
+    def _munkaresz_megjelenit(self, event):
+        munkaresz, cim, jelleg = self._meglevo_munkaresz()
+        self._munkaresz_urlap.beallit(munkaresz)
+        self._cim_urlap.beallit(cim)
+        self._jelleg_urlap.beallit(jelleg)
+    
+    def _meglevo_munkaresz(self):
+        munkaresz = self._munkaresz_valaszto.elem
+        cim = self._kon.select("cim", munkaresz=munkaresz.azonosito).fetchone()
+        cim = Cim(**cim)
+        jelleg = self._kon.select("jelleg", munkaresz=munkaresz.azonosito).fetchone()
+        jelleg = Jelleg(**jelleg)
+        return (munkaresz, cim, jelleg)
+    
+    def _modositott_munkaresz(self):        
+        munkaresz, cim, jelleg = self._meglevo_munkaresz()
+        munkaresz.adatok = self._munkaresz_urlap.export()
+        cim.adatok = self._cim_urlap.export()
+        jelleg.adatok = self._jelleg_urlap.export()
+        return (munkaresz, cim, jelleg)
 
 
 if __name__== "__main__":
