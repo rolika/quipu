@@ -173,6 +173,23 @@ class Quipu(Frame):
 
         return projekt_kon
 
+    def _init_arajanlat_db(self):
+        arajanlat_kon = tamer.Tamer("arajanlat.db")
+
+        arajanlat_kon.create("arajanlatkeres",
+            azonosito="INTEGER PRIMARY KEY",
+            munkaresz="INTEGER",
+            kontakt="INTEGER",
+            temafelelos="INTEGER",
+            hatarido="TEXT")
+        
+        arajanlat_kon.create("arajanlat",
+            azonosito="INTEGER PRIMARY KEY",
+            ajanlatkeres="INTEGER",
+            ajanlatiar="REAL",
+            leadva="TEXT",
+            ervenyes="INTEGER DEFAULT 30")
+
 
 if __name__ == "__main__":
     app = Quipu()
