@@ -53,8 +53,6 @@ class ProjektMenu(Menu):
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
         self.add("cascade", label="projekt", menu=ProjektAlmenu(projekt_kon, mb))
-        self.add("cascade", label="munkarész", menu=MunkareszAlmenu(projekt_kon, mb))
-        self.add("cascade", label="cím", menu=MunkareszCimAlmenu(projekt_kon, mb))
 
 
 class Alapmenu(Menu):
@@ -268,6 +266,7 @@ class ProjektAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
         self._projekt_kon = kon
+        self.add("cascade", label="munkarész", menu=MunkareszAlmenu(self._projekt_kon, mb))
 
     def uj(self):
         projekturlap.UjProjektUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
@@ -292,21 +291,6 @@ class MunkareszAlmenu(Alapmenu):
 
     def modosit(self):
         projekturlap.MunkareszModositoUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
-
-
-class MunkareszCimAlmenu(Alapmenu):
-    def __init__(self, kon, mb):
-        super().__init__(mb)
-        self._projekt_kon = kon
-
-    def uj(self):
-        projekturlap.UjMunkareszCimUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
-
-    def torol(self):
-        projekturlap.MunkareszCimTorloUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
-
-    def modosit(self):
-        projekturlap.MunkareszCimModositoUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
 
 
 if __name__ == "__main__":
