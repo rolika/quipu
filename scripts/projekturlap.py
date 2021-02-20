@@ -365,7 +365,7 @@ class MunkareszTorloUrlap(simpledialog.Dialog):
         self._projekt_valaszto.valaszto.bind("<<ComboboxSelected>>", self._munkaresz_megjelenit)
         self._projekt_valaszto.pack(ipadx=2, ipady=2)
 
-        self._munkaresz_valaszto = Valaszto("projekt", self._munkareszek(), self)
+        self._munkaresz_valaszto = Valaszto("munkarész", self._munkareszek(), self)
         self._munkaresz_valaszto.pack(ipadx=2, ipady=2)
 
         self._munkaresz_megjelenit(1)
