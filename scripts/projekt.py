@@ -12,18 +12,18 @@ class Projekt(Dolog):
         else:
             self._adatok = {
                 "megnevezes": "",
-                "ev": self._aktualis_ev(),
+                "rovidnev": "",
+                "ev": 0,
                 "szam": 0,
                 "gyakorisag": 0,
                 "megjegyzes": ""
             }
         self._tabla = "projekt"
-        self._elvalaszto = "/"
-    
+
     def __str__(self):
         """Projekt kiíratása emberi használatra"""
         return "{}/{} {}{}".format(self.ev, self.szam, self.megnevezes, self._nullazo(self.megjegyzes))
-    
+
     def __repr__(self):
         """Projekt elnevezése sorbarendezéshez"""
         return "{}{}{}{}".format(self.ev, self.szam, self._ascii_rep(self.megnevezes), self._ascii_rep(self.megjegyzes))
@@ -31,7 +31,7 @@ class Projekt(Dolog):
     def __bool__(self):
         """ A projekt meghatározott, ha adott a megnevezése."""
         return bool(self.megnevezes)
-    
+
     def listanezet(self):
         return str(self)
 
@@ -40,26 +40,31 @@ class Projekt(Dolog):
         return self._adatok
 
     @adatok.setter
-    def adatok(self, projekt):
-        self._adatok["megnevezes"] = projekt.megnevezes
-        self._adatok["megjegyzes"] = projekt.megjegyzes
+    def adatok(self, uj):
+        self._adatok["megnevezes"] = uj.megnevezes
+        self._adatok["rovidnev"] = uj.rovidnev
+        self._adatok["megjegyzes"] = uj.megjegyzes
 
     @property
     def megnevezes(self):
         return self._adatok.get("megnevezes")
-    
+
+    @property
+    def rovidnev(self):
+        return self._adatok.get("rovidnev")
+
     @property
     def ev(self):
         return self._adatok.get("ev")
-    
+
     @ev.setter
     def ev(self, evszam):
         self._adatok["ev"] = evszam
-    
+
     @property
     def szam(self):
         return self._adatok.get("szam")
-    
+
     @szam.setter
     def szam(self, projektszam):
         self._adatok["szam"] = projektszam
@@ -67,9 +72,12 @@ class Projekt(Dolog):
     @property
     def gyakorisag(self):
         return self._adatok.get("gyakorisag")
-    
+
     @gyakorisag.setter
     def gyakorisag(self, ertek):
         self._adatok["gyakorisag"] = ertek
-    
+
+    def hozzafer(self):
+        self._adatok["gyakorisag"] -= 1
+
 

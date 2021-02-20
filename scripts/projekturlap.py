@@ -17,6 +17,7 @@ class ProjektUrlap(Frame):
 
         self._projektszam = StringVar()
         self._megnevezes = StringVar()
+        self._rovidnev = StringVar()
         self._megjegyzes = StringVar()
 
         Label(self, text="projektszám").grid(row=0, column=0, sticky=W, padx=2, pady=2)
@@ -27,17 +28,22 @@ class ProjektUrlap(Frame):
         self._fokusz = Entry(self, textvariable=self._megnevezes, width=32)
         self._fokusz.grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
-        Label(self, text="megjegyzés").grid(row=2, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=2, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="rövid név").grid(row=2, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._rovidnev, width=32).grid(row=2, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="megjegyzés").grid(row=3, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=3, column=1, sticky=W, padx=2, pady=2)
 
     def beallit(self, projekt):
         self._projektszam.set("{}/{}".format(projekt.ev, projekt.szam))
         self._megnevezes.set(projekt.megnevezes)
+        self._rovidnev.set(projekt.rovidnev)
         self._megjegyzes.set(projekt.megjegyzes)
 
     def export(self):
         return Projekt(
             megnevezes=self._megnevezes.get(),
+            rovidnev=self._rovidnev.get(),
             megjegyzes=self._megjegyzes.get()
         )
 
@@ -176,7 +182,7 @@ class UjProjektUrlap(simpledialog.Dialog):
             return
 
         munkaresz = self._munkaresz_urlap.export()
-        munkaresz.projekt = projekt.azonosito
+        munkaresz.projekt = projekt_azonosito
         if not (munkaresz_azonosito := munkaresz.ment(self._kon)):
             print("A munkarészt nem sikerült elmenteni!")
             return
@@ -193,7 +199,7 @@ class UjProjektUrlap(simpledialog.Dialog):
 
     def _kovetkezo_projektszam(self):
         utolso = self._kon.select("projekt", "szam", ev=self._ev, orderby="szam", ordering="DESC").fetchone()
-        return utolso["szam"] + 1 if utolso["szam"] else 1
+        return utolso["szam"] + 1 if utolso else 1
 
 
 class ProjektTorloUrlap(simpledialog.Dialog):
@@ -345,7 +351,7 @@ class UjMunkareszUrlap(simpledialog.Dialog):
     def _projektek(self):
         return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
                       key=lambda elem: (elem.gyakorisag, repr(elem)))
-    
+
     def _cim_megjelenit(self, event):
         projekt = self._projekt_valaszto.elem
         if (munkaresz := self._kon.select("munkaresz", projekt=projekt.azonosito).fetchone())\

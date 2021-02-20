@@ -77,7 +77,7 @@ class Quipu(Frame):
             postafiok="TEXT",
             honlap="TEXT",
             megjegyzes="TEXT")
-        
+
         return szemely_kon
 
     def _init_szervezet_db(self):
@@ -117,7 +117,7 @@ class Quipu(Frame):
             postafiok="TEXT",
             honlap="TEXT",
             megjegyzes="TEXT")
-        
+
         return szervezet_kon
 
     def _init_kontakt_db(self):
@@ -130,20 +130,21 @@ class Quipu(Frame):
             beosztas="TEXT",
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
-        
+
         return kontakt_kon
-    
+
     def _init_projekt_db(self):
         projekt_kon = tamer.Tamer("projekt.db")
 
         projekt_kon.create("projekt",
             azonosito="INTEGER PRIMARY KEY",
             megnevezes="TEXT NOT NULL",
+            rovidnev="TEXT",
             ev="INTEGER NOT NULL",
             szam="INTEGER NOT NULL",
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
-        
+
         projekt_kon.create("munkaresz",
             azonosito="INTEGER PRIMARY KEY",
             projekt="INTEGER NOT NULL REFERENCES projekt",
@@ -163,13 +164,13 @@ class Quipu(Frame):
             postafiok="TEXT",
             honlap="TEXT",
             megjegyzes="TEXT")
-        
+
         projekt_kon.create("jelleg",
             azonosito="INTEGER PRIMARY KEY",
             munkaresz="INTEGER NOT NULL REFERENCES munkaresz",
             megnevezes="TEXT NOT NULL",
             megjegyzes="TEXT")
-        
+
         return projekt_kon
 
 
