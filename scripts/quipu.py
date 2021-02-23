@@ -37,7 +37,8 @@ class Quipu(Frame):
         szervezet_kon = self._init_szervezet_db()
         kontakt_kon = self._init_kontakt_db()
         projekt_kon = self._init_projekt_db()
-        menu.Fomenu(self, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon)
+        ajanlat_kon = self._init_ajanlat_db()
+        menu.Fomenu(self, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon, ajanlat_kon)
         self.grid()
         self.mainloop()
 
@@ -173,22 +174,27 @@ class Quipu(Frame):
 
         return projekt_kon
 
-    def _init_arajanlat_db(self):
-        arajanlat_kon = tamer.Tamer("arajanlat.db")
+    def _init_ajanlat_db(self):
+        ajanlat_kon = tamer.Tamer("ajanlat.db")
 
-        arajanlat_kon.create("arajanlatkeres",
+        ajanlat_kon.create("ajanlatkeres",
             azonosito="INTEGER PRIMARY KEY",
             munkaresz="INTEGER",
-            kontakt="INTEGER",
+            ajanlatkero="INTEGER",
             temafelelos="INTEGER",
-            hatarido="TEXT")
+            hatarido="TEXT",
+            megjegyzes="TEXT")
         
-        arajanlat_kon.create("arajanlat",
+        ajanlat_kon.create("ajanlat",
             azonosito="INTEGER PRIMARY KEY",
             ajanlatkeres="INTEGER",
             ajanlatiar="REAL",
             leadva="TEXT",
-            ervenyes="INTEGER DEFAULT 30")
+            ervenyes="INTEGER DEFAULT 30",
+            esely="REAL DEFAULT 0.05",
+            megjegyzes="TEXT")
+    
+        return ajanlat_kon
 
 
 if __name__ == "__main__":

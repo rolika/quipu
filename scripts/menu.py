@@ -2,10 +2,12 @@ from tkinter import *
 import szemelyurlap
 import szervezeturlap
 import projekturlap
+import ajanlaturlap
 
 
 class Fomenu(Frame):
-    def __init__(self, master=None, szemely_kon=None, szervezet_kon=None, kontakt_kon=None, projekt_kon=None, **kw):
+    def __init__(self, master=None, szemely_kon=None, szervezet_kon=None,
+                 kontakt_kon=None, projekt_kon=None, ajanlat_kon=None, **kw):
         super().__init__(master=master, **kw)
 
         # főmenü
@@ -17,7 +19,7 @@ class Fomenu(Frame):
         # menük
         szemelymenu = SzemelyMenu(szemelymb, szemely_kon, szervezet_kon, kontakt_kon)
         szervezetmenu = SzervezetMenu(szervezetmb, szervezet_kon, szemely_kon, kontakt_kon)
-        projektmenu = ProjektMenu(projektmb, projekt_kon)
+        projektmenu = ProjektMenu(projektmb, projekt_kon, szemely_kon, szervezet_kon, kontakt_kon, ajanlat_kon)
 
         szemelymb.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         szervezetmb.grid(row=0, column=1, sticky=W, ipadx=2, ipady=2)
@@ -49,10 +51,12 @@ class SzervezetMenu(Menu):
         self.add("cascade", label="kontaktszemély", menu=SzervezetKontaktAlmenu(szervezet_kon, mb, szemely_kon, kontakt_kon))
 
 class ProjektMenu(Menu):
-    def __init__(self, mb, projekt_kon):
+    def __init__(self, mb, projekt_kon, szemely_kon, szervezet_kon, kontakt_kon, ajanlat_kon):
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
         self.add("cascade", label="projekt", menu=ProjektAlmenu(projekt_kon, mb))
+        self.add("cascade", label="ajánlat(kérés)",
+                 menu=AjanlatAlmenu(ajanlat_kon, mb, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon))
 
 
 class Alapmenu(Menu):
@@ -291,6 +295,40 @@ class MunkareszAlmenu(Alapmenu):
 
     def modosit(self):
         projekturlap.MunkareszModositoUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
+    
+
+class AjanlatAlmenu(Alapmenu):
+    def __init__(self, ajanlat_kon, mb, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon):
+        super().__init__(mb)
+        self._ajanlat_kon = ajanlat_kon
+        self._szemely_kon = szemely_kon
+        self._szervezet_kon = szervezet_kon
+        self._kontakt_kon = kontakt_kon
+        self._projekt_kon = projekt_kon
+
+    def uj(self):
+        ajanlaturlap.UjAjanlatUrlap(self.mb.winfo_toplevel(),
+                                    self._ajanlat_kon, 
+                                    self._szemely_kon, 
+                                    self._szervezet_kon, 
+                                    self._kontakt_kon, 
+                                    self._projekt_kon)
+
+    def torol(self):
+        ajanlaturlap.AjanlatTorloUrlap(self.mb.winfo_toplevel(),
+                                       self._ajanlat_kon, 
+                                       self._szemely_kon, 
+                                       self._szervezet_kon, 
+                                       self._kontakt_kon, 
+                                       self._projekt_kon)
+
+    def modosit(self):
+        ajanlaturlap.AjanlatModositoUrlap(self.mb.winfo_toplevel(),
+                                          self._ajanlat_kon, 
+                                          self._szemely_kon, 
+                                          self._szervezet_kon, 
+                                          self._kontakt_kon, 
+                                          self._projekt_kon)
 
 
 if __name__ == "__main__":
