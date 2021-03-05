@@ -1,6 +1,4 @@
 import dolog
-import szemely
-import szervezet
 
 
 class Kontakt(dolog.Dolog):

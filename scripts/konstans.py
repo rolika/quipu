@@ -3,7 +3,7 @@
 ELERHETOSEG_TIPUS = ("alapértelmezett", "munkahelyi", "privát")
 CIM_TIPUS = ("alapértelmezett", "székhely", "telephely", "levelezési cím", "lakhely", "tartózkodási hely")
 BEOSZTAS = ("műszaki előkészítő", "képviselő", "projektvezető", "építésvezető", "csoportvezető", "felvételis", "dolgozó")
-JOGI_MAGAN = ("magánszemély", "jogi személy")
+JOGI_MAGAN = ("!magánszemély", "jogi személy")
 JELLEG = ("új", "felújítás", "javítás", "karbantartás", "bővítés", "átalakítás")
 MUNKARESZ = ("szigetelés", "lapostető-szigetelés", "alépítményi szigetelés", "terasz-szigetelés")
 MEGYE = ("Baranya", "Bács-Kiskun", "Békés", "Borsod-Abaúj-Zemplén", "Budapest", "Csongrád-Csanád", "Fejér",
@@ -20,4 +20,4 @@ ORSZAG = {
             "USA": "USA",
             "Románia": "RO"
         }
-        
+CEGAZONOSITO = 2  # az alkalmazást használó cég SQL PRIMARY KEY-e

@@ -50,12 +50,13 @@ class SzervezetMenu(Menu):
         self.add("cascade", label="cím", menu=SzervezetCimAlmenu(szervezet_kon, mb))
         self.add("cascade", label="kontaktszemély", menu=SzervezetKontaktAlmenu(szervezet_kon, mb, szemely_kon, kontakt_kon))
 
+
 class ProjektMenu(Menu):
     def __init__(self, mb, projekt_kon, szemely_kon, szervezet_kon, kontakt_kon, ajanlat_kon):
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
         self.add("cascade", label="projekt", menu=ProjektAlmenu(projekt_kon, mb))
-        self.add("cascade", label="ajánlat(kérés)",
+        self.add("cascade", label="ajánlat",
                  menu=AjanlatAlmenu(ajanlat_kon, mb, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon))
 
 
@@ -295,7 +296,7 @@ class MunkareszAlmenu(Alapmenu):
 
     def modosit(self):
         projekturlap.MunkareszModositoUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
-    
+
 
 class AjanlatAlmenu(Alapmenu):
     def __init__(self, ajanlat_kon, mb, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon):
@@ -307,27 +308,29 @@ class AjanlatAlmenu(Alapmenu):
         self._projekt_kon = projekt_kon
 
     def uj(self):
+        self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
         ajanlaturlap.UjAjanlatUrlap(self.mb.winfo_toplevel(),
-                                    self._ajanlat_kon, 
-                                    self._szemely_kon, 
-                                    self._szervezet_kon, 
-                                    self._kontakt_kon, 
+                                    self._ajanlat_kon,
+                                    self._szemely_kon,
+                                    self._szervezet_kon,
+                                    self._kontakt_kon,
                                     self._projekt_kon)
+        self._szervezet_kon.detach("szemely", "kontakt")
 
     def torol(self):
         ajanlaturlap.AjanlatTorloUrlap(self.mb.winfo_toplevel(),
-                                       self._ajanlat_kon, 
-                                       self._szemely_kon, 
-                                       self._szervezet_kon, 
-                                       self._kontakt_kon, 
+                                       self._ajanlat_kon,
+                                       self._szemely_kon,
+                                       self._szervezet_kon,
+                                       self._kontakt_kon,
                                        self._projekt_kon)
 
     def modosit(self):
         ajanlaturlap.AjanlatModositoUrlap(self.mb.winfo_toplevel(),
-                                          self._ajanlat_kon, 
-                                          self._szemely_kon, 
-                                          self._szervezet_kon, 
-                                          self._kontakt_kon, 
+                                          self._ajanlat_kon,
+                                          self._szemely_kon,
+                                          self._szervezet_kon,
+                                          self._kontakt_kon,
                                           self._projekt_kon)
 
 

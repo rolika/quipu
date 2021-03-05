@@ -182,6 +182,7 @@ class Quipu(Frame):
             munkaresz="INTEGER",
             ajanlatkero="INTEGER",
             temafelelos="INTEGER",
+            erkezett="TEXT",
             hatarido="TEXT",
             megjegyzes="TEXT")
         

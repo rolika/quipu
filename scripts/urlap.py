@@ -150,3 +150,6 @@ class Valaszto(LabelFrame):
             return self._valasztek[self._valaszto.current()]
         except IndexError:
             return None
+    
+    def set_callback(self, fv_ref):
+        self._valaszto.bind("<<ComboboxSelected>>", fv_ref)
