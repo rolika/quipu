@@ -106,6 +106,7 @@ class AjanlatUrlap(LabelFrame):
         super().__init__(szulo, text="ajánlat adatai", **kw)
 
         self._ajanlatiar = StringVar()
+        self._leadva = StringVar()
         self._ervenyes = StringVar()
         self._esely = StringVar()
         self._megjegyzes = StringVar()
@@ -115,29 +116,35 @@ class AjanlatUrlap(LabelFrame):
         self._fokusz.grid(row=0, column=1, sticky=W, padx=2, pady=2)
         Label(self, text="Ft (nettó)").grid(row=0, column=2, sticky=W, padx=2, pady=2)
 
-        Label(self, text="érvényes").grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._ervenyes, width=10).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="leadva").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._leadva, width=10).grid(row=1, column=1, sticky=W, padx=2, pady=2)
         Label(self, text="(éééé-hh-nn)").grid(row=1, column=2, sticky=W, padx=2, pady=2)
 
-        Label(self, text="esély").grid(row=2, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._esely, width=10).grid(row=2, column=1, sticky=W, padx=2, pady=2)
-        Label(self, text="%").grid(row=2, column=2, sticky=W, padx=2, pady=2)
+        Label(self, text="érvényes").grid(row=2, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._ervenyes, width=10).grid(row=2, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="(éééé-hh-nn)").grid(row=2, column=2, sticky=W, padx=2, pady=2)
 
-        Label(self, text="megjegyzés").grid(row=3, column=0, sticky=W, padx=2, pady=2)
+        Label(self, text="esély").grid(row=3, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._esely, width=10).grid(row=3, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="%").grid(row=3, column=2, sticky=W, padx=2, pady=2)
+
+        Label(self, text="megjegyzés").grid(row=4, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._megjegyzes, width=32)\
-            .grid(row=3, column=1, columnspan=2, sticky=W, padx=2, pady=2)
+            .grid(row=4, column=1, columnspan=2, sticky=W, padx=2, pady=2)
 
     def fokusz(self):
         return self._fokusz
 
     def beallit(self, ajanlat):
         self._ajanlatiar.set(ajanlat.ajanlatiar)
+        self._leadva.set(ajanlat.leadva)
         self._ervenyes.set(ajanlat.ervenyes)
         self._esely.set(ajanlat.esely)
         self._megjegyzes.set(ajanlat.megjegyzes)
 
     def export(self):
         return Ajanlat(ajanlatiar=self._ajanlatiar.get(),
+                       leadva=self._leadva.get(),
                        ervenyes=self._ervenyes.get(),
                        esely=self._esely.get(),
                        megjegyzes=self._megjegyzes.get())

@@ -9,6 +9,7 @@ class Ajanlat(dolog.Dolog):
         else:
             self._adatok = {
                 "ajanlatiar": "",
+                "leadva": "",
                 "ervenyes": "",
                 "esely": "",
                 "megjegyzes": ""
