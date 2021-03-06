@@ -42,16 +42,16 @@ class Ajanlat(dolog.Dolog):
 
     @property
     def ajanlatiar(self):
-        return self._adatok.get("ajanlatiar")
+        return self._adatok.get("ajanlatiar", "")
 
     @property
     def leadva(self):
-        return self._adatok.get("leadva")
+        return self._adatok.get("leadva", "")
 
     @property
     def ervenyes(self):
-        return self._adatok.get("ervenyes")
+        return self._adatok.get("ervenyes", "")
 
     @property
     def esely(self):
-        return self._adatok.get("esely")
+        return self._adatok.get("esely", "")

@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import simpledialog
-from datetime import date
+from datetime import date, timedelta
 from urlap import Valaszto
 from projekt import Projekt
 from munkaresz import Munkaresz
@@ -55,6 +55,11 @@ class AjanlatkeresUrlap(LabelFrame):
         megjegyzes = LabelFrame(self, text="megjegyzés")
         Entry(megjegyzes, textvariable=self._megjegyzes, width=40).pack(ipadx=2, ipady=2, side=LEFT)
         megjegyzes.pack(ipadx=2, ipady=2, fill=BOTH)
+    
+    def beallit(self, ajanlatkeres):
+        self._erkezett.set(ajanlatkeres.erkezett)
+        self._hatarido.set(ajanlatkeres.hatarido)
+        self._megjegyzes.set(ajanlatkeres.megjegyzes)
 
     def export(self):
         return Ajanlatkeres(munkaresz=self._munkaresz_valaszto.elem.azonosito,
@@ -163,9 +168,17 @@ class UjAjanlatUrlap(simpledialog.Dialog):
 
         self._ajanlatkeres_urlap =\
             AjanlatkeresUrlap(szulo, self._szervezet_kon, self._szemely_kon, self._kontakt_kon, self._projekt_kon)
+        ma = date.isoformat(date.today())
+        egyhetmulva = date.isoformat(date.today() + timedelta(days=7))
+        alapertelmezes = Ajanlatkeres(erkezett=ma, hatarido=egyhetmulva, megjegyzes="")
+        self._ajanlatkeres_urlap.beallit(alapertelmezes)
         self._ajanlatkeres_urlap.pack(ipadx=4, ipady=4)
 
         self._ajanlat_urlap = AjanlatUrlap(szulo)
+        ma = date.isoformat(date.today())
+        egyhonapmulva = date.isoformat(date.today() + timedelta(days=30))
+        alapertelmezes = Ajanlat(leadva=ma, ervenyes=egyhonapmulva, esely="5", megjegyzes="")
+        self._ajanlat_urlap.beallit(alapertelmezes)
         self._ajanlat_urlap.pack(ipadx=4, ipady=4)
 
         return self._ajanlatkeres_urlap.fokusz()
@@ -183,11 +196,6 @@ class UjAjanlatUrlap(simpledialog.Dialog):
                 print("Bejegyzés mentve.")
                 return
         print("Nem sikerült elmenteni!")
-
-        
-
-
-
 
 
 class AjanlatTorloUrlap(simpledialog.Dialog):
