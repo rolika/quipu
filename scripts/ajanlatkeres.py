@@ -15,7 +15,7 @@ class Ajanlatkeres(dolog.Dolog):
                 "hatarido": "",
                 "megjegyzes": ""
             }
-        self._tabla = "ajanlat"
+        self._tabla = "ajanlatkeres"
 
     def __bool__(self):
         return True

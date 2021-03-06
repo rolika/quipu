@@ -179,16 +179,16 @@ class Quipu(Frame):
 
         ajanlat_kon.create("ajanlatkeres",
             azonosito="INTEGER PRIMARY KEY",
-            munkaresz="INTEGER",
-            ajanlatkero="INTEGER",
-            temafelelos="INTEGER",
+            munkaresz="INTEGER NOT NULL",
+            ajanlatkero="INTEGER NOT NULL",
+            temafelelos="INTEGER NOT NULL",
             erkezett="TEXT",
             hatarido="TEXT",
             megjegyzes="TEXT")
         
         ajanlat_kon.create("ajanlat",
             azonosito="INTEGER PRIMARY KEY",
-            ajanlatkeres="INTEGER",
+            ajanlatkeres="INTEGER NOT NULL REFERENCES ajanlatkeres",
             ajanlatiar="REAL",
             leadva="TEXT",
             ervenyes="INTEGER DEFAULT 30",
