@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import simpledialog
+from tkinter import messagebox
 from datetime import date, timedelta
 from urlap import Valaszto
 from projekt import Projekt
@@ -165,7 +166,6 @@ class UjAjanlatUrlap(simpledialog.Dialog):
         super().__init__(szulo, title="Új ajánlat rögzítése")
 
     def body(self, szulo):
-
         self._ajanlatkeres_urlap =\
             AjanlatkeresUrlap(szulo, self._szervezet_kon, self._szemely_kon, self._kontakt_kon, self._projekt_kon)
         ma = date.isoformat(date.today())
@@ -175,7 +175,6 @@ class UjAjanlatUrlap(simpledialog.Dialog):
         self._ajanlatkeres_urlap.pack(ipadx=4, ipady=4)
 
         self._ajanlat_urlap = AjanlatUrlap(szulo)
-        ma = date.isoformat(date.today())
         egyhonapmulva = date.isoformat(date.today() + timedelta(days=30))
         alapertelmezes = Ajanlat(leadva=ma, ervenyes=egyhonapmulva, esely="5", megjegyzes="")
         self._ajanlat_urlap.beallit(alapertelmezes)
@@ -184,6 +183,21 @@ class UjAjanlatUrlap(simpledialog.Dialog):
         return self._ajanlatkeres_urlap.fokusz()
 
     def validate(self):
+        ajanlatkeres = self._ajanlatkeres_urlap.export()
+        ajanlat = self._ajanlat_urlap.export()
+        # dátumformátumok ellenőrzése     
+        try:
+            erkezett = date.fromisoformat(ajanlatkeres.erkezett)
+            hatarido = date.fromisoformat(ajanlatkeres.hatarido)
+            leadva = date.fromisoformat(ajanlat.leadva)
+            ervenyes = date.fromisoformat(ajanlat.ervenyes)
+        except ValueError:
+            messagebox.showwarning("Dátumhiba!", "Legalább egy dátum formátuma nem jó!", parent=self)
+            return False
+        # dátumok egymásutániságának ellenőrzése
+        if erkezett > hatarido or leadva < erkezett or leadva > ervenyes:
+            messagebox.showwarning("Dátumhiba!", "A dátumok nem jól követik egymást!", parent=self)
+            return False
         return True
 
     def apply(self):
