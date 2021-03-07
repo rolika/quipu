@@ -184,6 +184,9 @@ class UjAjanlatUrlap(simpledialog.Dialog):
 
     def validate(self):
         ajanlatkeres = self._ajanlatkeres_urlap.export()
+        if ajanlatkeres.meglevo(self._ajanlat_kon):
+            messagebox.showwarning("Létező ajánlatkérés!", "Megjegyzésben különböztesd meg!", parent=self)
+            return False
         ajanlat = self._ajanlat_urlap.export()
         # dátumformátumok ellenőrzése     
         try:
