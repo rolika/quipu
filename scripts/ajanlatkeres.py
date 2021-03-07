@@ -1,4 +1,5 @@
 import dolog
+import copy
 
 
 class Ajanlatkeres(dolog.Dolog):
@@ -52,3 +53,11 @@ class Ajanlatkeres(dolog.Dolog):
     @property
     def hatarido(self):
         return self._adatok.get("hatarido")
+
+    def meglevo(self, kon):
+        """Az ajánlatkérés meglévő, ha ugyanaz az ajánlatkérő és a munkarész"""
+        adatok = copy.copy(self._adatok)  # shallow copy
+        adatok.pop("azonosito", None)
+        adatok.pop("erkezett", None)
+        adatok.pop("határidő", None)
+        return kon.select(self._tabla, logic="AND", **adatok).fetchone()

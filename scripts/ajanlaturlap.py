@@ -56,7 +56,7 @@ class AjanlatkeresUrlap(LabelFrame):
         megjegyzes = LabelFrame(self, text="megjegyzés")
         Entry(megjegyzes, textvariable=self._megjegyzes, width=40).pack(ipadx=2, ipady=2, side=LEFT)
         megjegyzes.pack(ipadx=2, ipady=2, fill=BOTH)
-    
+
     def beallit(self, ajanlatkeres):
         self._erkezett.set(ajanlatkeres.erkezett)
         self._hatarido.set(ajanlatkeres.hatarido)
@@ -188,7 +188,7 @@ class UjAjanlatUrlap(simpledialog.Dialog):
             messagebox.showwarning("Létező ajánlatkérés!", "Megjegyzésben különböztesd meg!", parent=self)
             return False
         ajanlat = self._ajanlat_urlap.export()
-        # dátumformátumok ellenőrzése     
+        # dátumformátumok ellenőrzése
         try:
             erkezett = date.fromisoformat(ajanlatkeres.erkezett)
             hatarido = date.fromisoformat(ajanlatkeres.hatarido)
@@ -207,11 +207,15 @@ class UjAjanlatUrlap(simpledialog.Dialog):
         ajanlatkeres = self._ajanlatkeres_urlap.export()
         ajanlatkeres_azonosito = ajanlatkeres.ment(self._ajanlat_kon)
         if ajanlatkeres_azonosito:
+            print("Árajánlatkérés mentve.")
             ajanlat = self._ajanlat_urlap.export()
-            ajanlat.ajanlatkeres = ajanlatkeres_azonosito
-            if ajanlat.ment(self._ajanlat_kon):
-                print("Bejegyzés mentve.")
-                return
+            if ajanlat.ajanlatiar:
+                ajanlat.ajanlatkeres = ajanlatkeres_azonosito
+                if ajanlat.ment(self._ajanlat_kon):
+                    print("Árajánlat mentve.")
+                else:
+                    print("Az árajánlatot nem sikerült elmenteni!")
+            return
         print("Nem sikerült elmenteni!")
 
 
