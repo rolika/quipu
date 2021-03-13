@@ -318,12 +318,16 @@ class AjanlatAlmenu(Alapmenu):
         self._szervezet_kon.detach("szemely", "kontakt")
 
     def torol(self):
+        self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
+        self._projekt_kon.attach(ajanlat="ajanlat.db")
         ajanlaturlap.AjanlatTorloUrlap(self.mb.winfo_toplevel(),
                                        self._ajanlat_kon,
                                        self._szemely_kon,
                                        self._szervezet_kon,
                                        self._kontakt_kon,
                                        self._projekt_kon)
+        self._szervezet_kon.detach("szemely", "kontakt")
+        self._projekt_kon.detach("ajanlat")
 
     def modosit(self):
         ajanlaturlap.AjanlatModositoUrlap(self.mb.winfo_toplevel(),

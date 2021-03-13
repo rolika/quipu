@@ -220,6 +220,7 @@ class UjAjanlatUrlap(simpledialog.Dialog):
 
 
 class AjanlatTorloUrlap(simpledialog.Dialog):
+    """Csak ajánlatkérést lehet törölni, és csak olyat, amire nem született még ajánlat."""
     def __init__(self, szulo,
                  ajanlat_kon=None,
                  szemely_kon=None,
@@ -231,7 +232,33 @@ class AjanlatTorloUrlap(simpledialog.Dialog):
         self._kontakt_kon = kontakt_kon
         self._projekt_kon = projekt_kon
         self._ajanlat_kon = ajanlat_kon
-        super().__init__(szulo, title="Ajánlat törlése")
+        super().__init__(szulo, title="Ajánlatkérés törlése")
+
+    def body(self, szulo):
+        self._projekt_valaszto = Valaszto("projekt", self._projektek(), szulo)
+        # self._projekt_valaszto.set_callback(self._munkaresz_megjelenit)
+        self._projekt_valaszto.pack(ipadx=2, ipady=2)
+    
+    def _projektek(self):
+        projektek = self._projekt_kon.execute("""
+            SELECT *                                                        -- válaszd ki
+            FROM projekt                                                    -- azokat a projekteket,
+            WHERE azonosito IN (                                            -- melyek
+                SELECT projekt                                              -- szerepelnek
+                FROM munkaresz                                              -- azon munkarészekben,
+                WHERE azonosito IN (                                        -- melyek
+                    SELECT munkaresz                                        -- szerepelnek
+                    FROM ajanlatkeres                                       -- azon ajánlatkérésekben,
+                    WHERE azonosito NOT IN (                                -- melyek 
+                        SELECT ajanlatkeres.azonosito                       -- azonosítói nem találhatók
+                        FROM ajanlatkeres, ajanlat                          -- az ajánlatok között,
+                        ON ajanlatkeres.azonosito = ajanlat.ajanlatkeres    -- azaz nincs leadott ajánlata
+                    )
+                )
+            );
+            """)
+        return sorted(map(lambda projekt: Projekt(**projekt), projektek),
+                      key=lambda elem: (elem.gyakorisag, repr(elem)))
 
 
 class AjanlatModositoUrlap(simpledialog.Dialog):
