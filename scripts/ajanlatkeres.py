@@ -59,5 +59,6 @@ class Ajanlatkeres(dolog.Dolog):
         adatok = copy.copy(self._adatok)  # shallow copy
         adatok.pop("azonosito", None)
         adatok.pop("erkezett", None)
-        adatok.pop("határidő", None)
+        adatok.pop("hatarido", None)
+        adatok.pop("temafelelos", None)
         return kon.select(self._tabla, logic="AND", **adatok).fetchone()
