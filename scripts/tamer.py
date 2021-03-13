@@ -139,7 +139,6 @@ class Tamer(sqlite3.Connection):
 
         if cols:
             select_stmnt = """SELECT{} {}""".format(distinct, ", ".join(col for col in cols))
-            print(select_stmnt)
         else:
             select_stmnt = """SELECT{} *""".format(distinct)
         select_stmnt += """ FROM {}"""
