@@ -1,4 +1,5 @@
 import dolog
+from konstans import JOGI_MAGAN
 
 
 class Kontakt(dolog.Dolog):
@@ -17,6 +18,14 @@ class Kontakt(dolog.Dolog):
                 "megjegyzes": ""
             }
         self._tabla = "kontakt"
+        self._nev = ""
+        self._ceg = ""
+    
+    def __str__(self):
+        return "{}{}".format(self._nev, self._nullazo(self._ceg))
+    
+    def __repr__(self):
+        return self._ascii_rep(str(self))
     
     def __bool__(self):
         return True
@@ -44,3 +53,21 @@ class Kontakt(dolog.Dolog):
     def beosztas(self):
         return self._adatok.get("beosztas")
     
+    @property
+    def nev(self):
+        return self._nev
+    
+    @nev.setter
+    def nev(self, szemely):
+        self._nev = szemely.listanezet()
+    
+    @property
+    def ceg(self):
+        return self._ceg
+    
+    @ceg.setter
+    def ceg(self, szervezet):
+        self._ceg = "" if szervezet.rovidnev in JOGI_MAGAN else str(szervezet)
+    
+    def listanezet(self):
+        return str(self)
