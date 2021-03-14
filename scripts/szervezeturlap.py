@@ -86,8 +86,8 @@ class SzervezetTorloUrlap(simpledialog.Dialog):
 
     def validate(self):
         szervezet = self._nev_valaszto.elem
-        if szervezet.azonosito == Kulcs.MAGANSZEMELY.kulcs:
-            return False  # nem engedem törölni a speciális esetet
+        if szervezet.azonosito in (Kulcs.MAGANSZEMELY.kulcs, Kulcs.CEG.kulcs):
+            return False  # nem engedem törölni a speciális eseteket
         biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!", parent=self)
         return szervezet and biztos
 
