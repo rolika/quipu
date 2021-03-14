@@ -36,7 +36,7 @@ class Quipu(Frame):
     melynek segítségével helyettesítették az írást az Inka Birodalomban. A kipu a kecsuák nyelvén csomót jelent, 
     használati gyakorlatáról bebizonyították, hogy afféle textil abakusz, ahol a csomók jelentést hordoznak.
     A kipukon rögzített értékeket meglepő módon egy kettes számrendszeren alapuló, kövek helyzetével operáló, számoló
-    eszközzel dolgozták fel. Ezek az ősi számítógépek megelőzték a számítógépek fejlődését.
+    eszközzel, egy ősi számítógéppel dolgozták fel. [Wikipedia nyomán]
     """
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
