@@ -10,7 +10,7 @@ from szemely import Szemely
 from ajanlatkeres import Ajanlatkeres
 from ajanlat import Ajanlat
 from kontakt import Kontakt
-from konstans import CEGAZONOSITO, JOGI_MAGAN
+from konstans import Kulcs
 
 
 class AjanlatkeresUrlap(LabelFrame):
@@ -50,7 +50,7 @@ class AjanlatkeresUrlap(LabelFrame):
         hatarido.pack(ipadx=2, ipady=2, fill=BOTH)
 
         temafelelos = Frame(self)
-        self._temafelelos_valaszto = Valaszto("témafelelős", self._szemelyek(CEGAZONOSITO), temafelelos)
+        self._temafelelos_valaszto = Valaszto("témafelelős", self._szemelyek(2), temafelelos)
         self._temafelelos_valaszto.pack(ipadx=2, ipady=2, side=LEFT)
         temafelelos.pack(ipadx=2, ipady=2, fill=BOTH)
 
@@ -78,7 +78,7 @@ class AjanlatkeresUrlap(LabelFrame):
 
     def _kontaktszemelyek(self):
         szervezet = self._szervezet_valaszto.elem
-        if szervezet.rovidnev in JOGI_MAGAN:
+        if szervezet.azonosito == Kulcs.MAGANSZEMELY.kulcs:
             return self._szemelyek()
         else:
             return self._szemelyek(szervezet.azonosito)

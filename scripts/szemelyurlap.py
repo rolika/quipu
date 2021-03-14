@@ -8,7 +8,7 @@ from email import Email
 from cim import Cim
 from szervezet import Szervezet
 from kontakt import Kontakt
-from konstans import BEOSZTAS, JOGI_MAGAN
+from konstans import BEOSZTAS, Kulcs
 
 
 class SzemelyUrlap(Frame):
@@ -103,7 +103,7 @@ class SzemelyTorloUrlap(simpledialog.Dialog):
 
     def validate(self):
         szemely = self._nev_valaszto.elem
-        if szemely.vezeteknev in JOGI_MAGAN:
+        if szemely.azonosito == Kulcs.JOGISZEMELY.kulcs:
             return False  # nem engedem törölni a speciális esetet
         biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!", parent=self)
         return szemely and biztos
@@ -142,7 +142,7 @@ class SzemelyModositoUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        if self._nev_valaszto.elem.vezeteknev in JOGI_MAGAN:
+        if self._nev_valaszto.elem.vezeteknev == Kulcs.JOGISZEMELY.nev:
             return False  # nem engedem módosítani a speciális esetet
         self._szemely = self._uj_szemely()
         if not self._szemely:
@@ -190,7 +190,7 @@ class UjTelefonUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        if self._nev_valaszto.elem.vezeteknev in JOGI_MAGAN:
+        if self._nev_valaszto.elem.vezeteknev == Kulcs.JOGISZEMELY.nev:
             return False  # nem engedem módosítani a speciális esetet
         self._telefonszam = self._telefonszam_urlap.export()
         if not self._telefonszam:
@@ -325,7 +325,7 @@ class UjEmailUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        if self._nev_valaszto.elem.vezeteknev in JOGI_MAGAN:
+        if self._nev_valaszto.elem.vezeteknev == Kulcs.JOGISZEMELY.nev:
             return False  # nem engedem módosítani a speciális esetet
         self._emailcim = self._emailcim_urlap.export()
         if not self._emailcim:
@@ -460,7 +460,7 @@ class UjCimUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        if self._nev_valaszto.elem.vezeteknev in JOGI_MAGAN:
+        if self._nev_valaszto.elem.vezeteknev == Kulcs.JOGISZEMELY.nev:
             return False  # nem engedem módosítani a speciális esetet
         self._cim = self._cim_urlap.export()
         if not self._cim:

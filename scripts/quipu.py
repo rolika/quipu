@@ -27,10 +27,17 @@ SOFTWARE.
 from tkinter import *
 import tamer
 import menu
+from konstans import Kulcs
 
 
 class Quipu(Frame):
-    """ Fő alkalmazás """
+    """ Fő alkalmazás 
+    A kipu, más néven csomóírás vagy zsinórírás egy különleges, tízes számrendszerbeli információtárolási rendszer,
+    melynek segítségével helyettesítették az írást az Inka Birodalomban. A kipu a kecsuák nyelvén csomót jelent, 
+    használati gyakorlatáról bebizonyították, hogy afféle textil abakusz, ahol a csomók jelentést hordoznak.
+    A kipukon rögzített értékeket meglepő módon egy kettes számrendszeren alapuló, kövek helyzetével operáló, számoló
+    eszközzel, egy ősi számítógéppel dolgozták fel. [Wikipedia nyomán]
+    """
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
         szemely_kon = self._init_szemely_db()
@@ -50,8 +57,8 @@ class Quipu(Frame):
             azonosito="INTEGER PRIMARY KEY",
             elotag="TEXT",
             vezeteknev="TEXT NOT NULL",
-            keresztnev="TEXT NOT NULL",
-            nem="TEXT NOT NULL",
+            keresztnev="TEXT",
+            nem="TEXT",
             megjegyzes="TEXT")
 
         szemely_kon.create("telefon",
@@ -78,8 +85,14 @@ class Quipu(Frame):
             postafiok="TEXT",
             honlap="TEXT",
             megjegyzes="TEXT")
-
-        return szemely_kon
+        
+        # speciális esetek beillesztése
+        if len(szemely_kon.select("szemely").fetchall()) < 1:  # egy speciális eset van, ne dobjon hibaüzenetet
+            szemely_kon.insert("szemely",
+                                azonosito=Kulcs.JOGISZEMELY.kulcs,
+                                vezeteknev=Kulcs.JOGISZEMELY.nev)
+                                
+            return szemely_kon
 
     def _init_szervezet_db(self):
         """Szervezet adatbázis inicializálása"""
@@ -90,8 +103,6 @@ class Quipu(Frame):
             rovidnev="TEXT NOT NULL",
             teljesnev="TEXT",
             gyakorisag="INTEGER DEFAULT 0",
-            vevo="INTEGER DEFAULT 0",
-            szallito="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
 
         szervezet_kon.create("telefon",
@@ -118,6 +129,15 @@ class Quipu(Frame):
             postafiok="TEXT",
             honlap="TEXT",
             megjegyzes="TEXT")
+        
+        # speciális esetek beillesztése
+        if len(szervezet_kon.select("szervezet").fetchall()) < 2:  # kettő speciális eset van, ne dobjon hibaüzenetet
+            szervezet_kon.insert("szervezet",
+                                azonosito=Kulcs.MAGANSZEMELY.kulcs,
+                                rovidnev=Kulcs.MAGANSZEMELY.nev)
+            szervezet_kon.insert("szervezet",
+                                azonosito=Kulcs.CEG.kulcs,
+                                rovidnev=Kulcs.CEG.nev)
 
         return szervezet_kon
 
