@@ -92,7 +92,7 @@ class Quipu(Frame):
                                 azonosito=Kulcs.JOGISZEMELY.kulcs,
                                 vezeteknev=Kulcs.JOGISZEMELY.nev)
                                 
-            return szemely_kon
+        return szemely_kon
 
     def _init_szervezet_db(self):
         """Szervezet adatbázis inicializálása"""
