@@ -3,8 +3,6 @@ from tkinter.ttk import Combobox
 from telefon import Telefon
 from email import Email
 from cim import Cim
-from munkaresz import Munkaresz
-from jelleg import Jelleg
 from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS, ORSZAG, MEGYE
 
 
