@@ -8,7 +8,7 @@ from email import Email
 from cim import Cim
 from szemely import Szemely
 from kontakt import Kontakt
-from konstans import BEOSZTAS, JOGI_MAGAN
+from konstans import BEOSZTAS, Kulcs
 
 
 class SzervezetUrlap(Frame):
@@ -86,7 +86,7 @@ class SzervezetTorloUrlap(simpledialog.Dialog):
 
     def validate(self):
         szervezet = self._nev_valaszto.elem
-        if szervezet.rovidnev in JOGI_MAGAN:
+        if szervezet.azonosito == Kulcs.MAGANSZEMELY.kulcs:
             return False  # nem engedem törölni a speciális esetet
         biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!", parent=self)
         return szervezet and biztos
@@ -124,9 +124,9 @@ class SzervezetModositoUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        if self._nev_valaszto.elem.rovidnev in JOGI_MAGAN:
+        if self._nev_valaszto.elem.rovidnev == Kulcs.MAGANSZEMELY.nev:
             return False  # nem engedem módosítani a speciális esetet
-        szervezet = self._uj_szervezet()
+        szervezet = self._modositott_szervezet()
         if not szervezet:
             messagebox.showwarning("Hiányos adat!", "Legalább a rövid nevet add meg!", parent=self)
             return False
@@ -150,7 +150,7 @@ class SzervezetModositoUrlap(simpledialog.Dialog):
     def _megjelenit(self, event):
         self._szervezeturlap.beallit(self._nev_valaszto.elem or Szervezet())
 
-    def _uj_szervezet(self):
+    def _modositott_szervezet(self):
         szervezet = self._nev_valaszto.elem
         szervezet.adatok = self._szervezeturlap.export()
         return szervezet
@@ -172,7 +172,7 @@ class UjTelefonUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        if self._nev_valaszto.elem.rovidnev in JOGI_MAGAN:
+        if self._nev_valaszto.elem.rovidnev == Kulcs.MAGANSZEMELY.nev:
             return False  # nem engedem módosítani a speciális esetet
         self._telefonszam = self._telefonszam_urlap.export()
         if not self._telefonszam:
@@ -307,7 +307,7 @@ class UjEmailUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        if self._nev_valaszto.elem.rovidnev in JOGI_MAGAN:
+        if self._nev_valaszto.elem.rovidnev == Kulcs.MAGANSZEMELY.nev:
             return False  # nem engedem módosítani a speciális esetet
         self._emailcim = self._emailcim_urlap.export()
         if not self._emailcim:
@@ -442,7 +442,7 @@ class UjCimUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        if self._nev_valaszto.elem.rovidnev in JOGI_MAGAN:
+        if self._nev_valaszto.elem.rovidnev == Kulcs.MAGANSZEMELY.nev:
             return False  # nem engedem módosítani a speciális esetet
         self._cim = self._cim_urlap.export()
         if not self._cim:

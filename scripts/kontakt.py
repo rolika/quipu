@@ -1,5 +1,5 @@
 import dolog
-from konstans import JOGI_MAGAN
+from konstans import Kulcs
 
 
 class Kontakt(dolog.Dolog):
@@ -67,7 +67,7 @@ class Kontakt(dolog.Dolog):
     
     @ceg.setter
     def ceg(self, szervezet):
-        self._ceg = "" if szervezet.rovidnev in JOGI_MAGAN else str(szervezet)
+        self._ceg = "" if szervezet.azonosito == Kulcs.MAGANSZEMELY.kulcs else str(szervezet)
     
     def listanezet(self):
         return str(self)

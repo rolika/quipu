@@ -1,6 +1,8 @@
 """ Különböző konstansok, hogy minden egy helyen és egyszer legyen definiálva"""
 
+
 from enum import Enum
+
 
 ELERHETOSEG_TIPUS = ("alapértelmezett", "munkahelyi", "privát")
 CIM_TIPUS = ("alapértelmezett", "székhely", "telephely", "levelezési cím", "lakhely", "tartózkodási hely")
@@ -28,7 +30,6 @@ class Kulcs(Enum):
     MAGANSZEMELY = (1, "#magánszemély")  # SQL PRIMARY KEY = 1 a szervezetek között (mint rövid név)
     JOGISZEMELY = (1, "#jogi személy")  # SQL PRIMARY KEY = 1 a személyek között (mint vezetéknév)
     CEG = (2, "Pohlen-Dach Hungária Bt.")  # SQL PRIMARY KEY = 2 a felhasználó cég a szervezetek között (rövid név)
-    JOGI_MAGAN = 1
 
     def __init__(self, kulcs, nev):
         """A tuple kibontása automatikus."""
