@@ -248,6 +248,12 @@ class AjanlatTorloUrlap(simpledialog.Dialog):
         self._ajanlatkero_valaszto.pack(ipadx=2, ipady=2)
 
         return self._projekt_valaszto.valaszto
+    
+    def validate(self):
+        return messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
+    
+    def apply(self):
+        pass
 
     def _projektek(self):
         projektek = self._projekt_kon.execute("""
@@ -276,7 +282,7 @@ class AjanlatTorloUrlap(simpledialog.Dialog):
     def _munkareszek(self):
         projekt = self._projekt_valaszto.elem
         return sorted(map(lambda munkaresz: Munkaresz(**munkaresz),
-                          self._projekt_kon.select("munkaresz", projekt=projekt.azonosito)), key=repr)
+                              self._projekt_kon.select("munkaresz", projekt=projekt.azonosito)), key=repr)
 
     def _ajanlatkero_megjelenit(self, event):
         self._ajanlatkero_valaszto.beallit(self._ajanlatkerok())
@@ -284,7 +290,7 @@ class AjanlatTorloUrlap(simpledialog.Dialog):
     def _ajanlatkerok(self):
         munkaresz = self._munkaresz_valaszto.elem
         return sorted(map(self._ajanlatkero,
-                          self._ajanlat_kon.select("ajanlatkeres", "ajanlatkero", munkaresz=munkaresz.azonosito)),
+                          self._ajanlat_kon.select("ajanlatkeres", munkaresz=munkaresz.azonosito)),
                       key=repr)
 
     def _ajanlatkero(self, ajanlatkeres):
