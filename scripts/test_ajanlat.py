@@ -23,6 +23,8 @@ from projekt import Projekt
 from munkaresz import Munkaresz
 from ajanlatkeres import Ajanlatkeres
 from ajanlat import Ajanlat
+from cim import Cim
+from jelleg import Jelleg
 from konstans import Kulcs
 
 
@@ -37,17 +39,83 @@ class ProjektlistaTest(unittest.TestCase):
         self._ajanlat_kon = Tamer("ajanlat.db")
 
     def test_projektlista_import(self):
-        ProjektRekord = namedtuple("ProjektRekord", ["szam", "nev", "helyseg", "orszag", "ar", "esely", "temafelelos",
-                                   "szervezet", "szemely", "telefonszam", "emailcim"])
+        ProjektRekord = namedtuple("ProjektRekord", ["szam", "nev", "helyseg", "orszag", "ev", "ar", "euro", "felulet",
+            "esely", "statusz", "temafelelos", "szervezet", "szemely", "telefonszam", "emailcim", "hoszig", "mm",
+            "szig", "m2ar", "eurom2ar"])
+
         with open("projektlista.csv", newline='') as projektek:
             for projekt in map(ProjektRekord._make, csv.reader(projektek, delimiter=";")):
+                projekt_id = None
                 szemely_id = None
                 szervezet_id = None
                 kontakt_id = None
-                projekt_id = None
                 munkaresz_id = None
                 ajanlatkeres_id = None
-                # személyek
+
+                # projekt
+                ev, szam = projekt.szam.split("/")
+                projekt_ = Projekt(ev=ev, szam=szam, megnevezes=projekt.nev, rovidnev="", megjegyzes="", gyakorisag=0)
+                if bool(projekt_) and not projekt_.meglevo(self._projekt_kon):
+                    projekt_id = projekt_.ment(self._projekt_kon)
+                    munkaresz = Munkaresz(projekt=projekt_id, megnevezes="szigetelés", enaplo=1, megjegyzes="")
+                    munkaresz_id = munkaresz.ment(self._projekt_kon)
+                    orszag = "D" if projekt.orszag == "DE" else "HU"
+                    helyseg = projekt.helyseg if projekt.helyseg else "Herend"
+                    cim = Cim(munkaresz=munkaresz_id, orszag=orszag, megye="", iranyitoszam="", helyseg=helyseg, utca="", hrsz="", postafiok="", honlap="", megjegyzes="")
+                    cim.ment(self._projekt_kon)
+                    jelleg = Jelleg(munkaresz=munkaresz_id, megnevezes="új", megjegyzes="")
+                    jelleg.ment(self._projekt_kon)
+
+                    # ajánlatkérő szervezet
+                    szervezet = Szervezet(rovidnev=projekt.szervezet, teljesnev=projekt.szervezet, gyakorisag=0, megjegyzes=0)
+                    if bool(szervezet) and not szervezet.meglevo(self._szervezet_kon):
+                        szervezet_id = szervezet.ment(self._szervezet_kon)
+                    if not bool(szervezet):
+                        szervezet_id = Kulcs.MAGANSZEMELY.kulcs
+
+                    # ajánlatkérő személy
+                    nev = projekt.nev.split(" ", maxsplit=1)
+                    if len(nev) == 2:
+                        vezeteknev, keresztnev = nev
+                    elif len(nev) == 1:
+                        vezeteknev, keresztnev = nev[0], ""
+                    else:
+                        vezeteknev, keresztnev = ("Weisz", "Roland")
+                    szemely = Szemely(elotag="", vezeteknev=vezeteknev, keresztnev=keresztnev, nem="férfi", megjegyzes="")
+                    if not szemely.meglevo(self._szemely_kon):  # a fenti névmanipuláció miatt mindenképpen érvényes lesz
+                        szemely_id = szemely.ment(self._szemely_kon)
+                        telefonszam = projekt.telefonszam if projekt.telefonszam else "+36"
+                        telefon = Telefon(szemely=szemely_id, telefonszam=telefonszam, megjegyzes="")
+                        telefon.ment(self._szemely_kon)
+                        emailcim = projekt.emailcim if projekt.emailcim else ".hu"
+                        email = Email(szemely=szemely_id, emailcim=emailcim, megjegyzes="")
+                        email.ment(self._szemely_kon)
+
+                    # kontaktszemély
+                    if szervezet_id and szemely_id:
+                        kontakt = Kontakt(szemely=szemely_id, szervezet=szervezet_id, beosztas="műszaki előkészítő", gyakorisag=0, megjegyzes="")
+                        if not kontakt.meglevo(self._kontakt_kon):
+                            kontakt_id = kontakt.ment(self._kontakt_kon)
+
+                    # ajánlatkérés
+                    if kontakt_id and munkaresz_id:
+                        ajanlatkeres = Ajanlatkeres(munkaresz=munkaresz_id, ajanlatkero=kontakt_id, temafelelos=1, erkezett="", hatarido="", megjegyzes="")
+                        if not ajanlatkeres.meglevo(self._ajanlat_kon):
+                            ajanlatkeres_id = ajanlatkeres.ment(self._ajanlat_kon)
+
+                    # ajánlat
+                    if ajanlatkeres_id:
+                        esely = projekt.esely.replace("%", "")
+                        try:
+                            esely = float(esely) / 100
+                        except ValueError:
+                            esely = 0.05
+                        ajanlat = Ajanlat(ajanlatkeres=ajanlatkeres_id, ajanlatiar=projekt.ar, leadva="", ervenyes="", esely=esely, megjegyzes="")
+                        if not ajanlat.meglevo(self._ajanlat_kon):
+                            ajanlat.ment(self._ajanlat_kon)
+
+
+                """ # személyek
                 vnev, knev = projekt.szemely.split(" ", maxsplit=1)
                 szemely = Szemely(vezeteknev=vnev, keresztnev=knev, megjegyzes="")
                 if szemely.meglevo(self._szemely_kon):
@@ -88,5 +156,6 @@ class ProjektlistaTest(unittest.TestCase):
                 if ajanlatkeres_id:
                     ajanlat = Ajanlat(ajanlatkeres=ajanlatkeres_id, ajanlatiar=projekt.ar, megjegyzes="")
                     if not ajanlat.meglevo(self._ajanlat_kon):
-                        ajanlat.ment(self._ajanlat_kon)
+                        ajanlat.ment(self._ajanlat_kon) """
+
         return True
