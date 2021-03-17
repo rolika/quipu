@@ -320,12 +320,15 @@ class AjanlatAlmenu(Alapmenu):
     def torol(self):
         self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
         self._projekt_kon.attach(ajanlat="ajanlat.db")
-        ajanlaturlap.AjanlatTorloUrlap(self.mb.winfo_toplevel(),
-                                       self._ajanlat_kon,
-                                       self._szemely_kon,
-                                       self._szervezet_kon,
-                                       self._kontakt_kon,
-                                       self._projekt_kon)
+        try:
+            ajanlaturlap.AjanlatTorloUrlap(self.mb.winfo_toplevel(),
+                                        self._ajanlat_kon,
+                                        self._szemely_kon,
+                                        self._szervezet_kon,
+                                        self._kontakt_kon,
+                                        self._projekt_kon)
+        except AttributeError:
+            print("Nincs törölhető árajánlatkérés.")
         self._szervezet_kon.detach("szemely", "kontakt")
         self._projekt_kon.detach("ajanlat")
 

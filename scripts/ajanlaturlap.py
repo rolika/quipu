@@ -273,19 +273,13 @@ class AjanlatTorloUrlap(simpledialog.Dialog):
                 )
             );
             """)
-        projektek = sorted(map(lambda projekt: Projekt(**projekt), projektek),
+        return sorted(map(lambda projekt: Projekt(**projekt), projektek),
                       key=lambda elem: (elem.gyakorisag, repr(elem)))
-        if projektek:
-            return projektek
-        else:
-            self.destroy()  # inkább ezt a hibát dobja, mint hogy kontrollálatlanul továbblépjen
 
     def _munkaresz_megjelenit(self, event):
         self._munkaresz_valaszto.beallit(self._munkareszek())
 
     def _munkareszek(self):
-        """ Kezeletlen hibát dob a terminálon és visszatér a főmenübe, ha csak olyan ajánlatkérés van, amihez ajánlat is
-            tartozik, mégpedig azért, mert csak olyan ajánlatkérést lehet törölni, amihez nem készült ajánlat."""
         projekt = self._projekt_valaszto.elem
         return sorted(map(lambda munkaresz: Munkaresz(**munkaresz),
                               self._projekt_kon.select("munkaresz", projekt=projekt.azonosito)), key=repr)
