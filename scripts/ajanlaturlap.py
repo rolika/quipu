@@ -253,7 +253,17 @@ class AjanlatTorloUrlap(simpledialog.Dialog):
         return messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
 
     def apply(self):
-        pass
+        munkaresz = self._munkaresz_valaszto.elem
+        ajanlatkero = self._ajanlatkero_valaszto.elem
+        if munkaresz and ajanlatkero:
+            ajanlatkeres = self._ajanlat_kon.select("ajanlatkeres",
+                                                    munkaresz=munkaresz.azonosito,
+                                                    ajanlatkero=ajanlatkero.azonosito).fetchone()
+            ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
+            if ajanlatkeres.torol(self._ajanlat_kon):
+                print("Bejegyzés törölve")
+            else:
+                print("Nem sikerült törölni!")
 
     def _projektek(self):
         projektek = self._projekt_kon.execute("""
