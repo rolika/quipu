@@ -1,9 +1,9 @@
-import dolog
+from csomo import Csomo
 from konstans import Kulcs
 
 
-class Kontakt(dolog.Dolog):
-    """Kontaktszemély megvalósítása"""
+class Kontakt(Csomo):
+    """Kontaktszemély megvalósítása. Összetett csomó, több külső kulcsra támaszkodik."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""

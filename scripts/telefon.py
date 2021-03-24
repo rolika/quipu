@@ -1,8 +1,8 @@
-import dolog
+from csomo import Csomo
 
 
-class Telefon(dolog.Dolog):
-    """Telefonos elérhetőség megvalósítása."""
+class Telefon(Csomo):
+    """Telefonos elérhetőség megvalósítása. Egyszerű csomó, egy külső kulcsra támaszkodik."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""

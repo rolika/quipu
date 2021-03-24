@@ -1,8 +1,9 @@
-import dolog
+from csomo import Csomo
 
 
-class Email(dolog.Dolog):
-    """Email-elérhetőség megvalósítása."""
+class Email(Csomo):
+    """Email-elérhetőség megvalósítása.
+    Egyszerű csomó, egy külső kulcsra támaszkodik, ami azonos adatbázis file-ban van."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""

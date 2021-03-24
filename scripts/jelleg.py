@@ -1,8 +1,8 @@
-from dolog import Dolog
+from csomo import Csomo
 
 
-class Jelleg(Dolog):
-    "Munkarész jellegének megvalósítása"
+class Jelleg(Csomo):
+    "Munkarész jellegének megvalósítása. Egyszerű csomó, egy külső kulcsra támaszkodik."
     def __init__(self, **kwargs):
         super().__init__()
         if kwargs:

@@ -1,8 +1,8 @@
-from dolog import Dolog
+from csomo import Csomo
 
 
-class Projekt(Dolog):
-    """Projekt megvalósítása."""
+class Projekt(Csomo):
+    """Projekt megvalósítása. Alapvető csomó."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
