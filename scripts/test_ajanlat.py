@@ -74,7 +74,7 @@ class ProjektlistaTest(unittest.TestCase):
                         szervezet_id = Kulcs.MAGANSZEMELY.kulcs
 
                     # ajánlatkérő személy
-                    nev = projekt.nev.split(" ", maxsplit=1)
+                    nev = projekt.szemely.split(" ", maxsplit=1)
                     if len(nev) == 2:
                         vezeteknev, keresztnev = nev
                     elif len(nev) == 1:
