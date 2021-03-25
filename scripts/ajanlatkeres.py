@@ -1,8 +1,9 @@
-import dolog
+from csomo import Csomo
 import copy
 
 
-class Ajanlatkeres(dolog.Dolog):
+class Ajanlatkeres(Csomo):
+    "Munkarész jellegének megvalósítása. Összetett csomó, több külső kulcsra támaszkodik."
     def __init__(self, **kwargs):
         super().__init__()
         if kwargs:

@@ -1,8 +1,8 @@
-import dolog
+from csomo import Csomo
 
 
-class Szemely(dolog.Dolog):
-    """Személy megvalósítása."""
+class Szemely(Csomo):
+    """Személy megvalósítása. Alapvető csomó, nem támaszkodik külső kulcsra."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
@@ -39,7 +39,8 @@ class Szemely(dolog.Dolog):
 
     @adatok.setter
     def adatok(self, uj):
-        """Új személy-osztály alapján módosítja a meglévőt."""
+        """Új személy-osztály alapján módosítja a meglévőt.
+        uj: Szemely() objektum"""
         self._adatok["elotag"] = uj.elotag
         self._adatok["vezeteknev"] = uj.vezeteknev
         self._adatok["keresztnev"] = uj.keresztnev
@@ -65,7 +66,8 @@ class Szemely(dolog.Dolog):
     def listanezet(self):
         """Személy megjelenítése kiválasztáshoz (Combobox)"""
         megjegyzes = self._nullazo(self.megjegyzes)
-        return "{} {} {}{}".format(self.vezeteknev, self.keresztnev, self.elotag, megjegyzes)
+        elotag = self._nullazo(self.elotag, zarojel="")
+        return "{}{} {}{}".format(elotag, self.vezeteknev, self.keresztnev, megjegyzes)
 
     def megszolitas(self):
         return "Tisztelt {}!".format("Uram" if self.nem == "férfi" else "Hölgyem")
