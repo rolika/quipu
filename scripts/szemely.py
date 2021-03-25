@@ -66,9 +66,8 @@ class Szemely(Csomo):
     def listanezet(self):
         """Személy megjelenítése kiválasztáshoz (Combobox)"""
         megjegyzes = self._nullazo(self.megjegyzes)
-        elotag = self._nullazo(self.elotag)
-        return "{} {}{}{}".format(self.vezeteknev, self.keresztnev, elotag, megjegyzes)
-        # TODO: nullázót átírni: elválasztó-jel, zárójel (True/False)
+        elotag = self._nullazo(self.elotag, zarojel="")
+        return "{}{} {}{}".format(elotag, self.vezeteknev, self.keresztnev, megjegyzes)
 
     def megszolitas(self):
         return "Tisztelt {}!".format("Uram" if self.nem == "férfi" else "Hölgyem")

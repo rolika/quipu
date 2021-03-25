@@ -63,7 +63,14 @@ class Csomo:
         szoveg:     string"""
         return szoveg.lower().translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))
 
-    def _nullazo(self, attr):
+    def _nullazo(self, attr, zarojel="()", elvalasztojel=" "):
         """Ha hiányzik az adat, nem írjuk ki egyáltalán.
-        attr:   attribútum, vagy annak hiánya, ha üres"""
-        return " ({})".format(attr) if attr else ""
+        attr:           attribútum, vagy annak hiánya, ha üres
+        zarojel:        () vagy [] vagy {} esetleg // vagy "" legyen az adat körül (két karakter legyen, vagy üres)
+        elvalasztojel:  az adatot a többitől elválasztó jel"""
+        if attr == "None":
+            return ""
+        nyito = zarojel[0] if zarojel else ""
+        zaro = zarojel[1] if zarojel else ""
+        return "{elvalaszto}{nyit}{adat}{zar}"\
+            .format(elvalaszto=elvalasztojel, nyit=nyito, adat=attr, zar=zaro) if attr else ""
