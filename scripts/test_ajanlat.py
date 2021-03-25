@@ -67,7 +67,7 @@ class ProjektlistaTest(unittest.TestCase):
                     jelleg.ment(self._projekt_kon)
 
                     # ajánlatkérő szervezet
-                    szervezet = Szervezet(rovidnev=projekt.szervezet, teljesnev=projekt.szervezet, gyakorisag=0, megjegyzes=0)
+                    szervezet = Szervezet(rovidnev=projekt.szervezet, teljesnev=projekt.szervezet, gyakorisag=0, megjegyzes="")
                     if bool(szervezet) and not szervezet.meglevo(self._szervezet_kon):
                         szervezet_id = szervezet.ment(self._szervezet_kon)
                     if not bool(szervezet):
