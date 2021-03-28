@@ -50,6 +50,7 @@ class ProjektlistaTest(unittest.TestCase):
                 szervezet_id = None
                 kontakt_id = None
                 munkaresz_id = None
+                jelleg_id = None
                 ajanlatkeres_id = None
 
                 # projekt
@@ -64,7 +65,7 @@ class ProjektlistaTest(unittest.TestCase):
                     cim = Cim(munkaresz=munkaresz_id, orszag=orszag, megye="", iranyitoszam="", helyseg=helyseg, utca="", hrsz="", postafiok="", honlap="", megjegyzes="")
                     cim.ment(self._projekt_kon)
                     jelleg = Jelleg(munkaresz=munkaresz_id, megnevezes="új", megjegyzes="")
-                    jelleg.ment(self._projekt_kon)
+                    jelleg_id = jelleg.ment(self._projekt_kon)
 
                     # ajánlatkérő szervezet
                     szervezet = Szervezet(rovidnev=projekt.szervezet, teljesnev=projekt.szervezet, gyakorisag=0, megjegyzes="")
@@ -98,8 +99,8 @@ class ProjektlistaTest(unittest.TestCase):
                             kontakt_id = kontakt.ment(self._kontakt_kon)
 
                     # ajánlatkérés
-                    if kontakt_id and munkaresz_id:
-                        ajanlatkeres = Ajanlatkeres(munkaresz=munkaresz_id, ajanlatkero=kontakt_id, temafelelos=1, erkezett="", hatarido="", megjegyzes="")
+                    if kontakt_id and jelleg_id:
+                        ajanlatkeres = Ajanlatkeres(jelleg=jelleg_id, ajanlatkero=kontakt_id, temafelelos=1, erkezett="", hatarido="", megjegyzes="")
                         if not ajanlatkeres.meglevo(self._ajanlat_kon):
                             ajanlatkeres_id = ajanlatkeres.ment(self._ajanlat_kon)
 
