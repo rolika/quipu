@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import simpledialog
 from tkinter import messagebox
 from datetime import date, timedelta
+from jelleg import Jelleg
 from urlap import Valaszto
 from projekt import Projekt
 from munkaresz import Munkaresz
@@ -236,64 +237,51 @@ class AjanlatTorloUrlap(simpledialog.Dialog):
         super().__init__(szulo, title="Ajánlatkérés törlése")
 
     def body(self, szulo):
-        self._projekt_valaszto = Valaszto("projekt", self._projektek(), szulo)
-        self._projekt_valaszto.set_callback(self._munkaresz_megjelenit)
-        self._projekt_valaszto.pack(ipadx=2, ipady=2)
+        self._jelleg_valaszto = Valaszto("projekt", self._jellegek(), szulo)
+        #self._jelleg_valaszto.set_callback(self._ajanlatkero_megjelenit)
+        self._jelleg_valaszto.pack(ipadx=2, ipady=2)
 
-        self._munkaresz_valaszto = Valaszto("munkarész", self._munkareszek(), szulo)
-        self._munkaresz_valaszto.set_callback(self._ajanlatkero_megjelenit)
-        self._munkaresz_valaszto.pack(ipadx=2, ipady=2)
+        #self._ajanlatkero_valaszto = Valaszto("ajánlatkérő", self._ajanlatkerok(), szulo)
+        #self._ajanlatkero_valaszto.pack(ipadx=2, ipady=2)
 
-        self._ajanlatkero_valaszto = Valaszto("ajánlatkérő", self._ajanlatkerok(), szulo)
-        self._ajanlatkero_valaszto.pack(ipadx=2, ipady=2)
-
-        return self._projekt_valaszto.valaszto
+        return self._jelleg_valaszto.valaszto
 
     def validate(self):
         return messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
 
     def apply(self):
-        munkaresz = self._munkaresz_valaszto.elem
+        jelleg = self._jelleg_valaszto.elem
         ajanlatkero = self._ajanlatkero_valaszto.elem
-        if munkaresz and ajanlatkero:
+        if jelleg and ajanlatkero:
             ajanlatkeres = self._ajanlat_kon.select("ajanlatkeres",
-                                                    munkaresz=munkaresz.azonosito,
+                                                    jelleg=jelleg.azonosito,
                                                     ajanlatkero=ajanlatkero.azonosito).fetchone()
             ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
             if ajanlatkeres.torol(self._ajanlat_kon):
                 print("Bejegyzés törölve")
             else:
                 print("Nem sikerült törölni!")
+    
+    def _projekt_kon_setter(self, jelleg):
+        jelleg = Jelleg(**jelleg)
+        jelleg.projekt_kon = self._projekt_kon
+        return jelleg
 
-    def _projektek(self):
-        projektek = self._projekt_kon.execute("""
-            SELECT *                                                        -- válaszd ki
-            FROM projekt                                                    -- azokat a projekteket,
-            WHERE azonosito IN (                                            -- melyek
-                SELECT projekt                                              -- szerepelnek
-                FROM munkaresz                                              -- azon munkarészekben,
-                WHERE azonosito IN (                                        -- melyek
-                    SELECT munkaresz                                        -- szerepelnek
-                    FROM ajanlatkeres                                       -- azon ajánlatkérésekben,
-                    WHERE azonosito NOT IN (                                -- melyek
-                        SELECT ajanlatkeres.azonosito                       -- azonosítói nem találhatók
-                        FROM ajanlatkeres, ajanlat                          -- az ajánlatok között,
-                        ON ajanlatkeres.azonosito = ajanlat.ajanlatkeres    -- azaz nincs leadott ajánlatuk
-                    )
+    def _jellegek(self):
+        jellegek = self._projekt_kon.execute("""
+            SELECT *                                                    -- válaszd ki
+            FROM jelleg                                                 -- azokat a jellegeket,
+            WHERE azonosito IN (                                        -- melyek        
+                SELECT jelleg                                           -- szerepelnek
+                FROM ajanlatkeres                                       -- azon ajánlatkérésekben,
+                WHERE azonosito NOT IN (                                -- melyek
+                    SELECT ajanlatkeres.azonosito                       -- azonosítói nem találhatók
+                    FROM ajanlatkeres, ajanlat                          -- az ajánlatok között,
+                    ON ajanlatkeres.azonosito = ajanlat.ajanlatkeres    -- azaz nincs leadott ajánlatuk
                 )
             );
             """)
-        return sorted(map(lambda projekt: Projekt(**projekt), projektek),
-                      key=lambda elem: (elem.gyakorisag, repr(elem)))
-
-    def _munkaresz_megjelenit(self, event):
-        self._munkaresz_valaszto.beallit(self._munkareszek())
-        self._ajanlatkero_megjelenit(1)
-
-    def _munkareszek(self):
-        projekt = self._projekt_valaszto.elem
-        return sorted(map(lambda munkaresz: Munkaresz(**munkaresz),
-                              self._projekt_kon.select("munkaresz", projekt=projekt.azonosito)), key=repr)
+        return sorted(map(self._projekt_kon_setter, jellegek), key=repr)
 
     def _ajanlatkero_megjelenit(self, event):
         self._ajanlatkero_valaszto.beallit(self._ajanlatkerok())

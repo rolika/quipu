@@ -10,7 +10,7 @@ class Ajanlatkeres(Csomo):
             self._adatok = dict(kwargs)
         else:
             self._adatok = {
-                "munkaresz": 0,
+                "jelleg": 0,
                 "ajanlatkero": 0,
                 "temafelelos": "",
                 "erkezett": "",
@@ -28,7 +28,7 @@ class Ajanlatkeres(Csomo):
 
     @adatok.setter
     def adatok(self, ajanlatkeres):
-        self._adatok["munkaresz"] = ajanlatkeres.munkaresz
+        self._adatok["jelleg"] = ajanlatkeres.jelleg
         self._adatok["ajanlatkero"] = ajanlatkeres.ajanlatkero
         self._adatok["temafelelos"] = ajanlatkeres.temafelelos
         self._adatok["erkezett"] = ajanlatkeres.erkezett
@@ -36,8 +36,8 @@ class Ajanlatkeres(Csomo):
         self._adatok["megjegyzes"] = ajanlatkeres.megjegyzes
 
     @property
-    def munkaresz(self):
-        return self._adatok.get("munkaresz")
+    def jelleg(self):
+        return self._adatok.get("jelleg")
 
     @property
     def ajanlatkero(self):
@@ -56,7 +56,7 @@ class Ajanlatkeres(Csomo):
         return self._adatok.get("hatarido")
 
     def meglevo(self, kon):
-        """Az ajánlatkérés meglévő, ha ugyanaz az ajánlatkérő és a munkarész"""
+        """Az ajánlatkérés meglévő, ha ugyanaz az ajánlatkérő és a jelleg"""
         adatok = copy.copy(self._adatok)  # shallow copy
         adatok.pop("azonosito", None)
         adatok.pop("erkezett", None)

@@ -1,4 +1,6 @@
 from csomo import Csomo
+from projekt import Projekt
+from munkaresz import Munkaresz
 
 
 class Jelleg(Csomo):
@@ -13,6 +15,13 @@ class Jelleg(Csomo):
                 "megjegyzes": ""
             }
         self._tabla = "jelleg"
+        self._projekt_kon = None
+    
+    def __str__(self):
+        return "{}{}".format(self.megnevezes, self._nullazo(self.megjegyzes))
+    
+    def __repr__(self):
+        return self._ascii_rep(self.listanezet())
 
     def __bool__(self):
         return bool(self.megnevezes)
@@ -37,3 +46,24 @@ class Jelleg(Csomo):
     @munkaresz.setter
     def munkaresz(self, munkaresz):
         self._adatok["munkaresz"] = munkaresz
+    
+    @property
+    def projekt_kon(self):
+        return self._projekt_kon
+    
+    @projekt_kon.setter
+    def projekt_kon(self, kon):
+        self._projekt_kon = kon
+    
+    def listanezet(self):
+        """Egy adott azonosítójú jelleghez egy munkarész, így egy projekt tartozik."""
+        if self._projekt_kon:
+            munkaresz = self._projekt_kon.select("munkaresz", azonosito=self.munkaresz).fetchone()
+            munkaresz = Munkaresz(**munkaresz)
+            projekt = self._projekt_kon.select("projekt", azonosito=munkaresz.projekt).fetchone()
+            projekt = Projekt(**projekt)
+            return "{projekt}, {munkaresz}, {jelleg}".format(projekt=str(projekt),
+                                                             munkaresz=str(munkaresz),
+                                                             jelleg=str(self))
+        else:
+            raise NotImplementedError
