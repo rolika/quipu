@@ -288,6 +288,7 @@ class AjanlatTorloUrlap(simpledialog.Dialog):
 
     def _munkaresz_megjelenit(self, event):
         self._munkaresz_valaszto.beallit(self._munkareszek())
+        self._ajanlatkero_megjelenit(1)
 
     def _munkareszek(self):
         projekt = self._projekt_valaszto.elem
