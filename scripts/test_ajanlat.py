@@ -105,7 +105,7 @@ class ProjektlistaTest(unittest.TestCase):
                             ajanlatkeres_id = ajanlatkeres.ment(self._ajanlat_kon)
 
                     # ajánlat
-                    if ajanlatkeres_id:
+                    if ajanlatkeres_id and projekt.ar and float(projekt.ar) > 0:  # ár nélkül nem írom be az ajánlatok közé
                         esely = projekt.esely.replace("%", "")
                         try:
                             esely = float(esely) / 100
