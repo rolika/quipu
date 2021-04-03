@@ -47,6 +47,10 @@ class Szervezet(Csomo):
     @property
     def rovidnev(self):
         return self._adatok.get("rovidnev")
+    
+    @rovidnev.setter
+    def rovidnev(self, nev):
+        self._adatok["rovidnev"] = nev
 
     @property
     def teljesnev(self):

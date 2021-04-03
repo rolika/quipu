@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import simpledialog
 from tkinter import messagebox
 from datetime import date, timedelta
+from tkinter.ttk import Labelframe
 from jelleg import Jelleg
 from urlap import Valaszto
 from projekt import Projekt
@@ -11,7 +12,7 @@ from szemely import Szemely
 from kontakt import Kontakt
 from ajanlatkeres import Ajanlatkeres
 from ajanlat import Ajanlat
-from konstans import MAGANSZEMELY
+from konstans import MAGANSZEMELY, WEVIK
 
 
 class AjanlatkeresUrlap(LabelFrame):
@@ -168,21 +169,38 @@ class UjAjanlatUrlap(simpledialog.Dialog):
         super().__init__(szulo, title="Új ajánlat rögzítése")
 
     def body(self, szulo):
-        self._ajanlatkeres_urlap =\
-            AjanlatkeresUrlap(szulo, self._szervezet_kon, self._szemely_kon, self._kontakt_kon, self._projekt_kon)
+        self._erkezett = StringVar()
+        self._hatarido = StringVar()
+        self._megjegyzes = StringVar()
+
+        ajanlatkeres = Labelframe(self, text="ajánlatkérés")
+
+        self._kontakt_valaszto = Valaszto("ajánlatkérő", self._kontaktszemelyek(), ajanlatkeres)
+        self._kontakt_valaszto.pack(ipadx=2, ipady=2)
+        self._jelleg_valaszto = Valaszto("projekt", self._jellegek(), ajanlatkeres)
+        self._jelleg_valaszto.pack(ipadx=2, ipady=2)
+
+        megjegyzes = LabelFrame(ajanlatkeres, text="megjegyzés")
+        Entry(megjegyzes, textvariable=self._megjegyzes, width=40).pack(ipadx=2, ipady=2, side=LEFT)
+        megjegyzes.pack(ipadx=2, ipady=2, side=BOTTOM, fill=BOTH)
+
+        self._temafelelos_valaszto = Valaszto("témafelelős", self._kontaktszemelyek(WEVIK.azonosito), ajanlatkeres)
+        self._temafelelos_valaszto.pack(ipadx=2, ipady=2, side=BOTTOM)
+
+        erkezett = LabelFrame(ajanlatkeres, text="érkezett")
+        Entry(erkezett, textvariable=self._erkezett, width=10).pack(ipadx=2, ipady=2)
+        erkezett.pack(ipadx=2, ipady=2, side=LEFT)
+        hatarido = LabelFrame(ajanlatkeres, text="leadási határidő")
+        Entry(hatarido, textvariable=self._hatarido, width=10).pack(ipadx=2, ipady=2)
+        hatarido.pack(ipadx=2, ipady=2, side=LEFT)        
         ma = date.isoformat(date.today())
         egyhetmulva = date.isoformat(date.today() + timedelta(days=7))
-        alapertelmezes = Ajanlatkeres(erkezett=ma, hatarido=egyhetmulva, megjegyzes="")
-        self._ajanlatkeres_urlap.beallit(alapertelmezes)
-        self._ajanlatkeres_urlap.pack(ipadx=4, ipady=4)
+        self._erkezett.set(ma)
+        self._hatarido.set(egyhetmulva)
 
-        self._ajanlat_urlap = AjanlatUrlap(szulo)
-        egyhonapmulva = date.isoformat(date.today() + timedelta(days=30))
-        alapertelmezes = Ajanlat(leadva=ma, ervenyes=egyhonapmulva, esely="5", megjegyzes="")
-        self._ajanlat_urlap.beallit(alapertelmezes)
-        self._ajanlat_urlap.pack(ipadx=4, ipady=4)
+        ajanlatkeres.pack(padx=2, pady=2, ipadx=2, ipady=2)
 
-        return self._ajanlatkeres_urlap.fokusz()
+        return self._kontakt_valaszto.valaszto
 
     def validate(self):
         ajanlatkeres = self._ajanlatkeres_urlap.export()
@@ -219,6 +237,28 @@ class UjAjanlatUrlap(simpledialog.Dialog):
                     print("Az árajánlatot nem sikerült elmenteni!")
             return
         print("Nem sikerült elmenteni!")
+    
+    def _kontaktszemelyek(self, szervezet_id=None):
+        if szervezet_id:
+            kontaktok = self._kontakt_kon.select("kontakt", szervezet=szervezet_id)
+        else:
+            kontaktok = self._kontakt_kon.select("kontakt")
+        return sorted(map(self._kontaktszemely, kontaktok), key=repr)
+    
+    def _kontaktszemely(self, kontakt):
+        kontaktszemely = Kontakt(**kontakt)
+        kontaktszemely.szemely_kon = self._szemely_kon
+        kontaktszemely.szervezet_kon = self._szervezet_kon
+        return kontaktszemely
+    
+    def _jellegek(self):
+        jellegek = self._projekt_kon.select("jelleg")
+        return sorted(map(self._jelleg, jellegek), key=repr)
+    
+    def _jelleg(self, jelleg):
+        jelleg = Jelleg(**jelleg)
+        jelleg.projekt_kon = self._projekt_kon
+        return jelleg
 
 
 class AjanlatTorloUrlap(simpledialog.Dialog):
