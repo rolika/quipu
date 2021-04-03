@@ -26,7 +26,7 @@ class Projekt(Csomo):
 
     def __repr__(self):
         """Projekt elnevezése sorbarendezéshez"""
-        return "{}{}{}{}".format(self.ev, self.szam, self._ascii_rep(self.megnevezes), self._ascii_rep(self.megjegyzes))
+        return "{}{:03}{}{}".format(self.ev, self.szam, self._ascii_rep(self.megnevezes), self._ascii_rep(self.megjegyzes))
 
     def __bool__(self):
         """ A projekt meghatározott, ha adott a megnevezése."""
