@@ -1,6 +1,7 @@
 from csomo import Csomo
 from projekt import Projekt
 from munkaresz import Munkaresz
+from cim import Cim
 
 
 class Jelleg(Csomo):
@@ -60,10 +61,13 @@ class Jelleg(Csomo):
         if self._projekt_kon:
             munkaresz = self._projekt_kon.select("munkaresz", azonosito=self.munkaresz).fetchone()
             munkaresz = Munkaresz(**munkaresz)
+            cim = self._projekt_kon.select("cim", munkaresz=munkaresz.azonosito).fetchone()
+            cim = Cim(**cim)
             projekt = self._projekt_kon.select("projekt", azonosito=munkaresz.projekt).fetchone()
             projekt = Projekt(**projekt)
-            return "{projekt}, {munkaresz}, {jelleg}".format(projekt=str(projekt),
-                                                             munkaresz=str(munkaresz),
-                                                             jelleg=str(self))
+            return "{projekt}, {hely}, {munkaresz}, {jelleg}".format(projekt=str(projekt),
+                                                                     hely=cim.helyseg,
+                                                                     munkaresz=str(munkaresz),
+                                                                     jelleg=str(self))
         else:
             raise NotImplementedError
