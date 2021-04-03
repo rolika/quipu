@@ -1,6 +1,3 @@
-import copy
-
-
 class Csomo:
     """A kipu egy csomóírás. Ez az alkalmazás is alapvető csomókból áll."""
     def __init__(self):
@@ -41,14 +38,12 @@ class Csomo:
     def meglevo(self, kon):
         """Ellenőrzi, hogy a csomó szerepel-e az adatbázisban.
         kon:    tamer modul adatbázis konnektora"""
-        adatok = copy.copy(self._adatok)  # shallow copy
-        adatok.pop("azonosito", None)
-        return kon.select(self._tabla, logic="AND", **adatok).fetchone()
+        return kon.select(self._tabla, logic="AND", **self._adatok).fetchone()
 
     def ment(self, kon):
         """Menti vagy módosítja a csomó adatait.
         kon:    tamer modul adatbázis konnektora"""
-        if self.azonosito:
+        if self.meglevo(kon):
             return kon.update(self._tabla, self._adatok, azonosito=self.azonosito)  # True vagy False
         else:
             return kon.insert(self._tabla, **self._adatok)  # lastrowid vagy None

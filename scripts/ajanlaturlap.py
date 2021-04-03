@@ -8,10 +8,10 @@ from projekt import Projekt
 from munkaresz import Munkaresz
 from szervezet import Szervezet
 from szemely import Szemely
+from kontakt import Kontakt
 from ajanlatkeres import Ajanlatkeres
 from ajanlat import Ajanlat
-from kontakt import Kontakt
-from konstans import Kulcs
+from konstans import MAGANSZEMELY
 
 
 class AjanlatkeresUrlap(LabelFrame):
@@ -79,7 +79,7 @@ class AjanlatkeresUrlap(LabelFrame):
 
     def _kontaktszemelyek(self):
         szervezet = self._szervezet_valaszto.elem
-        if szervezet.azonosito == Kulcs.MAGANSZEMELY.kulcs:
+        if szervezet.azonosito == MAGANSZEMELY.azonosito:
             return self._szemelyek()
         else:
             return self._szemelyek(szervezet.azonosito)

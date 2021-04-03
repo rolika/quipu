@@ -1,7 +1,8 @@
 """ Különböző konstansok, hogy minden egy helyen és egyszer legyen definiálva"""
 
 
-from enum import Enum
+from szemely import Szemely
+from szervezet import Szervezet
 
 
 ELERHETOSEG_TIPUS = ("alapértelmezett", "munkahelyi", "privát")
@@ -24,28 +25,21 @@ ORSZAG = {
             "Románia": "RO"
         }
 
-class Kulcs(Enum):
-    """ Az alkalmazás adatbázisában különleges pozíciókat elfoglaló cégek, személyek adatai.
-        arg: (kulcs, nev): SQL PRIMARY KEY-t és megnevezést tartalmazó tuple. """
-    MAGANSZEMELY = (1, "#magánszemély")  # SQL PRIMARY KEY = 1 a szervezetek között (mint rövid név)
-    JOGISZEMELY = (1, "#jogi személy")  # SQL PRIMARY KEY = 1 a személyek között (mint vezetéknév)
-    CEG = (2, "Pohlen-Dach Hungária Bt.")  # SQL PRIMARY KEY = 2 a felhasználó cég a szervezetek között (rövid név)
+# a magánszemély egy különleges szervezet, hogy a magánszemélyek is kontaktok lehessenek
+MAGANSZEMELY = Szervezet(azonosito=1,
+                         rovidnev="#magánszemély",
+                         teljesnev="")
 
-    def __init__(self, kulcs, nev):
-        """A tuple kibontása automatikus."""
-        self._kulcs = kulcs
-        self._nev = nev
-    
-    @property
-    def kulcs(self):
-        return self._kulcs
-    
-    @property
-    def nev(self):
-        return self._nev
+WEVIK = Szervezet(azonosito=2,
+                  rovidnev="Wevik Engineer Kft.", 
+                  teljesnev="Wevik Engineer Kft.")
 
-if __name__ == "__main__":
-    """Használatot bemutató példák, ill. jelmagyarázat."""
-    print("Magánszemély megnevezése: {}, és SQL-kulcsa: {}.".format(Kulcs.MAGANSZEMELY.nev, Kulcs.MAGANSZEMELY.kulcs))
-    print("Jogi személy megnevezése: {}, és SQL-kulcsa: {}.".format(Kulcs.JOGISZEMELY.nev, Kulcs.JOGISZEMELY.kulcs))
-    print("Felhasználó cég neve: {}, és SQL-kulcsa: {}.".format(Kulcs.CEG.nev, Kulcs.CEG.kulcs))
+VITYA = Szemely(azonosito=1,
+                vezeteknev="Weisz",
+                keresztnev="Viktor",
+                nem="férfi")
+
+ROLI = Szemely(azonosito=2,
+               vezeteknev="Weisz",
+               keresztnev="Roland",
+               nem="férfi")

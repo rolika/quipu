@@ -1,5 +1,5 @@
 from csomo import Csomo
-from konstans import Kulcs
+from konstans import MAGANSZEMELY
 
 
 class Kontakt(Csomo):
@@ -38,7 +38,6 @@ class Kontakt(Csomo):
     def adatok(self, kontakt):
         self._adatok["szemely"] = kontakt.szemely
         self._adatok["szervezet"] = kontakt.szervezet
-        self._adatok["beosztas"] = kontakt.beosztas
         self._adatok["megjegyzes"] = kontakt.megjegyzes
     
     @property
@@ -48,10 +47,6 @@ class Kontakt(Csomo):
     @property
     def szervezet(self):
         return self._adatok.get("szervezet")
-
-    @property
-    def beosztas(self):
-        return self._adatok.get("beosztas")
     
     @property
     def nev(self):
@@ -67,7 +62,7 @@ class Kontakt(Csomo):
     
     @ceg.setter
     def ceg(self, szervezet):
-        self._ceg = "" if szervezet.azonosito == Kulcs.MAGANSZEMELY.kulcs else str(szervezet)
+        self._ceg = "" if szervezet.azonosito == MAGANSZEMELY.azonosito else str(szervezet)
     
     def listanezet(self):
         return str(self)
