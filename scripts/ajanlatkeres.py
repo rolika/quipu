@@ -5,7 +5,15 @@ import copy
 
 
 class Ajanlatkeres(Csomo):
-    "Munkarész jellegének megvalósítása. Összetett csomó, több külső kulcsra támaszkodik."
+    """
+    Munkarész jellegének megvalósítása. Összetett csomó, több külső kulcsra támaszkodik.
+    jelleg:         a projektet a jellegénél fogva tudjuk megjeleníteni (SQL PRIMARY KEY)
+    ajánlatkérő:    a kontaktszemély, aki kéri az ajánlatot (SQL PRIMARY KEY)
+    témafelelős:    a cégünk alkalmazottja, aki készíti az ajánlatot (SQL PRIMARY KEY)
+    érkezett:       az ajánlatkérés beérkezési dátuma (ISO-formátum: éééé-hh-nn)
+    határidő:       az ajánlat leadásának határideje (ISO-formátum: éééé-hh-nn)
+    megjegyzés:     az ajánlatkéréshez fűzött megjegyzés (szöveg)
+    """
     def __init__(self, **kwargs):
         super().__init__()
         if kwargs:
