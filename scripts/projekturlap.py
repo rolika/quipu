@@ -259,7 +259,7 @@ class ProjektModositoUrlap(simpledialog.Dialog):
         return self._projekt_valaszto.valaszto
 
     def validate(self):
-        """Ezen a ponton a projektek a projektszám miatt mindenképpen küldönbözni fognak egymástól."""
+        """Ezen a ponton a projektek a projektszám miatt mindenképpen különbözni fognak egymástól."""
         return True
 
     def apply(self):
