@@ -8,7 +8,7 @@ from email import Email
 from cim import Cim
 from szemely import Szemely
 from kontakt import Kontakt
-from konstans import BEOSZTAS, Kulcs
+from konstans import BEOSZTAS, MAGANSZEMELY, WEVIK
 
 
 class SzervezetUrlap(Frame):
@@ -86,7 +86,7 @@ class SzervezetTorloUrlap(simpledialog.Dialog):
 
     def validate(self):
         szervezet = self._nev_valaszto.elem
-        if szervezet.azonosito in (Kulcs.MAGANSZEMELY.kulcs, Kulcs.CEG.kulcs):
+        if szervezet.azonosito in (MAGANSZEMELY.azonosito, WEVIK.azonosito):
             return False  # nem engedem törölni a speciális eseteket
         biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!", parent=self)
         return szervezet and biztos
@@ -124,7 +124,7 @@ class SzervezetModositoUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        if self._nev_valaszto.elem.rovidnev == Kulcs.MAGANSZEMELY.nev:
+        if self._nev_valaszto.elem.azonosito == MAGANSZEMELY.azonosito:
             return False  # nem engedem módosítani a speciális esetet
         szervezet = self._modositott_szervezet()
         if not szervezet:
@@ -172,7 +172,7 @@ class UjTelefonUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        if self._nev_valaszto.elem.rovidnev == Kulcs.MAGANSZEMELY.nev:
+        if self._nev_valaszto.elem.azonosito == MAGANSZEMELY.azonosito:
             return False  # nem engedem módosítani a speciális esetet
         self._telefonszam = self._telefonszam_urlap.export()
         if not self._telefonszam:
@@ -307,7 +307,7 @@ class UjEmailUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        if self._nev_valaszto.elem.rovidnev == Kulcs.MAGANSZEMELY.nev:
+        if self._nev_valaszto.elem.azonosito == MAGANSZEMELY.azonosito:
             return False  # nem engedem módosítani a speciális esetet
         self._emailcim = self._emailcim_urlap.export()
         if not self._emailcim:
@@ -442,7 +442,7 @@ class UjCimUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        if self._nev_valaszto.elem.rovidnev == Kulcs.MAGANSZEMELY.nev:
+        if self._nev_valaszto.elem.azonosito == MAGANSZEMELY.azonosito:
             return False  # nem engedem módosítani a speciális esetet
         self._cim = self._cim_urlap.export()
         if not self._cim:
@@ -576,10 +576,6 @@ class UjKontaktUrlap(simpledialog.Dialog):
         self._szemelyvalaszto = Valaszto("személy", self._szemelynevsor(), self)
         self._szemelyvalaszto.pack(ipadx=2, ipady=2)
 
-        self._beosztas = StringVar()
-        self._beosztas.set(BEOSZTAS[0])
-        OptionMenu(self, self._beosztas, *BEOSZTAS).pack(ipadx=2, ipady=2)
-
         self._megjegyzes = StringVar()
         Label(self, text="megjegyzés").pack(ipadx=2, ipady=2)
         Entry(self, textvariable=self._megjegyzes, width=32).pack(ipadx=2, ipady=2)
@@ -592,7 +588,6 @@ class UjKontaktUrlap(simpledialog.Dialog):
     def apply(self):
         kontakt = Kontakt(szemely=self._szemelyvalaszto.elem.azonosito,
                           szervezet=self._szervezetvalaszto.elem.azonosito,
-                          beosztas=self._beosztas.get(),
                           megjegyzes=self._megjegyzes.get())
         if kontakt.ment(self._kontakt_kon):
             print("Bejegyzés mentve.")
@@ -676,10 +671,6 @@ class KontaktModositoUrlap(simpledialog.Dialog):
         self._szemelyvalaszto.valaszto.bind("<<ComboboxSelected>>", self._reszletek)
         self._szemelyvalaszto.pack(ipadx=2, ipady=2)
 
-        self._beosztas = StringVar()
-        self._beosztas.set(BEOSZTAS[0])
-        OptionMenu(self, self._beosztas, *BEOSZTAS).pack(ipadx=2, ipady=2)
-
         self._megjegyzes = StringVar()
         Label(self, text="megjegyzés").pack(ipadx=2, ipady=2)
         Entry(self, textvariable=self._megjegyzes, width=32).pack(ipadx=2, ipady=2)
@@ -696,7 +687,6 @@ class KontaktModositoUrlap(simpledialog.Dialog):
         if szemely and self._kontakt:
             self._kontakt.adatok = Kontakt(szemely=szemely.azonosito,
                                            szervezet=self._szervezetvalaszto.elem.azonosito,
-                                           beosztas=self._beosztas.get(),
                                            megjegyzes=self._megjegyzes.get())
             if self._kontakt.ment(self._kontakt_kon):
                 print("Bejegyzés módosítva.")
@@ -724,7 +714,6 @@ class KontaktModositoUrlap(simpledialog.Dialog):
             szervezet=self._szervezetvalaszto.elem.azonosito
             kontakt = self._kontakt_kon.select("kontakt", szemely=szemely.azonosito, logic="AND", szervezet=szervezet)
             self._kontakt = Kontakt(**(kontakt.fetchone()))
-            self._beosztas.set(self._kontakt.beosztas)
             self._megjegyzes.set(self._kontakt.megjegyzes)
 
 
