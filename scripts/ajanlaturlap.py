@@ -204,69 +204,40 @@ class AjanlatTorloUrlap(simpledialog.Dialog):
         super().__init__(szulo, title="Ajánlatkérés törlése")
 
     def body(self, szulo):
-        self._jelleg_valaszto = Valaszto("projekt", self._jellegek(), szulo)
-        #self._jelleg_valaszto.set_callback(self._ajanlatkero_megjelenit)
-        self._jelleg_valaszto.pack(ipadx=2, ipady=2)
-
-        #self._ajanlatkero_valaszto = Valaszto("ajánlatkérő", self._ajanlatkerok(), szulo)
-        #self._ajanlatkero_valaszto.pack(ipadx=2, ipady=2)
-
-        return self._jelleg_valaszto.valaszto
+        self._ajanlatkeres_valaszto = Valaszto("ajánlatkérés", self._ajanlatkeresek(), szulo)
+        self._ajanlatkeres_valaszto.pack(ipadx=2, ipady=2)
+        return self._ajanlatkeres_valaszto.valaszto
 
     def validate(self):
         return messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
 
     def apply(self):
-        jelleg = self._jelleg_valaszto.elem
-        ajanlatkero = self._ajanlatkero_valaszto.elem
-        if jelleg and ajanlatkero:
-            ajanlatkeres = self._ajanlat_kon.select("ajanlatkeres",
-                                                    jelleg=jelleg.azonosito,
-                                                    ajanlatkero=ajanlatkero.azonosito).fetchone()
-            ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
-            if ajanlatkeres.torol(self._ajanlat_kon):
-                print("Bejegyzés törölve")
-            else:
-                print("Nem sikerült törölni!")
-    
-    def _projekt_kon_setter(self, jelleg):
-        jelleg = Jelleg(**jelleg)
-        jelleg.projekt_kon = self._projekt_kon
-        return jelleg
+        ajanlatkeres = self._ajanlatkeres_valaszto.elem
+        if ajanlatkeres.torol(self._ajanlat_kon):
+            print("Bejegyzés törölve")
+        else:
+            print("Nem sikerült törölni!")
 
-    def _jellegek(self):
-        jellegek = self._projekt_kon.execute("""
-            SELECT *                                                    -- válaszd ki
-            FROM jelleg                                                 -- azokat a jellegeket,
-            WHERE azonosito IN (                                        -- melyek        
-                SELECT jelleg                                           -- szerepelnek
-                FROM ajanlatkeres                                       -- azon ajánlatkérésekben,
-                WHERE azonosito NOT IN (                                -- melyek
-                    SELECT ajanlatkeres.azonosito                       -- azonosítói nem találhatók
-                    FROM ajanlatkeres, ajanlat                          -- az ajánlatok között,
-                    ON ajanlatkeres.azonosito = ajanlat.ajanlatkeres    -- azaz nincs leadott ajánlatuk
-                )
+    def _ajanlatkeresek(self):
+        # azok az ajánlatkérések kellenek, melyekre még nem született ajánlat
+        ajanlatkeresek = self._ajanlat_kon.execute("""
+            SELECT *
+            FROM ajanlatkeres
+            WHERE azonosito NOT IN (
+                SELECT ajanlatkeres.azonosito
+                FROM ajanlatkeres, ajanlat
+                ON ajanlatkeres.azonosito = ajanlat.ajanlatkeres
             );
             """)
-        return sorted(map(self._projekt_kon_setter, jellegek), key=repr)
-
-    def _ajanlatkero_megjelenit(self, event):
-        self._ajanlatkero_valaszto.beallit(self._ajanlatkerok())
-
-    def _ajanlatkerok(self):
-        munkaresz = self._munkaresz_valaszto.elem
-        return sorted(map(self._ajanlatkero,
-                          self._ajanlat_kon.select("ajanlatkeres", munkaresz=munkaresz.azonosito)),
-                      key=repr)
-
-    def _ajanlatkero(self, ajanlatkeres):
-        kontakt = self._kontakt_kon.select("kontakt", azonosito=ajanlatkeres["ajanlatkero"]).fetchone()
-        kontakt = Kontakt(**kontakt)
-        szemely = self._szemely_kon.select("szemely", azonosito=kontakt.szemely).fetchone()
-        szervezet = self._szervezet_kon.select("szervezet", azonosito=kontakt.szervezet).fetchone()
-        kontakt.nev = Szemely(**szemely)
-        kontakt.ceg = Szervezet(**szervezet)
-        return kontakt
+        return sorted(map(self._kon_setter, ajanlatkeresek), key=repr)
+    
+    def _kon_setter(self, ajanlatkeres):
+        ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
+        ajanlatkeres.kontakt_kon = self._kontakt_kon
+        ajanlatkeres.projekt_kon = self._projekt_kon
+        ajanlatkeres.szemely_kon = self._szemely_kon
+        ajanlatkeres.szervezet_kon = self._szervezet_kon
+        return ajanlatkeres
 
 
 class AjanlatModositoUrlap(simpledialog.Dialog):
