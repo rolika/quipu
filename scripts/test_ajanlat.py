@@ -60,7 +60,7 @@ class ProjektlistaTest(unittest.TestCase):
                     projekt_id = projekt_.ment(self._projekt_kon)
                     munkaresz = Munkaresz(projekt=projekt_id, megnevezes="szigetelés", enaplo=1, megjegyzes="")
                     munkaresz_id = munkaresz.ment(self._projekt_kon)
-                    orszag = "D" if projekt.orszag == "DE" else "HU"
+                    orszag = "D" if projekt.orszag.startswith("D") else "H"
                     helyseg = projekt.helyseg if projekt.helyseg else "Herend"
                     cim = Cim(munkaresz=munkaresz_id, orszag=orszag, megye="", iranyitoszam="", helyseg=helyseg, utca="", hrsz="", postafiok="", honlap="", megjegyzes="")
                     cim.ment(self._projekt_kon)
@@ -110,9 +110,9 @@ class ProjektlistaTest(unittest.TestCase):
                     if ajanlatkeres_id and projekt.ar and float(projekt.ar) > 0:  # ár nélkül nem írom be az ajánlatok közé
                         esely = projekt.esely.replace("%", "")
                         try:
-                            esely = float(esely) / 100
+                            esely = int(esely)
                         except ValueError:
-                            esely = 0.05
+                            esely = 10
                         ajanlat = Ajanlat(ajanlatkeres=ajanlatkeres_id, ajanlatiar=projekt.ar, leadva="", ervenyes="", esely=esely, megjegyzes="")
                         if not ajanlat.meglevo(self._ajanlat_kon):
                             ajanlat.ment(self._ajanlat_kon)
