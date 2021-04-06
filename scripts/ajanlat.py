@@ -45,7 +45,6 @@ class Ajanlat(Csomo):
 
     @adatok.setter
     def adatok(self, ajanlat):
-        self._adatok["ajanlatkeres"] = ajanlat.ajanlatkeres
         self._adatok["ajanlatiar"] = ajanlat.ajanlatiar
         self._adatok["leadva"] = ajanlat.leadva
         self._adatok["ervenyes"] = ajanlat.ervenyes

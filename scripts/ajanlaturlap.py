@@ -214,7 +214,7 @@ class AjanlatTorloUrlap(simpledialog.Dialog):
     def apply(self):
         ajanlatkeres = self._ajanlatkeres_valaszto.elem
         if ajanlatkeres.torol(self._ajanlat_kon):
-            print("Bejegyzés törölve")
+            print("Bejegyzés törölve.")
         else:
             print("Nem sikerült törölni!")
 
@@ -253,3 +253,53 @@ class AjanlatModositoUrlap(simpledialog.Dialog):
         self._projekt_kon = projekt_kon
         self._ajanlat_kon = ajanlat_kon
         super().__init__(szulo, title="Ajánlat módosítása")
+    
+    def body(self, szulo):
+        self._ajanlatkeres_valaszto = Valaszto("ajánlatkérés", self._ajanlatkeresek(), self)
+        self._ajanlatkeres_valaszto.set_callback(self._aktiv_ajanlat)
+        self._ajanlatkeres_valaszto.pack(ipadx=2, ipady=2)
+        
+        self._ajanlat_urlap = AjanlatUrlap(self)
+        self._ajanlat_urlap.pack(padx=2, pady=2, ipadx=2, ipady=2, fill=BOTH)
+
+        self._aktiv_ajanlat(1)
+        return self._ajanlatkeres_valaszto.valaszto        
+
+    def validate(self):
+        return True
+    
+    def apply(self):
+        ajanlat = self._ajanlat_urlap.export()
+        if self._ajanlat:
+            self._ajanlat.adatok = ajanlat
+            ajanlat = self._ajanlat
+        else:
+            ajanlat.ajanlatkeres = self._ajanlatkeres_valaszto.elem.azonosito
+        if ajanlat.ment(self._ajanlat_kon):
+            print("Bejegyzés módosítva.")
+        else:
+            print("Nem sikerült módosítani!")
+
+    def _ajanlatkeresek(self):
+        return sorted(map(self._ajanlatkeres_kon_setter, self._ajanlat_kon.select("ajanlatkeres")), key=repr)
+
+    def _ajanlatkeres_kon_setter(self, ajanlatkeres):
+        ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
+        ajanlatkeres.kontakt_kon = self._kontakt_kon
+        ajanlatkeres.projekt_kon = self._projekt_kon
+        ajanlatkeres.szemely_kon = self._szemely_kon
+        ajanlatkeres.szervezet_kon = self._szervezet_kon
+        return ajanlatkeres
+    
+    def _aktiv_ajanlat(self, event):
+        ajanlatkeres=self._ajanlatkeres_valaszto.elem.azonosito
+        ajanlat = self._ajanlat_kon.select("ajanlat", ajanlatkeres=ajanlatkeres).fetchone()
+        if ajanlat:
+            ajanlat = Ajanlat(**ajanlat)
+            self._ajanlat = ajanlat
+        else:
+            self._ajanlat = None
+            ma = date.isoformat(date.today())
+            egyhonapmulva = date.isoformat(date.today() + timedelta(days=30))
+            ajanlat = Ajanlat(ajanlatiar="", leadva=ma, ervenyes=egyhonapmulva, esely=10, megjegyzes="")
+        self._ajanlat_urlap.beallit(ajanlat)
