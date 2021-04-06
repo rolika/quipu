@@ -1,8 +1,11 @@
-from dolog import Dolog
+from csomo import Csomo
+from projekt import Projekt
+from munkaresz import Munkaresz
+from cim import Cim
 
 
-class Jelleg(Dolog):
-    "Munkarész jellegének megvalósítása"
+class Jelleg(Csomo):
+    "Munkarész jellegének megvalósítása. Egyszerű csomó, egy külső kulcsra támaszkodik."
     def __init__(self, **kwargs):
         super().__init__()
         if kwargs:
@@ -13,6 +16,13 @@ class Jelleg(Dolog):
                 "megjegyzes": ""
             }
         self._tabla = "jelleg"
+        self._projekt_kon = None
+    
+    def __str__(self):
+        return "{}{}".format(self.megnevezes, self._nullazo(self.megjegyzes))
+    
+    def __repr__(self):
+        return self._ascii_rep(self.listanezet())
 
     def __bool__(self):
         return bool(self.megnevezes)
@@ -37,3 +47,27 @@ class Jelleg(Dolog):
     @munkaresz.setter
     def munkaresz(self, munkaresz):
         self._adatok["munkaresz"] = munkaresz
+    
+    @property
+    def projekt_kon(self):
+        return self._projekt_kon
+    
+    @projekt_kon.setter
+    def projekt_kon(self, kon):
+        self._projekt_kon = kon
+    
+    def listanezet(self):
+        """Egy adott azonosítójú jelleghez egy munkarész, így egy projekt tartozik."""
+        if self._projekt_kon:
+            munkaresz = self._projekt_kon.select("munkaresz", azonosito=self.munkaresz).fetchone()
+            munkaresz = Munkaresz(**munkaresz)
+            cim = self._projekt_kon.select("cim", munkaresz=munkaresz.azonosito).fetchone()
+            cim = Cim(**cim)
+            projekt = self._projekt_kon.select("projekt", azonosito=munkaresz.projekt).fetchone()
+            projekt = Projekt(**projekt)
+            return "{projekt}, {hely}, {munkaresz}, {jelleg}".format(projekt=str(projekt),
+                                                                     hely=cim.helyseg,
+                                                                     munkaresz=str(munkaresz),
+                                                                     jelleg=str(self))
+        else:
+            raise NotImplementedError

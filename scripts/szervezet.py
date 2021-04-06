@@ -1,8 +1,8 @@
-import dolog
+from csomo import Csomo
 
 
-class Szervezet(dolog.Dolog):
-    """Szervezet megvalósítása."""
+class Szervezet(Csomo):
+    """Szervezet megvalósítása. Alapvető csomó, nem támaszkodik külső kulcsra."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
@@ -37,7 +37,8 @@ class Szervezet(dolog.Dolog):
 
     @adatok.setter
     def adatok(self, uj):
-        """Új szervezet-osztály alapján módosítja a meglévőt."""
+        """Új szervezet-osztály alapján módosítja a meglévőt.
+        uj: Szervezet() objektum"""
         self._adatok["rovidnev"] = uj.rovidnev
         self._adatok["teljesnev"] = uj.teljesnev
         self._adatok["gyakorisag"] = uj.gyakorisag
@@ -46,6 +47,10 @@ class Szervezet(dolog.Dolog):
     @property
     def rovidnev(self):
         return self._adatok.get("rovidnev")
+    
+    @rovidnev.setter
+    def rovidnev(self, nev):
+        self._adatok["rovidnev"] = nev
 
     @property
     def teljesnev(self):

@@ -3,8 +3,6 @@ from tkinter.ttk import Combobox
 from telefon import Telefon
 from email import Email
 from cim import Cim
-from munkaresz import Munkaresz
-from jelleg import Jelleg
 from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS, ORSZAG, MEGYE
 
 
@@ -150,3 +148,6 @@ class Valaszto(LabelFrame):
             return self._valasztek[self._valaszto.current()]
         except IndexError:
             return None
+    
+    def set_callback(self, fv_ref):
+        self._valaszto.bind("<<ComboboxSelected>>", fv_ref)
