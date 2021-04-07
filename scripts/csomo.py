@@ -3,6 +3,11 @@ class Csomo:
     def __init__(self):
         self._adatok = dict()
         self._tabla = None
+        self._szemely_kon = None
+        self._szervezet_kon = None
+        self._kontakt_kon = None
+        self._projekt_kon = None
+        self._ajanlat_kon = None
 
     def __str__(self):
         """Csomó szöveges megjelenítése, elsősorban debugoláshoz."""
@@ -30,6 +35,46 @@ class Csomo:
     def megjegyzes(self):
         """Minden csomóhoz fűzhető valamilyen megjegyzés."""
         return self._adatok.get("megjegyzes")
+    
+    @property
+    def szemely_kon(self):
+        return self._szemely_kon
+    
+    @szemely_kon.setter
+    def szemely_kon(self, kon):
+        self._szemely_kon = kon
+    
+    @property
+    def szervezet_kon(self):
+        return self._szervezet_kon
+    
+    @szervezet_kon.setter
+    def szervezet_kon(self, kon):
+        self._szervezet_kon = kon
+    
+    @property
+    def kontakt_kon(self):
+        return self._kontakt_kon
+    
+    @kontakt_kon.setter
+    def kontakt_kon(self, kon):
+        self._kontakt_kon = kon
+    
+    @property
+    def projekt_kon(self):
+        return self._projekt_kon
+    
+    @projekt_kon.setter
+    def projekt_kon(self, kon):
+        self._projekt_kon = kon
+    
+    @property
+    def ajanlat_kon(self):
+        return self._ajanlat_kon
+    
+    @projekt_kon.setter
+    def ajanlat_kon(self, kon):
+        self._ajanlat_kon = kon
 
     def listanezet(self):
         """Csomó szöveges megjelenítése kiválasztáshoz (pl. Combobox)."""

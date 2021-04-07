@@ -19,8 +19,6 @@ class Kontakt(Csomo):
                 "megjegyzes": ""
             }
         self._tabla = "kontakt"
-        self._szemely_kon = None
-        self._szervezet_kon = None
     
     def __str__(self):
         return self.listanezet()
@@ -48,22 +46,6 @@ class Kontakt(Csomo):
     @property
     def szervezet(self):
         return self._adatok.get("szervezet")
-    
-    @property
-    def szervezet_kon(self):
-        return self._szervezet_kon
-    
-    @szervezet_kon.setter
-    def szervezet_kon(self, kon):
-        self._szervezet_kon = kon
-    
-    @property
-    def szemely_kon(self):
-        return self._szemely_kon
-    
-    @szemely_kon.setter
-    def szemely_kon(self, kon):
-        self._szemely_kon = kon
     
     def listanezet(self):
         if self._szemely_kon and self._szervezet_kon:

@@ -31,10 +31,6 @@ class Ajanlat(Csomo):
                 "megjegyzes": ""
             }
         self._tabla = "ajanlat"
-        self._projekt_kon = None
-        self._kontakt_kon = None
-        self._szervezet_kon = None
-        self._szemely_kon = None
 
     def __bool__(self):
         return True
@@ -74,38 +70,6 @@ class Ajanlat(Csomo):
     @property
     def esely(self):
         return self._adatok.get("esely", "")
-    
-    @property
-    def projekt_kon(self):
-        return self._projekt_kon
-    
-    @projekt_kon.setter
-    def projekt_kon(self, kon):
-        self._projekt_kon = kon
-    
-    @property
-    def kontakt_kon(self):
-        return self._kontakt_kon
-    
-    @projekt_kon.setter
-    def kontakt_kon(self, kon):
-        self._kontakt_kon = kon
-    
-    @property
-    def szervezet_kon(self):
-        return self._szervezet_kon
-    
-    @szervezet_kon.setter
-    def szervezet_kon(self, kon):
-        self._szervezet_kon = kon
-    
-    @property
-    def szemely_kon(self):
-        return self._szemely_kon
-    
-    @szemely_kon.setter
-    def szemely_kon(self, kon):
-        self._szemely_kon = kon
     
     def listanezet(self):
         if self._szemely_kon and self._szervezet_kon and self._kontakt_kon and self._projekt_kon:
