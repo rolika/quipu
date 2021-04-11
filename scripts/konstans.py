@@ -26,20 +26,16 @@ ORSZAG = {
         }
 
 # a magánszemély egy különleges szervezet, hogy a magánszemélyek is kontaktok lehessenek
-MAGANSZEMELY = Szervezet(azonosito=1,
-                         rovidnev="#magánszemély",
+MAGANSZEMELY = Szervezet(rovidnev="#magánszemély",
                          teljesnev="")
 
-WEVIK = Szervezet(azonosito=2,
-                  rovidnev="Wevik Engineer Kft.", 
+WEVIK = Szervezet(rovidnev="Wevik Engineer Kft.", 
                   teljesnev="Wevik Engineer Kft.")
 
-VITYA = Szemely(azonosito=1,
-                vezeteknev="Weisz",
+VITYA = Szemely(vezeteknev="Weisz",
                 keresztnev="Viktor",
                 nem="férfi")
 
-ROLI = Szemely(azonosito=2,
-               vezeteknev="Weisz",
+ROLI = Szemely(vezeteknev="Weisz",
                keresztnev="Roland",
                nem="férfi")
