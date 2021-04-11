@@ -83,12 +83,13 @@ class Csomo:
     def meglevo(self, kon):
         """Ellenőrzi, hogy a csomó szerepel-e az adatbázisban.
         kon:    tamer modul adatbázis konnektora"""
+        print(bool(kon.select(self._tabla, logic="AND", **self._adatok).fetchone()))
         return True if self.azonosito else kon.select(self._tabla, logic="AND", **self._adatok).fetchone()
 
     def ment(self, kon):
         """Menti vagy módosítja a csomó adatait.
         kon:    tamer modul adatbázis konnektora"""
-        if self.meglevo(kon):
+        if self.azonosito:
             return kon.update(self._tabla, self._adatok, azonosito=self.azonosito)  # True vagy False
         else:
             return kon.insert(self._tabla, **self._adatok)  # lastrowid vagy None

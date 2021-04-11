@@ -88,10 +88,10 @@ class ProjektlistaTest(unittest.TestCase):
                     if bool(szemely) and not szemely.meglevo(self._szemely_kon):
                         szemely_id = szemely.ment(self._szemely_kon)
                         telefonszam = projekt.telefonszam if projekt.telefonszam else "+36"
-                        telefon = Telefon(szemely=szemely_id, telefonszam=telefonszam, megjegyzes="")
+                        telefon = Telefon(szemely=szemely_id, telefonszam=telefonszam, megjegyzes="alapértelmezett")
                         telefon.ment(self._szemely_kon)
                         emailcim = projekt.emailcim if projekt.emailcim else ".hu"
-                        email = Email(szemely=szemely_id, emailcim=emailcim, megjegyzes="")
+                        email = Email(szemely=szemely_id, emailcim=emailcim, megjegyzes="alapértelmezett")
                         email.ment(self._szemely_kon)
 
                     # kontaktszemély
@@ -108,7 +108,7 @@ class ProjektlistaTest(unittest.TestCase):
 
                     # ajánlat
                     if ajanlatkeres_id and projekt.ar and float(projekt.ar) > 0:  # ár nélkül nem írom be az ajánlatok közé
-                        esely = projekt.esely.replace("%", "")
+                        esely = projekt.esely.rstrip("%")
                         try:
                             esely = int(esely)
                         except ValueError:
