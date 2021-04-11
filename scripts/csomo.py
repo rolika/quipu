@@ -83,7 +83,6 @@ class Csomo:
     def meglevo(self, kon):
         """Ellenőrzi, hogy a csomó szerepel-e az adatbázisban.
         kon:    tamer modul adatbázis konnektora"""
-        print(bool(kon.select(self._tabla, logic="AND", **self._adatok).fetchone()))
         return True if self.azonosito else kon.select(self._tabla, logic="AND", **self._adatok).fetchone()
 
     def ment(self, kon):
