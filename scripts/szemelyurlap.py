@@ -127,7 +127,6 @@ class SzemelyTorloUrlap(simpledialog.Dialog):
 class SzemelyModositoUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon
-        self._szemely = None
         super().__init__(szulo, title="Személy módosítása")
 
     def body(self, szulo):
@@ -143,35 +142,29 @@ class SzemelyModositoUrlap(simpledialog.Dialog):
 
     def validate(self):
         if self._nev_valaszto.elem.azonosito in (VITYA.azonosito, ROLI.azonosito):
-            return False  # nem engedem módosítani a speciális eseteket
-        self._szemely = self._uj_szemely()
-        if not self._szemely:
+            return False  # nem engedem módosítani a speciális eseteket        
+        szemely = self._szemelyurlap.export()
+        if not szemely:
             messagebox.showwarning("Hiányos adat!", "Legalább az egyik nevet add meg!", parent=self)
             return False
-        if self._szemely.meglevo(self._kon):
+        if szemely.meglevo(self._kon):
             messagebox.showwarning("A név már létezik!", "Különböztesd meg a megjegyzésben!", parent=self)
             return False
         return True
 
-    def apply(self):
-        szemely = self._uj_szemely()
-        if self._szemely.ment(self._kon):
+    def apply(self):    
+        szemely = self._nev_valaszto.elem
+        szemely.adatok = self._szemelyurlap.export()
+        if szemely.ment(self._kon):
             print("{}: Bejegyzés módosítva.".format(szemely))
         else:
             print("Nem sikerült módosítani.")
-        self._nev_valaszto.beallit(self._nevsor())
-        self._megjelenit(1)
 
     def _nevsor(self):
         return sorted(map(lambda szemely: Szemely(**szemely), self._kon.select("szemely")), key=repr)
 
     def _megjelenit(self, event):
         self._szemelyurlap.beallit(self._nev_valaszto.elem or Szemely())
-
-    def _uj_szemely(self):
-        szemely = self._nev_valaszto.elem
-        szemely.adatok = self._szemelyurlap.export()
-        return szemely
 
 
 class UjTelefonUrlap(simpledialog.Dialog):

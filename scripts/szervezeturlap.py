@@ -126,7 +126,7 @@ class SzervezetModositoUrlap(simpledialog.Dialog):
     def validate(self):
         if self._nev_valaszto.elem.azonosito == MAGANSZEMELY.azonosito:
             return False  # nem engedem módosítani a speciális esetet
-        szervezet = self._modositott_szervezet()
+        szervezet = self._szervezeturlap.export()
         if not szervezet:
             messagebox.showwarning("Hiányos adat!", "Legalább a rövid nevet add meg!", parent=self)
             return False
@@ -136,24 +136,18 @@ class SzervezetModositoUrlap(simpledialog.Dialog):
         return True
 
     def apply(self):
-        szervezet = self._uj_szervezet()
+        szervezet = self._nev_valaszto.elem
+        szervezet.adatok = self._szervezeturlap.export()
         if szervezet.ment(self._kon):
             print("{}: Bejegyzés módosítva.".format(szervezet))
         else:
             print("Nem sikerült módosítani.")
-        self._nev_valaszto.beallit(self._nevsor())
-        self._megjelenit(1)
 
     def _nevsor(self):
         return sorted(map(lambda szervezet: Szervezet(**szervezet), self._kon.select("szervezet")), key=repr)
 
     def _megjelenit(self, event):
         self._szervezeturlap.beallit(self._nev_valaszto.elem or Szervezet())
-
-    def _modositott_szervezet(self):
-        szervezet = self._nev_valaszto.elem
-        szervezet.adatok = self._szervezeturlap.export()
-        return szervezet
 
 
 class UjTelefonUrlap(simpledialog.Dialog):
