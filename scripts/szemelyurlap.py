@@ -746,7 +746,11 @@ class KontaktModositoUrlap(simpledialog.Dialog):
     def _reszletek(self, event):
         szemely = self._szemelyvalaszto.elem.azonosito
         szervezet = self._szervezetvalaszto.elem.azonosito
-        megjegyzes = self._kontakt_kon.select("kontakt", "megjegyzes", szemely=szemely, szervezet=szervezet, logic="AND").fetchone()
+        megjegyzes = self._kontakt_kon.select("kontakt", 
+                                              "megjegyzes", 
+                                              szemely=szemely, 
+                                              szervezet=szervezet, 
+                                              logic="AND").fetchone()
         self._megjegyzes.set(megjegyzes["megjegyzes"])
 
 

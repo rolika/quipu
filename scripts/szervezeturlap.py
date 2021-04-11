@@ -659,7 +659,6 @@ class KontaktModositoUrlap(simpledialog.Dialog):
         self._szervezet_kon = szervezet_kon
         self._szemely_kon = szemely_kon
         self._kontakt_kon = kontakt_kon
-        self._kontakt = None
         super().__init__(szulo, title="Kontaktszemély módosítása")
 
     def body(self, szulo):
@@ -671,6 +670,9 @@ class KontaktModositoUrlap(simpledialog.Dialog):
         self._szemelyvalaszto.valaszto.bind("<<ComboboxSelected>>", self._reszletek)
         self._szemelyvalaszto.pack(ipadx=2, ipady=2)
 
+        self._modszemelyvalaszto = Valaszto("személy", self._modszemelynevsor(), self)
+        self._modszemelyvalaszto.pack(ipadx=2, ipady=2)
+
         self._megjegyzes = StringVar()
         Label(self, text="megjegyzés").pack(ipadx=2, ipady=2)
         Entry(self, textvariable=self._megjegyzes, width=32).pack(ipadx=2, ipady=2)
@@ -680,19 +682,20 @@ class KontaktModositoUrlap(simpledialog.Dialog):
         return self._szervezetvalaszto
 
     def validate(self):
-        return self._szemelyvalaszto.elem
+        return True
 
     def apply(self):
-        szemely = self._szemelyvalaszto.elem
-        if szemely and self._kontakt:
-            self._kontakt.adatok = Kontakt(szemely=szemely.azonosito,
-                                           szervezet=self._szervezetvalaszto.elem.azonosito,
-                                           megjegyzes=self._megjegyzes.get())
-            if self._kontakt.ment(self._kontakt_kon):
-                print("Bejegyzés módosítva.")
-                self._megjelenit(1)
-                return
-        print("Nem sikerült módosítani.")
+        szervezet = self._szervezetvalaszto.elem.azonosito
+        szemely = self._szemelyvalaszto.elem.azonosito
+        modszemely = self._modszemelyvalaszto.elem.azonosito
+        megjegyzes = self._megjegyzes.get()
+        kontakt_id = self._kontakt_kon.select("kontakt", "azonosito", szemely=szemely, szervezet=szervezet, logic="AND")
+        kontakt_id = kontakt_id.fetchone()["azonosito"]
+        kontakt = Kontakt(azonosito=kontakt_id, szemely=modszemely, szervezet=szervezet, megjegyzes=megjegyzes)
+        if kontakt.ment(self._kontakt_kon):
+            print("Bejegyzés módosítva.")
+        else:
+            print("Nem sikerült módosítani.")
 
     def _szervezetnevsor(self):
         return sorted(map(lambda szervezet: Szervezet(**szervezet), self._szervezet_kon.select("szervezet")), key=repr)
@@ -700,21 +703,41 @@ class KontaktModositoUrlap(simpledialog.Dialog):
     def _szemelynevsor(self):
         szervezetazonosito = self._szervezetvalaszto.elem.azonosito
         szervezethez_rendelt_szemelyek = self._szervezet_kon.execute("""
-            SELECT * FROM szemely WHERE azonosito IN (SELECT szemely FROM kontakt WHERE szervezet = ?);
+            SELECT * 
+            FROM szemely 
+            WHERE azonosito IN (
+                SELECT szemely FROM kontakt WHERE szervezet = ?
+            );
         """, (szervezetazonosito, ))
         return sorted(map(lambda szemely: Szemely(**szemely), szervezethez_rendelt_szemelyek), key=repr)
 
+    def _modszemelynevsor(self):
+        szervezetazonosito = self._szervezetvalaszto.elem.azonosito
+        szervezethez_nem_rendelt_szemelyek = self._szervezet_kon.execute("""
+            SELECT * 
+            FROM szemely 
+            WHERE azonosito NOT IN (
+                SELECT szemely 
+                FROM kontakt 
+                WHERE szervezet = ?
+            );
+        """, (szervezetazonosito, ))
+        return sorted(map(lambda szemely: Szemely(**szemely), szervezethez_nem_rendelt_szemelyek), key=repr)
+
     def _megjelenit(self, event):
         self._szemelyvalaszto.beallit(self._szemelynevsor())
+        self._modszemelyvalaszto.beallit(self._modszemelynevsor())
         self._reszletek(1)
 
     def _reszletek(self, event):
-        szemely = self._szemelyvalaszto.elem
-        if szemely:
-            szervezet=self._szervezetvalaszto.elem.azonosito
-            kontakt = self._kontakt_kon.select("kontakt", szemely=szemely.azonosito, logic="AND", szervezet=szervezet)
-            self._kontakt = Kontakt(**(kontakt.fetchone()))
-            self._megjegyzes.set(self._kontakt.megjegyzes)
+        szemely = self._szemelyvalaszto.elem.azonosito
+        szervezet=self._szervezetvalaszto.elem.azonosito
+        megjegyzes = self._kontakt_kon.select("kontakt", 
+                                              "megjegyzes", 
+                                              szemely=szemely, 
+                                              szervezet=szervezet, 
+                                              logic="AND").fetchone()
+        self._megjegyzes.set(megjegyzes["megjegyzes"])
 
 
 if __name__ == "__main__":
