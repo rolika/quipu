@@ -8,7 +8,7 @@ from email import Email
 from cim import Cim
 from szervezet import Szervezet
 from kontakt import Kontakt
-from konstans import BEOSZTAS, VITYA, ROLI
+from konstans import VITYA, ROLI
 
 
 class SzemelyUrlap(Frame):
