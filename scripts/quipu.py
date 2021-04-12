@@ -55,8 +55,8 @@ class Quipu(Frame):
             wevik_id = WEVIK.ment(szervezet_kon)  # SQL PRIMARY KEY 2
             vitya = VITYA.ment(szemely_kon)  # SQL PRIMARY KEY 1
             roli = ROLI.ment(szemely_kon)  # SQL PRIMARY KEY 2
-            Kontakt(szemely=vitya, szervezet=wevik_id).ment(kontakt_kon)
-            Kontakt(szemely=roli, szervezet=wevik_id).ment(kontakt_kon)
+            Kontakt(szemely=vitya, szervezet=wevik_id).ment(kontakt_kon)  # SQL PRIMARY KEY 1
+            Kontakt(szemely=roli, szervezet=wevik_id).ment(kontakt_kon)  # SQL PRIMARY KEY 2
 
         # főmenü megjelenítése
         menu.Fomenu(self, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon, ajanlat_kon)
