@@ -28,10 +28,6 @@ class Ajanlatkeres(Csomo):
                 "megjegyzes": ""
             }
         self._tabla = "ajanlatkeres"
-        self._projekt_kon = None
-        self._kontakt_kon = None
-        self._szervezet_kon = None
-        self._szemely_kon = None
     
     def __str__(self):
         return self.listanezet()
@@ -75,47 +71,6 @@ class Ajanlatkeres(Csomo):
     def hatarido(self):
         return self._adatok.get("hatarido")
     
-    @property
-    def projekt_kon(self):
-        return self._projekt_kon
-    
-    @projekt_kon.setter
-    def projekt_kon(self, kon):
-        self._projekt_kon = kon
-    
-    @property
-    def kontakt_kon(self):
-        return self._kontakt_kon
-    
-    @projekt_kon.setter
-    def kontakt_kon(self, kon):
-        self._kontakt_kon = kon
-    
-    @property
-    def szervezet_kon(self):
-        return self._szervezet_kon
-    
-    @szervezet_kon.setter
-    def szervezet_kon(self, kon):
-        self._szervezet_kon = kon
-    
-    @property
-    def szemely_kon(self):
-        return self._szemely_kon
-    
-    @szemely_kon.setter
-    def szemely_kon(self, kon):
-        self._szemely_kon = kon
-
-    def meglevo(self, kon):
-        """Az ajánlatkérés meglévő, ha ugyanaz az ajánlatkérő és a jelleg"""
-        adatok = copy.copy(self._adatok)  # shallow copy
-        adatok.pop("azonosito", None)
-        adatok.pop("erkezett", None)
-        adatok.pop("hatarido", None)
-        adatok.pop("temafelelos", None)
-        return kon.select(self._tabla, logic="AND", **adatok).fetchone()
-    
     def listanezet(self):
         if self._szemely_kon and self._szervezet_kon and self._kontakt_kon and self._projekt_kon:
             jelleg = self._projekt_kon.select("jelleg", azonosito=self.jelleg).fetchone()
@@ -126,6 +81,6 @@ class Ajanlatkeres(Csomo):
             kontakt.szemely_kon = self._szemely_kon
             kontakt.szervezet_kon = self._szervezet_kon
             return "{jelleg} / {ajanlatkero}".format(jelleg=jelleg.listanezet(),
-                                                   ajanlatkero=kontakt.listanezet())
+                                                     ajanlatkero=kontakt.listanezet())
         else:
             raise NotImplementedError

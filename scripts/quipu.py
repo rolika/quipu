@@ -53,8 +53,10 @@ class Quipu(Frame):
         if not WEVIK.meglevo(szervezet_kon):  # feltételezem, hogy a céggel együtt a többet se írta még be
             MAGANSZEMELY.ment(szervezet_kon)  # SQL PRIMARY KEY 1
             wevik_id = WEVIK.ment(szervezet_kon)  # SQL PRIMARY KEY 2
-            Kontakt(szemely=VITYA.ment(szemely_kon), szervezet=wevik_id).ment(kontakt_kon)
-            Kontakt(szemely=ROLI.ment(szemely_kon), szervezet=wevik_id).ment(kontakt_kon)
+            vitya = VITYA.ment(szemely_kon)  # SQL PRIMARY KEY 1
+            roli = ROLI.ment(szemely_kon)  # SQL PRIMARY KEY 2
+            Kontakt(szemely=vitya, szervezet=wevik_id).ment(kontakt_kon)  # SQL PRIMARY KEY 1
+            Kontakt(szemely=roli, szervezet=wevik_id).ment(kontakt_kon)  # SQL PRIMARY KEY 2
 
         # főmenü megjelenítése
         menu.Fomenu(self, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon, ajanlat_kon)
@@ -72,6 +74,7 @@ class Quipu(Frame):
             elotag="TEXT DEFAULT ''",
             vezeteknev="TEXT NOT NULL",
             keresztnev="TEXT",
+            becenev="TEXT",
             nem="TEXT",
             megjegyzes="TEXT DEFAULT ''")
 

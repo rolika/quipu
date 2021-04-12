@@ -33,11 +33,11 @@ class Telefon(Csomo):
     @property
     def szemely(self):
         return self._adatok.get("szemely")
-    
+
     @property
     def szervezet(self):
         return self._adatok.get("szervezet")
-    
+
     @szervezet.setter
     def szervezet(self, szervezet):
         self._adatok["szervezet"] = szervezet
@@ -52,4 +52,4 @@ class Telefon(Csomo):
 
     def listanezet(self):
         """Elérhetőseg megjelenítése kiválasztáshoz (Combobox)"""
-        return "{} ({})".format(self.telefonszam, self.megjegyzes)
+        return "{}{}".format(self.telefonszam, self._nullazo(self.megjegyzes))

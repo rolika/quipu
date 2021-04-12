@@ -16,7 +16,6 @@ class Jelleg(Csomo):
                 "megjegyzes": ""
             }
         self._tabla = "jelleg"
-        self._projekt_kon = None
     
     def __str__(self):
         return "{}{}".format(self.megnevezes, self._nullazo(self.megjegyzes))
@@ -47,14 +46,6 @@ class Jelleg(Csomo):
     @munkaresz.setter
     def munkaresz(self, munkaresz):
         self._adatok["munkaresz"] = munkaresz
-    
-    @property
-    def projekt_kon(self):
-        return self._projekt_kon
-    
-    @projekt_kon.setter
-    def projekt_kon(self, kon):
-        self._projekt_kon = kon
     
     def listanezet(self):
         """Egy adott azonosítójú jelleghez egy munkarész, így egy projekt tartozik."""

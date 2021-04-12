@@ -62,7 +62,7 @@ class ProjektlistaTest(unittest.TestCase):
                     munkaresz_id = munkaresz.ment(self._projekt_kon)
                     orszag = "D" if projekt.orszag.startswith("D") else "H"
                     helyseg = projekt.helyseg if projekt.helyseg else "Herend"
-                    cim = Cim(munkaresz=munkaresz_id, orszag=orszag, megye="", iranyitoszam="", helyseg=helyseg, utca="", hrsz="", postafiok="", honlap="", megjegyzes="")
+                    cim = Cim(munkaresz=munkaresz_id, orszag=orszag, megye="", iranyitoszam="", helyseg=helyseg, utca="", hrsz="", postafiok="", honlap="", megjegyzes="alapértelmezett")
                     cim.ment(self._projekt_kon)
                     jelleg = Jelleg(munkaresz=munkaresz_id, megnevezes="új", megjegyzes="")
                     jelleg_id = jelleg.ment(self._projekt_kon)
@@ -88,10 +88,10 @@ class ProjektlistaTest(unittest.TestCase):
                     if bool(szemely) and not szemely.meglevo(self._szemely_kon):
                         szemely_id = szemely.ment(self._szemely_kon)
                         telefonszam = projekt.telefonszam if projekt.telefonszam else "+36"
-                        telefon = Telefon(szemely=szemely_id, telefonszam=telefonszam, megjegyzes="")
+                        telefon = Telefon(szemely=szemely_id, telefonszam=telefonszam, megjegyzes="alapértelmezett")
                         telefon.ment(self._szemely_kon)
                         emailcim = projekt.emailcim if projekt.emailcim else ".hu"
-                        email = Email(szemely=szemely_id, emailcim=emailcim, megjegyzes="")
+                        email = Email(szemely=szemely_id, emailcim=emailcim, megjegyzes="alapértelmezett")
                         email.ment(self._szemely_kon)
 
                     # kontaktszemély
@@ -102,13 +102,13 @@ class ProjektlistaTest(unittest.TestCase):
 
                     # ajánlatkérés
                     if kontakt_id and jelleg_id:
-                        ajanlatkeres = Ajanlatkeres(jelleg=jelleg_id, ajanlatkero=kontakt_id, temafelelos=ROLI.azonosito)
+                        ajanlatkeres = Ajanlatkeres(jelleg=jelleg_id, ajanlatkero=kontakt_id, temafelelos=2)  # Roli kontakt id
                         if not ajanlatkeres.meglevo(self._ajanlat_kon):
                             ajanlatkeres_id = ajanlatkeres.ment(self._ajanlat_kon)
 
                     # ajánlat
                     if ajanlatkeres_id and projekt.ar and float(projekt.ar) > 0:  # ár nélkül nem írom be az ajánlatok közé
-                        esely = projekt.esely.replace("%", "")
+                        esely = projekt.esely.rstrip("%")
                         try:
                             esely = int(esely)
                         except ValueError:
@@ -118,3 +118,6 @@ class ProjektlistaTest(unittest.TestCase):
                             ajanlat.ment(self._ajanlat_kon)
 
         return True
+
+if __name__ == "__main__":
+    ProjektlistaTest()
