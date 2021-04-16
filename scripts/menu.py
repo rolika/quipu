@@ -2,6 +2,7 @@ from tkinter import *
 import szemelyurlap
 import szervezeturlap
 import projekturlap
+import ajanlatkeresurlap
 import ajanlaturlap
 
 
@@ -56,6 +57,8 @@ class ProjektMenu(Menu):
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
         self.add("cascade", label="projekt", menu=ProjektAlmenu(projekt_kon, mb))
+        self.add("cascade", label="ajánlatkérés",
+                 menu=AjanlatkeresAlmenu(ajanlat_kon, mb, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon))
         self.add("cascade", label="ajánlat",
                  menu=AjanlatAlmenu(ajanlat_kon, mb, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon))
 
@@ -296,6 +299,49 @@ class MunkareszAlmenu(Alapmenu):
 
     def modosit(self):
         projekturlap.MunkareszModositoUrlap(self.mb.winfo_toplevel(), self._projekt_kon)
+
+
+class AjanlatkeresAlmenu(Alapmenu):
+    def __init__(self, ajanlat_kon, mb, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon):
+        super().__init__(mb)
+        self._ajanlat_kon = ajanlat_kon
+        self._szemely_kon = szemely_kon
+        self._szervezet_kon = szervezet_kon
+        self._kontakt_kon = kontakt_kon
+        self._projekt_kon = projekt_kon
+
+    def uj(self):
+        self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
+        ajanlatkeresurlap.UjAjanlatkeresUrlap(self.mb.winfo_toplevel(),
+                                              self._ajanlat_kon,
+                                              self._szemely_kon,
+                                              self._szervezet_kon,
+                                              self._kontakt_kon,
+                                              self._projekt_kon)
+        self._szervezet_kon.detach("szemely", "kontakt")
+
+    def torol(self):
+        self._szervezet_kon.attach(szemely="szemely.db", kontakt="kontakt.db")
+        self._projekt_kon.attach(ajanlat="ajanlat.db")
+        try:
+            ajanlatkeresurlap.AjanlatkeresTorloUrlap(self.mb.winfo_toplevel(),
+                                                     self._ajanlat_kon,
+                                                     self._szemely_kon,
+                                                     self._szervezet_kon,
+                                                     self._kontakt_kon,
+                                                     self._projekt_kon)
+        except AttributeError:
+            print("Nincs törölhető árajánlatkérés.")
+        self._szervezet_kon.detach("szemely", "kontakt")
+        self._projekt_kon.detach("ajanlat")
+
+    def modosit(self):
+        ajanlatkeresurlap.AjanlatkeresModositoUrlap(self.mb.winfo_toplevel(),
+                                                    self._ajanlat_kon,
+                                                    self._szemely_kon,
+                                                    self._szervezet_kon,
+                                                    self._kontakt_kon,
+                                                    self._projekt_kon)
 
 
 class AjanlatAlmenu(Alapmenu):
