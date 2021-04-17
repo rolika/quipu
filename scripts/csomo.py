@@ -20,6 +20,9 @@ class Csomo:
     def __bool__(self):
         """A csomó elegendően meghatározott-e, azaz a felhasználó elég adatot adott meg vagy sem."""
         raise NotImplementedError
+    
+    def __eq__(self, masik):
+        return self.azonosito == masik.azonosito
 
     @property
     def azonosito(self):

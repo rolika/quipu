@@ -58,7 +58,24 @@ class AjanlatkeresUrlap(Frame):
                             megjegyzes=self._megjegyzes.get())
     
     def beallit(self, ajanlatkeres):
-        self._kontakt_valaszto.beallit()
+        ajanlatkero = self._kontakt_kon.select("kontakt", azonosito=ajanlatkeres.ajanlatkero).fetchone()
+        ajanlatkero = Kontakt(**ajanlatkero)
+        ajanlatkero.szemely_kon = self._szemely_kon
+        ajanlatkero.szervezet_kon = self._szervezet_kon
+        jelleg = self._projekt_kon.select("jelleg", azonosito=ajanlatkeres.jelleg).fetchone()
+        jelleg = Jelleg(**jelleg)
+        jelleg.projekt_kon = self._projekt_kon
+        temafelelos = self._kontakt_kon.select("kontakt", azonosito=ajanlatkeres.temafelelos).fetchone()
+        temafelelos = Kontakt(**temafelelos)
+        temafelelosok = self._kontaktszemelyek(2)
+
+        self._kontakt_valaszto.beallit((ajanlatkero, ))
+        self._jelleg_valaszto.beallit((jelleg, ))
+        self._temafelelos_valaszto.beallit(temafelelosok)
+        self._temafelelos_valaszto.valaszto.current(temafelelosok.index(temafelelos))
+        self._erkezett.set(ajanlatkeres.erkezett)
+        self._hatarido.set(ajanlatkeres.hatarido)
+        self._megjegyzes.set(ajanlatkeres.megjegyzes)
     
     def _kontaktszemelyek(self, szervezet_id=None):
         if szervezet_id:
@@ -188,6 +205,7 @@ class AjanlatkeresModositoUrlap(simpledialog.Dialog):
     def body(self, szulo):
         ajanlatkeres = Frame(self)
         self._ajanlatkeres_valaszto = Valaszto("ajánlatkérés", self._ajanlatkeresek(), ajanlatkeres)
+        self._ajanlatkeres_valaszto.set_callback(self._megjelenit)
         self._ajanlatkeres_valaszto.pack(ipadx=2, ipady=2)
         self._ajanlatkeres_urlap = AjanlatkeresUrlap(ajanlatkeres,
                                                      self._ajanlat_kon, 
@@ -197,7 +215,7 @@ class AjanlatkeresModositoUrlap(simpledialog.Dialog):
                                                      self._projekt_kon)
         self._ajanlatkeres_urlap.pack(padx=2, pady=2, ipadx=2, ipady=2, fill=BOTH, side=BOTTOM)
         ajanlatkeres.pack(ipadx=2, ipady=2, fill=BOTH, side=TOP)
-
+        self._megjelenit(1)
         return self._ajanlatkeres_valaszto.valaszto
 
     def validate(self):
@@ -205,10 +223,15 @@ class AjanlatkeresModositoUrlap(simpledialog.Dialog):
 
     def apply(self):
         ajanlatkeres = self._ajanlatkeres_valaszto.elem
+        modositas = self._ajanlatkeres_urlap.export()
+        ajanlatkeres.adatok = modositas
         if ajanlatkeres.ment(self._ajanlat_kon):
             print("Bejegyzés módosítva.")
         else:
             print("Nem sikerült módosítani!")
+    
+    def _megjelenit(self, event):
+        self._ajanlatkeres_urlap.beallit(self._ajanlatkeres_valaszto.elem)
 
     def _ajanlatkeresek(self):
         # azok az ajánlatkérések kellenek, melyekre még nem született ajánlat
