@@ -73,9 +73,25 @@ class AjanlatkeresUrlap(Frame):
         self._jelleg_valaszto.beallit((jelleg, ))
         self._temafelelos_valaszto.beallit(temafelelosok)
         self._temafelelos_valaszto.valaszto.current(temafelelosok.index(temafelelos))
-        self._erkezett.set(ajanlatkeres.erkezett)
-        self._hatarido.set(ajanlatkeres.hatarido)
+        try:
+            erkezett = date.isoformat(date.fromisoformat(ajanlatkeres.erkezett))
+            hatarido = date.isoformat(date.fromisoformat(ajanlatkeres.hatarido))
+        except ValueError:
+            erkezett = hatarido = ""
+        self._erkezett.set(erkezett)
+        self._hatarido.set(hatarido)
         self._megjegyzes.set(ajanlatkeres.megjegyzes)
+    
+    def datum_ervenyes(self):
+        """Dátumok formátumának és sorrendjének ellenőrzése"""
+        try:
+            erkezett = date.fromisoformat(self._erkezett.get())
+            hatarido = date.fromisoformat(self._hatarido.get())
+        except ValueError:
+            return False
+        if erkezett > hatarido:
+            return False
+        return True
     
     def _kontaktszemelyek(self, szervezet_id=None):
         if szervezet_id:
@@ -124,16 +140,8 @@ class UjAjanlatkeresUrlap(simpledialog.Dialog):
         if ajanlatkeres.meglevo(self._ajanlat_kon):
             messagebox.showwarning("Létező ajánlatkérés!", "Megjegyzésben különböztesd meg!", parent=self)
             return False
-        # dátumformátumok ellenőrzése
-        try:
-            erkezett = date.fromisoformat(ajanlatkeres.erkezett)
-            hatarido = date.fromisoformat(ajanlatkeres.hatarido)
-        except ValueError:
-            messagebox.showwarning("Dátumhiba!", "Legalább egy dátum formátuma nem jó!", parent=self)
-            return False
-        # dátumok egymásutániságának ellenőrzése
-        if erkezett > hatarido:
-            messagebox.showwarning("Dátumhiba!", "A dátumok nem jól követik egymást!", parent=self)
+        if not self._ajanlatkeres_urlap.datum_ervenyes():
+            messagebox.showwarning("Dátumhiba!", "Formátum vagy sorrend hibás!", parent=self)
             return False
         return True
 
@@ -219,6 +227,9 @@ class AjanlatkeresModositoUrlap(simpledialog.Dialog):
         return self._ajanlatkeres_valaszto.valaszto
 
     def validate(self):
+        if not self._ajanlatkeres_urlap.datum_ervenyes():
+            messagebox.showwarning("Dátumhiba!", "Formátum vagy sorrend hibás!", parent=self)
+            return False
         return True
 
     def apply(self):
