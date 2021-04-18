@@ -7,8 +7,12 @@ import ajanlaturlap
 
 
 class Fomenu(Frame):
-    def __init__(self, master=None, szemely_kon=None, szervezet_kon=None,
-                 kontakt_kon=None, projekt_kon=None, ajanlat_kon=None, **kw):
+    """A főmenüből történik az alkalmazás kezelése."""
+    def __init__(self, master=None, kon=None, **kw) -> Frame:
+        """A főmenü saját tkinter.Frame-ben kap helyet.
+        master: szülő widget
+        kon:    adazbázis konnektorok gyűjtősztálya
+        **kw:   tkinter.Frame tulajdonságát szabályozó értékek"""
         super().__init__(master=master, **kw)
 
         # főmenü
@@ -18,9 +22,9 @@ class Fomenu(Frame):
         raktarmb = Menubutton(self, text="Raktár", width=10)
 
         # menük
-        szemelymenu = SzemelyMenu(szemelymb, szemely_kon, szervezet_kon, kontakt_kon)
-        szervezetmenu = SzervezetMenu(szervezetmb, szervezet_kon, szemely_kon, kontakt_kon)
-        projektmenu = ProjektMenu(projektmb, projekt_kon, szemely_kon, szervezet_kon, kontakt_kon, ajanlat_kon)
+        szemelymenu = SzemelyMenu(szemelymb, kon)
+        szervezetmenu = SzervezetMenu(szervezetmb, kon)
+        projektmenu = ProjektMenu(projektmb, kon)
 
         szemelymb.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         szervezetmb.grid(row=0, column=1, sticky=W, ipadx=2, ipady=2)
@@ -31,40 +35,50 @@ class Fomenu(Frame):
 
 
 class SzemelyMenu(Menu):
-    def __init__(self, mb, szemely_kon, szervezet_kon, kontakt_kon):
+    """Személymenü létrehozása és megjelenítése. A tkinter.Menu osztályból származtatva."""
+    def __init__(self, mb, kon) -> Menu:
+        """Személymenü példányosítása.
+        mb:     tkinter.Menubutton példánya (amolyan szülő widget)
+        kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
-        self.add("cascade", label="személy", menu=SzemelyAlmenu(szemely_kon, mb))
-        self.add("cascade", label="telefon", menu=TelefonAlmenu(szemely_kon, mb))
-        self.add("cascade", label="email", menu=EmailAlmenu(szemely_kon, mb))
-        self.add("cascade", label="cím", menu=CimAlmenu(szemely_kon, mb))
-        self.add("cascade", label="kontaktszemély", menu=SzemelyKontaktAlmenu(szemely_kon, mb, szervezet_kon, kontakt_kon))
+        self.add("cascade", label="személy", menu=SzemelyAlmenu(mb, kon))
+        self.add("cascade", label="telefon", menu=TelefonAlmenu(mb, kon))
+        self.add("cascade", label="email", menu=EmailAlmenu(mb, kon))
+        self.add("cascade", label="cím", menu=CimAlmenu(mb, kon))
+        self.add("cascade", label="kontaktszemély", menu=SzemelyKontaktAlmenu(mb, kon))
 
 
 class SzervezetMenu(Menu):
-    def __init__(self, mb, szervezet_kon, szemely_kon, kontakt_kon):
+    """Szervezetmenü létrehozása és megjelenítése. A tkinter.Menu osztályból származtatva."""
+    def __init__(self, mb, kon) -> Menu:
+        """Szervezetmenü példányosítása.
+        mb:     tkinter.Menubutton példánya (amolyan szülő widget)
+        kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
-        self.add("cascade", label="szervezet", menu=SzervezetAlmenu(szervezet_kon, mb))
-        self.add("cascade", label="telefon", menu=SzervezetTelefonAlmenu(szervezet_kon, mb))
-        self.add("cascade", label="email", menu=SzervezetEmailAlmenu(szervezet_kon, mb))
-        self.add("cascade", label="cím", menu=SzervezetCimAlmenu(szervezet_kon, mb))
-        self.add("cascade", label="kontaktszemély", menu=SzervezetKontaktAlmenu(szervezet_kon, mb, szemely_kon, kontakt_kon))
+        self.add("cascade", label="szervezet", menu=SzervezetAlmenu(mb, kon))
+        self.add("cascade", label="telefon", menu=SzervezetTelefonAlmenu(mb, kon))
+        self.add("cascade", label="email", menu=SzervezetEmailAlmenu(mb, kon))
+        self.add("cascade", label="cím", menu=SzervezetCimAlmenu(mb, kon))
+        self.add("cascade", label="kontaktszemély", menu=SzervezetKontaktAlmenu(mb, kon))
 
 
 class ProjektMenu(Menu):
-    def __init__(self, mb, projekt_kon, szemely_kon, szervezet_kon, kontakt_kon, ajanlat_kon):
+    """Projektmenü létrehozása és megjelenítése. A tkinter.Menu osztályból származtatva."""
+    def __init__(self, mb, kon) -> Menu:
+        """Projektmenü példányosítása.
+        mb:     tkinter.Menubutton példánya (amolyan szülő widget)
+        kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
-        self.add("cascade", label="projekt", menu=ProjektAlmenu(projekt_kon, mb))
-        self.add("cascade", label="ajánlatkérés",
-                 menu=AjanlatkeresAlmenu(ajanlat_kon, mb, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon))
-        self.add("cascade", label="ajánlat",
-                 menu=AjanlatAlmenu(ajanlat_kon, mb, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon))
+        self.add("cascade", label="projekt", menu=ProjektAlmenu(kon, mb))
+        self.add("cascade", label="ajánlatkérés", menu=AjanlatkeresAlmenu(kon, mb))
+        self.add("cascade", label="ajánlat", menu=AjanlatAlmenu(kon, mb))
 
 
 class Alapmenu(Menu):
-    def __init__(self, mb):
+    def __init__(self, mb) -> Menu:
         super().__init__(mb, tearoff=0)
         self._mb = mb
 
@@ -87,33 +101,33 @@ class Alapmenu(Menu):
 
 
 class SzemelyAlmenu(Alapmenu):
-    def __init__(self, kon, mb):
+    def __init__(self, kon, mb) -> Menu:
         super().__init__(mb)
-        self._szemely_kon = kon
+        self._kon = kon
 
     def uj(self):
-        szemelyurlap.UjSzemelyUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
+        szemelyurlap.UjSzemelyUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
-        szemelyurlap.SzemelyTorloUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
+        szemelyurlap.SzemelyTorloUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def modosit(self):
-        szemelyurlap.SzemelyModositoUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
+        szemelyurlap.SzemelyModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 
 class TelefonAlmenu(Alapmenu):
     def __init__(self, kon, mb):
         super().__init__(mb)
-        self._szemely_kon = kon
+        self._kon = kon
 
     def uj(self):
-        szemelyurlap.UjTelefonUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
+        szemelyurlap.UjTelefonUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def torol(self):
-        szemelyurlap.TelefonTorloUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
+        szemelyurlap.TelefonTorloUrlap(self.mb.winfo_toplevel(), self._kon)
 
     def modosit(self):
-        szemelyurlap.TelefonModositoUrlap(self.mb.winfo_toplevel(), self._szemely_kon)
+        szemelyurlap.TelefonModositoUrlap(self.mb.winfo_toplevel(), self._kon)
 
 
 class EmailAlmenu(Alapmenu):

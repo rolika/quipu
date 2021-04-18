@@ -29,6 +29,7 @@ import tamer
 import menu
 from konstans import MAGANSZEMELY, WEVIK, VITYA, ROLI
 from kontakt import Kontakt
+from konnektor import Konnektor
 
 
 class Quipu(Frame):
@@ -39,27 +40,31 @@ class Quipu(Frame):
     A kipukon rögzített értékeket meglepő módon egy kettes számrendszeren alapuló, kövek helyzetével operáló, számoló
     eszközzel, egy ősi számítógéppel dolgozták fel. [Wikipedia nyomán]
     """
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, **kwargs) -> None:
+        """ A fő alkalmazás egy tkinter.Frame-ben indul. Ha a szülője None, mint az alapértelmezés, akkor saját
+        ablakot nyit magának.
+        master: szülő widget
+        kwargs: tkinter.Frame tulajdonságait szabályozó értékek"""
         super().__init__(master=master, **kwargs)
 
         # adatbázis konnektorok
-        szemely_kon = self._init_szemely_db()
-        szervezet_kon = self._init_szervezet_db()
-        kontakt_kon = self._init_kontakt_db()
-        projekt_kon = self._init_projekt_db()
-        ajanlat_kon = self._init_ajanlat_db()
+        kon = Konnektor(szemely=self._init_szemely_db(),
+                        szervezet=self._init_szervezet_db(),
+                        kontakt=self._init_kontakt_db(),
+                        projekt=self._init_projekt_db(),
+                        ajanlat=self._init_ajanlat_db())
 
         # alapadatok beírása
-        if not WEVIK.meglevo(szervezet_kon):  # feltételezem, hogy a céggel együtt a többet se írta még be
-            MAGANSZEMELY.ment(szervezet_kon)  # SQL PRIMARY KEY 1
-            wevik_id = WEVIK.ment(szervezet_kon)  # SQL PRIMARY KEY 2
-            vitya = VITYA.ment(szemely_kon)  # SQL PRIMARY KEY 1
-            roli = ROLI.ment(szemely_kon)  # SQL PRIMARY KEY 2
-            Kontakt(szemely=vitya, szervezet=wevik_id).ment(kontakt_kon)  # SQL PRIMARY KEY 1
-            Kontakt(szemely=roli, szervezet=wevik_id).ment(kontakt_kon)  # SQL PRIMARY KEY 2
+        if not WEVIK.meglevo(kon.szervezet):  # feltételezem, hogy a céggel együtt a többet se írta még be
+            MAGANSZEMELY.ment(kon.szervezet)  # SQL PRIMARY KEY 1
+            wevik_id = WEVIK.ment(kon.szervezet)  # SQL PRIMARY KEY 2
+            vitya = VITYA.ment(kon.szemely)  # SQL PRIMARY KEY 1
+            roli = ROLI.ment(kon.szemely)  # SQL PRIMARY KEY 2
+            Kontakt(szemely=vitya, szervezet=wevik_id).ment(kon.kontakt)  # SQL PRIMARY KEY 1
+            Kontakt(szemely=roli, szervezet=wevik_id).ment(kon.kontakt)  # SQL PRIMARY KEY 2
 
         # főmenü megjelenítése
-        menu.Fomenu(self, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon, ajanlat_kon)
+        menu.Fomenu(self, kon)
         self.grid()
 
         # és pörgés :-)
@@ -105,7 +110,7 @@ class Quipu(Frame):
                                 
         return szemely_kon
 
-    def _init_szervezet_db(self):
+    def _init_szervezet_db(self) -> tamer.Tamer:
         """Szervezet adatbázis inicializálása"""
         szervezet_kon = tamer.Tamer("szervezet.db")
 
@@ -143,7 +148,7 @@ class Quipu(Frame):
 
         return szervezet_kon
 
-    def _init_kontakt_db(self):
+    def _init_kontakt_db(self) -> tamer.Tamer:
         """Kontaktszemélyek adatbázisának inicializálása"""
         kontakt_kon = tamer.Tamer("kontakt.db")
 
@@ -162,7 +167,7 @@ class Quipu(Frame):
 
         return kontakt_kon
 
-    def _init_projekt_db(self):
+    def _init_projekt_db(self) -> tamer.Tamer:
         """Projekt adatbázis inicializálása"""
         projekt_kon = tamer.Tamer("projekt.db")
 
@@ -203,7 +208,7 @@ class Quipu(Frame):
 
         return projekt_kon
 
-    def _init_ajanlat_db(self):
+    def _init_ajanlat_db(self) -> tamer.Tamer:
         """Ajánlat adatbázis inicializálása"""
         ajanlat_kon = tamer.Tamer("ajanlat.db")
 
