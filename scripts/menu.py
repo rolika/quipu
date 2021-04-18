@@ -132,7 +132,7 @@ class SzemelyAlmenu(Alapmenu):
 
 class SzemelyTelefonAlmenu(Alapmenu):
     """Személyek telefonos elérhetőségeit kezelő alapmenü."""
-    def __init__(self, kon, mb) -> Menu:
+    def __init__(self, mb, kon) -> Menu:
         """Személyek telefonkezelő menüpontjainak élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
@@ -154,7 +154,7 @@ class SzemelyTelefonAlmenu(Alapmenu):
 
 class SzemelyEmailAlmenu(Alapmenu):
     """Személyek email elérhetőségeit kezelő alapmenü."""
-    def __init__(self, kon, mb) -> Menu:
+    def __init__(self, mb, kon) -> Menu:
         """Személyek emailkezelő menüpontjainak élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
@@ -176,7 +176,7 @@ class SzemelyEmailAlmenu(Alapmenu):
 
 class SzemelyCimAlmenu(Alapmenu):
     """Személyek cím elérhetőségeit kezelő alapmenü."""
-    def __init__(self, kon, mb) -> Menu:
+    def __init__(self, mb, kon) -> Menu:
         """Személyek címkezelő menüpontjainak élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
@@ -268,6 +268,8 @@ class SzervezetCimAlmenu(Alapmenu):
         """Szervezetek címkezelő menüpontjainak élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
+        super().__init__(mb)
+        self._kon = kon
 
     def uj(self) -> None:
         """Űrlap megjelenítése szervezet új cím elérhetőségének létrehozására."""
