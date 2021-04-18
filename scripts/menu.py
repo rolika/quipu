@@ -80,20 +80,16 @@ class ProjektMenu(Menu):
 
 
 class Alapmenu(Menu):
-    def __init__(self, mb) -> Menu:
+    def __init__(self, mb, kon=None) -> Menu:
         """Minden menüpont alatt elvégezhető parancsok.
         mb: tkinter.Menubutton példánya (amolyan szülő widget)"""
         super().__init__(mb, tearoff=0)
         self._mb = mb
+        self._kon = kon
 
         self.add("command", label="új", command=self.uj)
         self.add("command", label="törlés", command=self.torol)
         self.add("command", label="módosítás", command=self.modosit)
-
-    @property
-    def mb(self):
-        """A tkinter.Menubutton példányra szükség van a konkrét megvalósításban."""
-        return self._mb
 
     def uj(self) -> None:
         """Új csomó létrehozása."""
@@ -114,20 +110,19 @@ class SzemelyAlmenu(Alapmenu):
         """Személykezelő menüpontok élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
 
     def uj(self) -> None:
         """Űrlap megjelenítése új személy létrehozására."""
-        szemelyurlap.UjSzemelyUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.UjSzemelyUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def torol(self) -> None:
         """Űrlap megjelenítése meglévő személy törlésére."""
-        szemelyurlap.SzemelyTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.SzemelyTorloUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def modosit(self) -> None:
         """Űrlap megjelenítése meglévő személy módosítására."""
-        szemelyurlap.SzemelyModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.SzemelyModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 class SzemelyTelefonAlmenu(Alapmenu):
@@ -136,20 +131,19 @@ class SzemelyTelefonAlmenu(Alapmenu):
         """Személyek telefonkezelő menüpontjainak élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
 
     def uj(self) -> None:
         """Űrlap megjelenítése személy új telefonos elérhetőségének létrehozására."""
-        szemelyurlap.UjTelefonUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.UjTelefonUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def torol(self) -> None:
         """Űrlap megjelenítése személy meglévő telefonos elérhetőségének törlésére."""
-        szemelyurlap.TelefonTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.TelefonTorloUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def modosit(self) -> None:
         """Űrlap megjelenítése személy meglévő telefonos elérhetőségének módosítására."""
-        szemelyurlap.TelefonModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.TelefonModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 class SzemelyEmailAlmenu(Alapmenu):
@@ -158,20 +152,19 @@ class SzemelyEmailAlmenu(Alapmenu):
         """Személyek emailkezelő menüpontjainak élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
 
     def uj(self) -> None:
         """Űrlap megjelenítése személy új email elérhetőségének létrehozására."""
-        szemelyurlap.UjEmailUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.UjEmailUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def torol(self) -> None:
         """Űrlap megjelenítése személy meglévő email elérhetőségének törlésére."""
-        szemelyurlap.EmailTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.EmailTorloUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def modosit(self) -> None:
         """Űrlap megjelenítése személy meglévő email elérhetőségének módosítására."""
-        szemelyurlap.EmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.EmailModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 class SzemelyCimAlmenu(Alapmenu):
@@ -180,20 +173,19 @@ class SzemelyCimAlmenu(Alapmenu):
         """Személyek címkezelő menüpontjainak élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
 
     def uj(self) -> None:
         """Űrlap megjelenítése személy új cím elérhetőségének létrehozására."""
-        szemelyurlap.UjCimUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.UjCimUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def torol(self) -> None:
         """Űrlap megjelenítése személy meglévő cím elérhetőségének törlésére."""
-        szemelyurlap.CimTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.CimTorloUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def modosit(self) -> None:
         """Űrlap megjelenítése személy meglévő cím elérhetőségének módosítására."""
-        szemelyurlap.CimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.CimModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 class SzervezetAlmenu(Alapmenu):
@@ -202,20 +194,19 @@ class SzervezetAlmenu(Alapmenu):
         """Szervezetkezelő menüpontok élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
 
     def uj(self) -> None:
         """Űrlap megjelenítése új szervezet létrehozására."""
-        szervezeturlap.UjSzervezetUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.UjSzervezetUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def torol(self) -> None:
         """Űrlap megjelenítése meglévő szervezet törlésére."""
-        szervezeturlap.SzervezetTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.SzervezetTorloUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def modosit(self) -> None:
         """Űrlap megjelenítése meglévő szervezet módosítására."""
-        szervezeturlap.SzervezetModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.SzervezetModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 class SzervezetTelefonAlmenu(Alapmenu):
@@ -224,20 +215,19 @@ class SzervezetTelefonAlmenu(Alapmenu):
         """Szervezetek telefonkezelő menüpontjainak élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
 
     def uj(self) -> None:
         """Űrlap megjelenítése szervezet új telefonos elérhetőségének létrehozására."""
-        szervezeturlap.UjTelefonUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.UjTelefonUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def torol(self) -> None:
         """Űrlap megjelenítése szervezet meglévő telefonos elérhetőségének törlésére."""
-        szervezeturlap.TelefonTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.TelefonTorloUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def modosit(self) -> None:
         """Űrlap megjelenítése szervezet meglévő telefonos elérhetőségének módosítására."""
-        szervezeturlap.TelefonModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.TelefonModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 class SzervezetEmailAlmenu(Alapmenu):
@@ -246,20 +236,19 @@ class SzervezetEmailAlmenu(Alapmenu):
         """Szervezetek emailkezelő menüpontjainak élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
 
     def uj(self) -> None:
         """Űrlap megjelenítése szervezet új email elérhetőségének létrehozására."""
-        szervezeturlap.UjEmailUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.UjEmailUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def torol(self) -> None:
         """Űrlap megjelenítése szervezet meglévő email elérhetőségének törlésére."""
-        szervezeturlap.EmailTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.EmailTorloUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def modosit(self) -> None:
         """Űrlap megjelenítése szervezet meglévő email elérhetőségének módosítására."""
-        szervezeturlap.EmailModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.EmailModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 class SzervezetCimAlmenu(Alapmenu):
@@ -268,20 +257,19 @@ class SzervezetCimAlmenu(Alapmenu):
         """Szervezetek címkezelő menüpontjainak élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
 
     def uj(self) -> None:
         """Űrlap megjelenítése szervezet új cím elérhetőségének létrehozására."""
-        szervezeturlap.UjCimUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.UjCimUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def torol(self) -> None:
         """Űrlap megjelenítése szervezet meglévő cím elérhetőségének törlésére."""
-        szervezeturlap.CimTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.CimTorloUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def modosit(self) -> None:
         """Űrlap megjelenítése szervezet meglévő cím elérhetőségének módosítására."""
-        szervezeturlap.CimModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.CimModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 class SzervezetKontaktAlmenu(Alapmenu):
@@ -290,25 +278,24 @@ class SzervezetKontaktAlmenu(Alapmenu):
         """Szervezetek kontaktszemély-kezelő menüpontjainak élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
 
     def uj(self) -> None:
         """Űrlap megjelenítése szervezethez új kontaktszemély hozzárendelésére."""
         self._kon.szervezet.attach(szemely="szemely.db", kontakt="kontakt.db")
-        szervezeturlap.UjKontaktUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.UjKontaktUrlap(self._mb.winfo_toplevel(), self._kon)
         self._kon.szervezet.detach("szemely", "kontakt")
 
     def torol(self) -> None:
         """Űrlap megjelenítése szervezet meglévő kontaktszemélyének törlésére."""
         self._kon.szervezet.attach(szemely="szemely.db", kontakt="kontakt.db")
-        szervezeturlap.KontaktTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.KontaktTorloUrlap(self._mb.winfo_toplevel(), self._kon)
         self._kon.szervezet.detach("szemely", "kontakt")
 
     def modosit(self) -> None:
         """Űrlap megjelenítése szervezethez meglévő kontaktszemélyének módosítására."""
         self._kon.szervezet.attach(szemely="szemely.db", kontakt="kontakt.db")
-        szervezeturlap.KontaktModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szervezeturlap.KontaktModositoUrlap(self._mb.winfo_toplevel(), self._kon)
         self._kon.szervezet.detach("szemely", "kontakt")
 
 
@@ -318,25 +305,24 @@ class SzemelyKontaktAlmenu(Alapmenu):
         """Kontaktszemélyhez rendelt szervezetek kezelő menüpontjainak élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
 
     def uj(self) -> None:
         """Űrlap megjelenítése kontaktszemélyhez új szervezet hozzárendelésére."""
         self._kon.szemely.attach(szervezet="szervezet.db", kontakt="kontakt.db")
-        szemelyurlap.UjKontaktUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.UjKontaktUrlap(self._mb.winfo_toplevel(), self._kon)
         self._kon.szemely.detach("szervezet", "kontakt")
 
     def torol(self) -> None:
         """Űrlap megjelenítése kontaktszemélyhez rendelt szervezet törlésére."""
         self._kon.szemely.attach(szervezet="szervezet.db", kontakt="kontakt.db")
-        szemelyurlap.KontaktTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.KontaktTorloUrlap(self._mb.winfo_toplevel(), self._kon)
         self._kon.szemely.detach("szervezet", "kontakt")
 
     def modosit(self) -> None:
         """Űrlap megjelenítése kontaktszemélyhez rendelt szervezet módosítására."""
         self._kon.szemely.attach(szervezet="szervezet.db", kontakt="kontakt.db")
-        szemelyurlap.KontaktModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        szemelyurlap.KontaktModositoUrlap(self._mb.winfo_toplevel(), self._kon)
         self._kon.szemely.detach("szervezet", "kontakt")
 
 
@@ -346,21 +332,20 @@ class ProjektAlmenu(Alapmenu):
         """Projektkezelő menüpontok élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
         self.add("cascade", label="munkarész", menu=MunkareszAlmenu(mb, self._kon))
 
     def uj(self) -> None:
         """Űrlap megjelenítése új projekt létrehozására."""
-        projekturlap.UjProjektUrlap(self.mb.winfo_toplevel(), self._kon)
+        projekturlap.UjProjektUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def torol(self) -> None:
         """Űrlap megjelenítése meglévő projekt törlésére."""
-        projekturlap.ProjektTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        projekturlap.ProjektTorloUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def modosit(self) -> None:
         """Űrlap megjelenítése meglévő projekt módosítására."""
-        projekturlap.ProjektModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        projekturlap.ProjektModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 class MunkareszAlmenu(Alapmenu):
@@ -369,20 +354,19 @@ class MunkareszAlmenu(Alapmenu):
         """Munkarész-kezelő menüpontok élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
 
     def uj(self) -> None:
         """Űrlap megjelenítése új munkarész létrehozására."""
-        projekturlap.UjMunkareszUrlap(self.mb.winfo_toplevel(), self._kon)
+        projekturlap.UjMunkareszUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def torol(self) -> None:
         """Űrlap megjelenítése meglévő munkarész törlésére."""
-        projekturlap.MunkareszTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        projekturlap.MunkareszTorloUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def modosit(self) -> None:
         """Űrlap megjelenítése meglévő munkarész módosítására."""
-        projekturlap.MunkareszModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        projekturlap.MunkareszModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 class AjanlatkeresAlmenu(Alapmenu):
@@ -391,13 +375,12 @@ class AjanlatkeresAlmenu(Alapmenu):
         """Ajánlatkérés-kezelő menüpontok élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
 
     def uj(self) -> None:
         """Űrlap megjelenítése új ajánlatkérés létrehozására."""
         self._kon.szervezet.attach(szemely="szemely.db", kontakt="kontakt.db")
-        ajanlatkeresurlap.UjAjanlatkeresUrlap(self.mb.winfo_toplevel(), self._kon)
+        ajanlatkeresurlap.UjAjanlatkeresUrlap(self._mb.winfo_toplevel(), self._kon)
         self._kon.szervezet.detach("szemely", "kontakt")
 
     def torol(self) -> None:
@@ -406,7 +389,7 @@ class AjanlatkeresAlmenu(Alapmenu):
         self._kon.projekt.attach(ajanlat="ajanlat.db")
         # ha nincs megjeleníthető ajánlatkérés, a hibát itt elkapom
         try:
-            ajanlatkeresurlap.AjanlatkeresTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+            ajanlatkeresurlap.AjanlatkeresTorloUrlap(self._mb.winfo_toplevel(), self._kon)
         except AttributeError:
             print("Nincs törölhető árajánlatkérés.")
         self._kon.szervezet.detach("szemely", "kontakt")
@@ -414,7 +397,7 @@ class AjanlatkeresAlmenu(Alapmenu):
 
     def modosit(self) -> None:
         """Űrlap megjelenítése meglévő ajánlatkérés módosítására."""
-        ajanlatkeresurlap.AjanlatkeresModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        ajanlatkeresurlap.AjanlatkeresModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 class AjanlatAlmenu(Alapmenu):
@@ -423,20 +406,19 @@ class AjanlatAlmenu(Alapmenu):
         """Ajánlatkezelő menüpontok élesítése.        
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
-        super().__init__(mb)
-        self._kon = kon
+        super().__init__(mb, kon)
 
     def uj(self) -> None:
         """Űrlap megjelenítése új ajánlat létrehozására."""
-        ajanlaturlap.UjAjanlatUrlap(self.mb.winfo_toplevel(), self._kon)
+        ajanlaturlap.UjAjanlatUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def torol(self) -> None:
         """Űrlap megjelenítése meglévő ajánlat törlésére."""
-        ajanlaturlap.AjanlatTorloUrlap(self.mb.winfo_toplevel(), self._kon)
+        ajanlaturlap.AjanlatTorloUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def modosit(self) -> None:
         """Űrlap megjelenítése meglévő ajánlat módosítására."""
-        ajanlaturlap.AjanlatModositoUrlap(self.mb.winfo_toplevel(), self._kon)
+        ajanlaturlap.AjanlatModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 if __name__ == "__main__":
