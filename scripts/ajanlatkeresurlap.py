@@ -10,12 +10,8 @@ from ajanlatkeres import Ajanlatkeres
 
 
 class AjanlatkeresUrlap(Frame):
-    def __init__(self, szulo, ajanlat_kon, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon):
-        self._szemely_kon = szemely_kon  # super() előtt kell legyenek
-        self._szervezet_kon = szervezet_kon
-        self._kontakt_kon = kontakt_kon
-        self._projekt_kon = projekt_kon
-        self._ajanlat_kon = ajanlat_kon
+    def __init__(self, szulo, kon):
+        self._kon = kon
         super().__init__(szulo)
 
         self._erkezett = StringVar()
@@ -58,14 +54,14 @@ class AjanlatkeresUrlap(Frame):
                             megjegyzes=self._megjegyzes.get())
     
     def beallit(self, ajanlatkeres):
-        ajanlatkero = self._kontakt_kon.select("kontakt", azonosito=ajanlatkeres.ajanlatkero).fetchone()
+        ajanlatkero = self._kon.kontakt.select("kontakt", azonosito=ajanlatkeres.ajanlatkero).fetchone()
         ajanlatkero = Kontakt(**ajanlatkero)
-        ajanlatkero.szemely_kon = self._szemely_kon
-        ajanlatkero.szervezet_kon = self._szervezet_kon
-        jelleg = self._projekt_kon.select("jelleg", azonosito=ajanlatkeres.jelleg).fetchone()
+        ajanlatkero.szemely_kon = self._kon.szemely
+        ajanlatkero.szervezet_kon = self._kon.szervezet
+        jelleg = self._kon.projekt.select("jelleg", azonosito=ajanlatkeres.jelleg).fetchone()
         jelleg = Jelleg(**jelleg)
-        jelleg.projekt_kon = self._projekt_kon
-        temafelelos = self._kontakt_kon.select("kontakt", azonosito=ajanlatkeres.temafelelos).fetchone()
+        jelleg.projekt_kon = self._kon.projekt
+        temafelelos = self._kon.kontakt.select("kontakt", azonosito=ajanlatkeres.temafelelos).fetchone()
         temafelelos = Kontakt(**temafelelos)
         temafelelosok = self._kontaktszemelyek(2)
 
@@ -95,49 +91,40 @@ class AjanlatkeresUrlap(Frame):
     
     def _kontaktszemelyek(self, szervezet_id=None):
         if szervezet_id:
-            kontaktok = self._kontakt_kon.select("kontakt", szervezet=szervezet_id)
+            kontaktok = self._kon.kontakt.select("kontakt", szervezet=szervezet_id)
         else:
-            kontaktok = self._kontakt_kon.select("kontakt")
+            kontaktok = self._kon.kontakt.select("kontakt")
         return sorted(map(self._kontaktszemely, kontaktok), key=repr)
     
     def _kontaktszemely(self, kontakt):
         kontaktszemely = Kontakt(**kontakt)
-        kontaktszemely.szemely_kon = self._szemely_kon
-        kontaktszemely.szervezet_kon = self._szervezet_kon
+        kontaktszemely.szemely_kon = self._kon.szemely
+        kontaktszemely.szervezet_kon = self._kon.szervezet
         return kontaktszemely
     
     def _jellegek(self):
-        jellegek = self._projekt_kon.select("jelleg")
+        jellegek = self._kon.projekt.select("jelleg")
         return sorted(map(self._jelleg, jellegek), key=repr)
     
     def _jelleg(self, jelleg):
         jelleg = Jelleg(**jelleg)
-        jelleg.projekt_kon = self._projekt_kon
+        jelleg.projekt_kon = self._kon.projekt
         return jelleg
 
 
 class UjAjanlatkeresUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, ajanlat_kon, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon):
-        self._szemely_kon = szemely_kon  # super() előtt kell legyenek
-        self._szervezet_kon = szervezet_kon
-        self._kontakt_kon = kontakt_kon
-        self._projekt_kon = projekt_kon
-        self._ajanlat_kon = ajanlat_kon
+    def __init__(self, szulo, kon):
+        self._kon = kon
         super().__init__(szulo, title="Új ajánlatkérés rögzítése")
 
     def body(self, szulo):
-        self._ajanlatkeres_urlap = AjanlatkeresUrlap(self,
-                                                     self._ajanlat_kon, 
-                                                     self._szemely_kon, 
-                                                     self._szervezet_kon, 
-                                                     self._kontakt_kon, 
-                                                     self._projekt_kon)
+        self._ajanlatkeres_urlap = AjanlatkeresUrlap(self, self._kon)
         self._ajanlatkeres_urlap.pack(padx=2, pady=2, ipadx=2, ipady=2, fill=BOTH)
         return self._ajanlatkeres_urlap.fokusz
 
     def validate(self):
         ajanlatkeres = self._ajanlatkeres_urlap.export()
-        if ajanlatkeres.meglevo(self._ajanlat_kon):
+        if ajanlatkeres.meglevo(self._kon.ajanlat):
             messagebox.showwarning("Létező ajánlatkérés!", "Megjegyzésben különböztesd meg!", parent=self)
             return False
         if not self._ajanlatkeres_urlap.datum_ervenyes():
@@ -147,7 +134,7 @@ class UjAjanlatkeresUrlap(simpledialog.Dialog):
 
     def apply(self):        
         ajanlatkeres = self._ajanlatkeres_urlap.export()
-        if ajanlatkeres.ment(self._ajanlat_kon):
+        if ajanlatkeres.ment(self._kon.ajanlat):
             print("Árajánlatkérés mentve.")
         else:
             print("Nem sikerült elmenteni!")
@@ -155,12 +142,8 @@ class UjAjanlatkeresUrlap(simpledialog.Dialog):
 
 class AjanlatkeresTorloUrlap(simpledialog.Dialog):
     """Csak ajánlatkérést lehet törölni, és csak olyat, amire nem született még ajánlat."""
-    def __init__(self, szulo, ajanlat_kon, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon):
-        self._szemely_kon = szemely_kon  # super() előtt kell legyenek
-        self._szervezet_kon = szervezet_kon
-        self._kontakt_kon = kontakt_kon
-        self._projekt_kon = projekt_kon
-        self._ajanlat_kon = ajanlat_kon
+    def __init__(self, szulo, kon):
+        self._kon =_kon
         super().__init__(szulo, title="Ajánlatkérés törlése")
 
     def body(self, szulo):
@@ -173,14 +156,14 @@ class AjanlatkeresTorloUrlap(simpledialog.Dialog):
 
     def apply(self):
         ajanlatkeres = self._ajanlatkeres_valaszto.elem
-        if ajanlatkeres.torol(self._ajanlat_kon):
+        if ajanlatkeres.torol(self._kon.ajanlat):
             print("Bejegyzés törölve.")
         else:
             print("Nem sikerült törölni!")
 
     def _ajanlatkeresek(self):
         # azok az ajánlatkérések kellenek, melyekre még nem született ajánlat
-        ajanlatkeresek = self._ajanlat_kon.execute("""
+        ajanlatkeresek = self._kon.ajanlat.execute("""
             SELECT *
             FROM ajanlatkeres
             WHERE azonosito NOT IN (
@@ -193,21 +176,17 @@ class AjanlatkeresTorloUrlap(simpledialog.Dialog):
     
     def _kon_setter(self, ajanlatkeres):
         ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
-        ajanlatkeres.kontakt_kon = self._kontakt_kon
-        ajanlatkeres.projekt_kon = self._projekt_kon
-        ajanlatkeres.szemely_kon = self._szemely_kon
-        ajanlatkeres.szervezet_kon = self._szervezet_kon
+        ajanlatkeres.kontakt_kon = self._kon.kontakt
+        ajanlatkeres.projekt_kon = self._kon.projekt
+        ajanlatkeres.szemely_kon = self._kon.szemely
+        ajanlatkeres.szervezet_kon = self._kon.szervezet
         return ajanlatkeres
 
 
 class AjanlatkeresModositoUrlap(simpledialog.Dialog):
     """Csak olyan ajánlatkérést lehet módosítani, amire nem született még ajánlat."""
-    def __init__(self, szulo, ajanlat_kon, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon):
-        self._szemely_kon = szemely_kon  # super() előtt kell legyenek
-        self._szervezet_kon = szervezet_kon
-        self._kontakt_kon = kontakt_kon
-        self._projekt_kon = projekt_kon
-        self._ajanlat_kon = ajanlat_kon
+    def __init__(self, szulo, kon):
+        self._kon = kon
         super().__init__(szulo, title="Ajánlatkérés módosítása")
 
     def body(self, szulo):
@@ -215,12 +194,7 @@ class AjanlatkeresModositoUrlap(simpledialog.Dialog):
         self._ajanlatkeres_valaszto = Valaszto("ajánlatkérés", self._ajanlatkeresek(), ajanlatkeres)
         self._ajanlatkeres_valaszto.set_callback(self._megjelenit)
         self._ajanlatkeres_valaszto.pack(ipadx=2, ipady=2)
-        self._ajanlatkeres_urlap = AjanlatkeresUrlap(ajanlatkeres,
-                                                     self._ajanlat_kon, 
-                                                     self._szemely_kon, 
-                                                     self._szervezet_kon, 
-                                                     self._kontakt_kon, 
-                                                     self._projekt_kon)
+        self._ajanlatkeres_urlap = AjanlatkeresUrlap(ajanlatkeres, self._kon)
         self._ajanlatkeres_urlap.pack(padx=2, pady=2, ipadx=2, ipady=2, fill=BOTH, side=BOTTOM)
         ajanlatkeres.pack(ipadx=2, ipady=2, fill=BOTH, side=TOP)
         self._megjelenit(1)
@@ -236,7 +210,7 @@ class AjanlatkeresModositoUrlap(simpledialog.Dialog):
         ajanlatkeres = self._ajanlatkeres_valaszto.elem
         modositas = self._ajanlatkeres_urlap.export()
         ajanlatkeres.adatok = modositas
-        if ajanlatkeres.ment(self._ajanlat_kon):
+        if ajanlatkeres.ment(self._kon.ajanlat):
             print("Bejegyzés módosítva.")
         else:
             print("Nem sikerült módosítani!")
@@ -246,7 +220,7 @@ class AjanlatkeresModositoUrlap(simpledialog.Dialog):
 
     def _ajanlatkeresek(self):
         # azok az ajánlatkérések kellenek, melyekre még nem született ajánlat
-        ajanlatkeresek = self._ajanlat_kon.execute("""
+        ajanlatkeresek = self._kon.ajanlat.execute("""
             SELECT *
             FROM ajanlatkeres
             WHERE azonosito NOT IN (
@@ -259,8 +233,8 @@ class AjanlatkeresModositoUrlap(simpledialog.Dialog):
     
     def _kon_setter(self, ajanlatkeres):
         ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
-        ajanlatkeres.kontakt_kon = self._kontakt_kon
-        ajanlatkeres.projekt_kon = self._projekt_kon
-        ajanlatkeres.szemely_kon = self._szemely_kon
-        ajanlatkeres.szervezet_kon = self._szervezet_kon
+        ajanlatkeres.kontakt_kon = self._kon.kontakt
+        ajanlatkeres.projekt_kon = self._kon.projekt
+        ajanlatkeres.szemely_kon = self._kon.szemely
+        ajanlatkeres.szervezet_kon = self._kon.szervezet
         return ajanlatkeres
