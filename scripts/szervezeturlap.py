@@ -651,11 +651,11 @@ class KontaktModositoUrlap(simpledialog.Dialog):
 
     def body(self, szulo):
         self._szervezetvalaszto = Valaszto("szervezet", self._szervezetnevsor(), self)
-        self._szervezetvalaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenit)
+        self._szervezetvalaszto.set_callback(self._megjelenit)
         self._szervezetvalaszto.pack(ipadx=2, ipady=2)
 
         self._szemelyvalaszto = Valaszto("személy", self._szemelynevsor(), self)
-        self._szemelyvalaszto.valaszto.bind("<<ComboboxSelected>>", self._reszletek)
+        self._szemelyvalaszto.set_callback(self._reszletek)
         self._szemelyvalaszto.pack(ipadx=2, ipady=2)
 
         self._modszemelyvalaszto = Valaszto("személy", self._modszemelynevsor(), self)

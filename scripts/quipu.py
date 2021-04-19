@@ -58,10 +58,14 @@ class Quipu(Frame):
         if not WEVIK.meglevo(kon.szervezet):  # feltételezem, hogy a céggel együtt a többet se írta még be
             MAGANSZEMELY.ment(kon.szervezet)  # SQL PRIMARY KEY 1
             wevik_id = WEVIK.ment(kon.szervezet)  # SQL PRIMARY KEY 2
-            vitya = VITYA.ment(kon.szemely)  # SQL PRIMARY KEY 1
-            roli = ROLI.ment(kon.szemely)  # SQL PRIMARY KEY 2
-            Kontakt(szemely=vitya, szervezet=wevik_id).ment(kon.kontakt)  # SQL PRIMARY KEY 1
-            Kontakt(szemely=roli, szervezet=wevik_id).ment(kon.kontakt)  # SQL PRIMARY KEY 2
+            vitya_id = VITYA.ment(kon.szemely)  # SQL PRIMARY KEY 1
+            roli_id = ROLI.ment(kon.szemely)  # SQL PRIMARY KEY 2
+            Kontakt(szemely=vitya_id, szervezet=wevik_id).ment(kon.kontakt)  # SQL PRIMARY KEY 1
+            Kontakt(szemely=roli_id, szervezet=wevik_id).ment(kon.kontakt)  # SQL PRIMARY KEY 2
+        MAGANSZEMELY.azonosito = 1
+        WEVIK.azonosito = 2
+        VITYA.azonosito = 1  # a fenti mentési sorrend miatt kontaktszemély-azonosítóként is használandó
+        ROLI.azonosito = 2  # ez is
 
         # főmenü megjelenítése
         menu.Fomenu(self, kon)
