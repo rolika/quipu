@@ -40,8 +40,8 @@ class Quipu(Frame):
     A kipukon rögzített értékeket meglepő módon egy kettes számrendszeren alapuló, kövek helyzetével operáló, számoló
     eszközzel, egy ősi számítógéppel dolgozták fel. [Wikipedia nyomán]
     """
-    def __init__(self, master=None, **kwargs) -> None:
-        """ A fő alkalmazás egy tkinter.Frame-ben indul. Ha a szülője None, mint az alapértelmezés, akkor saját
+    def __init__(self, master=None, **kwargs) -> Frame:
+        """A fő alkalmazás egy tkinter.Frame-ben indul. Ha a szülője None, mint az alapértelmezés, akkor saját
         ablakot nyit magának.
         master: szülő widget
         kwargs: tkinter.Frame tulajdonságait szabályozó értékek"""
@@ -70,7 +70,7 @@ class Quipu(Frame):
         # és pörgés :-)
         self.mainloop()
 
-    def _init_szemely_db(self):
+    def _init_szemely_db(self) -> tamer.Tamer:
         """ Személy adatbázis inicializálása  """
         szemely_kon = tamer.Tamer("szemely.db")
 

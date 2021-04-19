@@ -1,6 +1,12 @@
+"""
+A Quipu személyekkel kapcsolatos űrlapjait tartalmazza.
+"""
+
+
 from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
+from tkinter.ttk import Combobox
 from urlap import TelefonszamUrlap, EmailcimUrlap, CimUrlap, Valaszto
 from szemely import Szemely
 from telefon import Telefon
@@ -12,7 +18,12 @@ from konstans import VITYA, ROLI
 
 
 class SzemelyUrlap(Frame):
-    def __init__(self, master=None, **kw):
+    """Űrlap személyi adatokhoz."""
+    def __init__(self, master=None, **kw) -> Frame:
+        """Az űrlap egy tkinter.Frame-ben helyezkedik el, mert a Frame-en belül lehet .grid-elni a widget-eket,
+        viszont a simpledialog.Dialog-on belül csak .pack-olni lehet.
+        master: szülő widget
+        kwargs: tkinter.Frame tulajdonságait szabályozó értékek"""
         super().__init__(master=master, **kw)
 
         self._elotag = StringVar()
@@ -42,17 +53,21 @@ class SzemelyUrlap(Frame):
             .grid(row=4, column=1, columnspan=2, sticky=W, padx=2, pady=2)
 
     @property
-    def fokusz(self):
+    def fokusz(self) -> Entry:
+        """Az űrlap alapértelmezett widget-je."""
         return self._fokusz
 
-    def beallit(self, szemely):
+    def beallit(self, szemely) -> None:
+        """Adatokkal tölti fel az űrlapot.
+        szemely:    szemely.Szemely csomó"""
         self._elotag.set(szemely.elotag)
         self._vezeteknev.set(szemely.vezeteknev)
         self._keresztnev.set(szemely.keresztnev)
         self._nem.set(szemely.nem)
         self._megjegyzes.set(szemely.megjegyzes)
 
-    def export(self):
+    def export(self) -> Szemely:
+        """Beolvassa az űrlap kitöltött mezőit és Szemely csomót ad vissza belőlük."""
         return Szemely(elotag=self._elotag.get(),
                       vezeteknev=self._vezeteknev.get(),
                       keresztnev=self._keresztnev.get(),
@@ -61,18 +76,22 @@ class SzemelyUrlap(Frame):
 
 
 class UjSzemelyUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
+    """Új személy adatait beolvasó űrlap."""
+    def __init__(self, szulo, kon=None) -> simpledialog.Dialog:
+        """Az űrlap egy simpledialog.Dialog példány.
+        szulo:  szülő widget
+        kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Új személy felvitele")
 
-    def body(self, szulo):
+    def body(self, szulo) -> Entry:
         """Override Dialog.body - gui megjelenítése"""
         self._szemelyurlap = SzemelyUrlap(self)
         self._szemelyurlap.pack(ipadx=2, ipady=2)
         return self._szemelyurlap.fokusz
 
-    def validate(self):
-        """Override Dialog.validate - adatok ellenőrzése"""
+    def validate(self) -> bool:
+        """Override Dialog.validate - személyi adatok ellenőrzése"""
         szemely = self._szemelyurlap.export()
         if not szemely:
             messagebox.showwarning("Hiányos adat!", "Legalább az egyik nevet add meg!", parent=self)
@@ -82,8 +101,8 @@ class UjSzemelyUrlap(simpledialog.Dialog):
             return False
         return True
 
-    def apply(self):
-        """Override Dialog.apply - helyes adatok feldolgozása"""
+    def apply(self) -> None:
+        """Override Dialog.apply - személy mentése"""
         szemely = self._szemelyurlap.export()
         if szemely.ment(self._kon.szemely):
             print("{}: Bejegyzés mentve.".format(szemely))
@@ -92,23 +111,30 @@ class UjSzemelyUrlap(simpledialog.Dialog):
 
 
 class SzemelyTorloUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
+    """Meglévő személy adatait törlő űrlap."""
+    def __init__(self, szulo, kon=None) -> simpledialog.Dialog:
+        """Az űrlap egy simpledialog.Dialog példány.
+        szulo:  szülő widget
+        kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         self._kon = kon
         super().__init__(szulo, title="Személy törlése")
 
-    def body(self, szulo):
+    def body(self, szulo) -> Combobox:
+        """Override Dialog.body - gui megjelenítése"""
         self._nev_valaszto = Valaszto("név", self._nevsor(), self)
         self._nev_valaszto.pack(ipadx=2, ipady=2)
         return self._nev_valaszto.valaszto
 
-    def validate(self):
+    def validate(self) -> bool:
+        """Override Dialog.validate - törlés előtti utolsó megerősítés"""
         szemely = self._nev_valaszto.elem
         if szemely.azonosito in (VITYA.azonosito, ROLI.azonosito):
             return False  # nem engedem törölni a speciális eseteket
         biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!", parent=self)
         return szemely and biztos
 
-    def apply(self):
+    def apply(self) -> None:
+        """Override Dialog.apply - személy törlése"""
         szemely = self._nev_valaszto.elem
         self._kon.szemely.delete("telefon", szemely=szemely.azonosito)  # GDPR!
         self._kon.szemely.delete("email", szemely=szemely.azonosito)
@@ -120,7 +146,8 @@ class SzemelyTorloUrlap(simpledialog.Dialog):
         else:
             print("Nem sikerült törölni.")
 
-    def _nevsor(self):
+    def _nevsor(self) -> list:
+        """Belső függvény, abc-rendbe rakott szemely. Szemely csomókból álló listát készít, a __repr__ alapján."""
         return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
 
 

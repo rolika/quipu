@@ -1,6 +1,7 @@
 class Konnektor:
     """Adatbázis kapcsolat gyűjtőosztálya.
-    A vég nélküli paraméterlistákat hivatott kiváltani, egy név alá gyűjtve az összes adatbázis-kapcsolatot."""
+    A vég nélküli paraméterlistákat hivatott kiváltani, egy név alá gyűjtve az összes adatbázis-kapcsolatot.
+    Kezeli az összetett lekérdezéseket, melyeket a tamer.Tamer() nem tud."""
     def __init__(self, **kwargs) -> None:
         """Konnektor inicializása.
         kwargs: név=konnektor párosok
@@ -11,6 +12,17 @@ class Konnektor:
         """
         for nev, kon in kwargs.items():
             setattr(self, nev, kon)
+    
+    def szemelyhez_rendelt_szervezetek(self, szemelyazonosito):
+        self._kon.szemely.execute("""
+            SELECT *
+            FROM szervezet
+            WHERE azonosito IN (
+                SELECT szervezet
+                FROM kontakt
+                WHERE szemely = ?
+            );
+        """, (szemelyazonosito, ))
 
 
 # az elv tesztelése
