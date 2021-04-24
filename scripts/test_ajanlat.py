@@ -25,7 +25,6 @@ from ajanlatkeres import Ajanlatkeres
 from ajanlat import Ajanlat
 from cim import Cim
 from jelleg import Jelleg
-from konstans import MAGANSZEMELY, ROLI
 
 
 class ProjektlistaTest(unittest.TestCase):
@@ -69,10 +68,10 @@ class ProjektlistaTest(unittest.TestCase):
 
                     # ajánlatkérő szervezet
                     szervezet = Szervezet(rovidnev=projekt.szervezet, teljesnev=projekt.szervezet, gyakorisag=0, megjegyzes="")
-                    if not bool(szervezet):  # ha nincs szervezet feltüntve, akkor magánszemély
-                        szervezet_id = MAGANSZEMELY.azonosito
+                    if not bool(szervezet):
+                        szervezet_id = 1  # magánszemély azonosítója
                     else:
-                        meglevo = szervezet.meglevo(self._szervezet_kon)
+                        meglevo = szervezet.meglevo(self._szervezet_kon)  # kezeli a agánszemélyt is, ami mindig meglévő
                         if meglevo:
                             szervezet_id = Szervezet(**meglevo).azonosito
                         else:

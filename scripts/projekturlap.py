@@ -116,9 +116,9 @@ class JellegUrlap(Frame):
 
 
 class UjProjektUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
+    def __init__(self, szulo, kon):
         # super() előtt kell legyenek
-        self._kon = kon
+        self._kon = kon.projekt
         self._ev = date.today().strftime("%y")
         self._szam = self._kovetkezo_projektszam()
 
@@ -203,8 +203,8 @@ class UjProjektUrlap(simpledialog.Dialog):
 
 
 class ProjektTorloUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
-        self._kon = kon  # super() előtt kell legyen
+    def __init__(self, szulo, kon):
+        self._kon = kon.projekt  # super() előtt kell legyen
         super().__init__(szulo, title="Projekt törlése")
 
     def body(self, szulo):
@@ -241,13 +241,13 @@ class ProjektTorloUrlap(simpledialog.Dialog):
 
 
 class ProjektModositoUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
-        self._kon = kon  # super() előtt kell legyen
+    def __init__(self, szulo, kon):
+        self._kon = kon.projekt  # super() előtt kell legyen
         super().__init__(szulo, title="Projekt módosítása")
 
     def body(self, szulo):
         self._projekt_valaszto = Valaszto("megnevezés", self._projektek(), self)
-        self._projekt_valaszto.valaszto.bind("<<ComboboxSelected>>", self._projekt_megjelenit)
+        self._projekt_valaszto.set_callback(self._projekt_megjelenit)
         self._projekt_valaszto.pack(ipadx=2, ipady=2)
 
         megnevezes = LabelFrame(self, text="projekt neve")
@@ -285,13 +285,13 @@ class ProjektModositoUrlap(simpledialog.Dialog):
 
 
 class UjMunkareszUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
-        self._kon = kon  # super() előtt kell legyen
+    def __init__(self, szulo, kon):
+        self._kon = kon.projekt  # super() előtt kell legyen
         super().__init__(szulo, title="Új munkarész felvitele")
 
     def body(self, szulo):
         self._projekt_valaszto = Valaszto("projekt", self._projektek(), self)
-        self._projekt_valaszto.valaszto.bind("<<ComboboxSelected>>", self._cim_megjelenit)
+        self._projekt_valaszto.set_callback(self._cim_megjelenit)
         self._projekt_valaszto.pack(ipadx=2, ipady=2)
 
         munkaresz = LabelFrame(self, text="munkarész")
@@ -362,13 +362,13 @@ class UjMunkareszUrlap(simpledialog.Dialog):
 
 
 class MunkareszTorloUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
-        self._kon = kon  # super() előtt kell legyen
+    def __init__(self, szulo, kon):
+        self._kon = kon.projekt  # super() előtt kell legyen
         super().__init__(szulo, title="Munkarész törlése")
 
     def body(self, szulo):
         self._projekt_valaszto = Valaszto("projekt", self._projektek(), self)
-        self._projekt_valaszto.valaszto.bind("<<ComboboxSelected>>", self._munkaresz_megjelenit)
+        self._projekt_valaszto.set_callback(self._munkaresz_megjelenit)
         self._projekt_valaszto.pack(ipadx=2, ipady=2)
 
         self._munkaresz_valaszto = Valaszto("munkarész", self._munkareszek(), self)
@@ -410,17 +410,17 @@ class MunkareszTorloUrlap(simpledialog.Dialog):
 
 
 class MunkareszModositoUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, kon=None):
-        self._kon = kon  # super() előtt kell legyen
+    def __init__(self, szulo, kon):
+        self._kon = kon.projekt  # super() előtt kell legyen
         super().__init__(szulo, title="Munkarész módosítása")
 
     def body(self, szulo):
         self._projekt_valaszto = Valaszto("projekt", self._projektek(), self)
-        self._projekt_valaszto.valaszto.bind("<<ComboboxSelected>>", self._munkaresz_kivalaszt)
+        self._projekt_valaszto.set_callback(self._munkaresz_kivalaszt)
         self._projekt_valaszto.pack(ipadx=2, ipady=2)
 
         self._munkaresz_valaszto = Valaszto("munkarész", self._munkareszek(), self)
-        self._munkaresz_valaszto.valaszto.bind("<<ComboboxSelected>>", self._munkaresz_megjelenit)
+        self._munkaresz_valaszto.set_callback(self._munkaresz_megjelenit)
         self._munkaresz_valaszto.pack(ipadx=2, ipady=2)
 
         munkaresz = LabelFrame(self, text="munkarész")
