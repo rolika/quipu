@@ -221,17 +221,17 @@ class Quipu(Frame):
             jelleg="INTEGER NOT NULL",
             ajanlatkero="INTEGER NOT NULL",
             temafelelos="INTEGER NOT NULL",
-            erkezett="TEXT DEFAULT ''",
+            erkezett="TEXT DEFAULT CURRENT_DATE",
             hatarido="TEXT DEFAULT ''",
             megjegyzes="TEXT DEFAULT ''")
         
         ajanlat_kon.create("ajanlat",
             azonosito="INTEGER PRIMARY KEY",
             ajanlatkeres="INTEGER NOT NULL REFERENCES ajanlatkeres",
-            ajanlatiar="REAL",
-            leadva="TEXT DEFAULT ''",
-            ervenyes="INTEGER DEFAULT 30",
-            esely="REAL DEFAULT 0.05",
+            ajanlatiar="INTEGER NOT NULL",
+            leadva="TEXT DEFAULT CURRENT_DATE",
+            ervenyes="TEXT DEFAULT ''",
+            esely="INTEGER DEFAULT 5",
             megjegyzes="TEXT DEFAULT ''")
     
         return ajanlat_kon
