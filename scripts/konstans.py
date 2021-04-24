@@ -3,6 +3,7 @@
 
 from szemely import Szemely
 from szervezet import Szervezet
+import enum
 
 
 ELERHETOSEG_TIPUS = ("alapértelmezett", "munkahelyi", "privát")
@@ -39,3 +40,16 @@ VITYA = Szemely(vezeteknev="Weisz",
 ROLI = Szemely(vezeteknev="Weisz",
                keresztnev="Roland",
                nem="férfi")
+
+
+class Esely(enum.IntEnum):
+    """Ajánlat elnyerésének esélye."""
+    BUKOTT = 0
+    NORMAL = 5
+    ERDEKES = 50
+    VEGSO = 90
+
+    @property
+    def ertek(self):
+        return self.value
+

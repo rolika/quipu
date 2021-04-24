@@ -1,10 +1,6 @@
 from ajanlatkeres import Ajanlatkeres
-from csomo import Csomo
 from jelleg import Jelleg
-from kontakt import Kontakt
-from projekt import Projekt
-from munkaresz import Munkaresz
-from cim import Cim
+from csomo import Csomo
 
 
 class Ajanlat(Csomo):
@@ -24,16 +20,24 @@ class Ajanlat(Csomo):
         else:
             self._adatok = {
                 "ajanlatkeres": 0,
-                "ajanlatiar": "",
+                "ajanlatiar": 0,
                 "leadva": "",
                 "ervenyes": "",
-                "esely": "",
+                "esely": 5,
                 "megjegyzes": ""
             }
         self._tabla = "ajanlat"
 
     def __bool__(self):
+        """Az ajánlat akkor érvényes, ha 0-nál nagyobb egész számra konvertálható az ajánlati ár."""
+        #try:
+        assert int(self.ajanlatiar) > 0
         return True
+        #except (ValueError, AssertionError):
+        return False
+    
+    def __repr__(self):
+        return self._ascii_rep(self.listanezet())
 
     @property
     def adatok(self):
@@ -62,24 +66,35 @@ class Ajanlat(Csomo):
     @property
     def leadva(self):
         return self._adatok.get("leadva", "")
+    
+    @leadva.setter
+    def leadva(self, datum):
+        self._adatok["leadva"] = datum
 
     @property
     def ervenyes(self):
         return self._adatok.get("ervenyes", "")
+    
+    @ervenyes.setter
+    def ervenyes(self, datum):
+        self._adatok["ervenyes"] = datum
 
     @property
     def esely(self):
         return self._adatok.get("esely", "")
     
-    def listanezet(self):
-        if self._szemely_kon and self._szervezet_kon and self._kontakt_kon and self._projekt_kon:
-            ajanlatkeres = self._ajanlat_kon("ajanlatkeres", azonosito=self.ajanlatkeres).fetchone()
+    @esely.setter
+    def esely(self, uj):
+        self._adatok["esely"] = uj
+    
+    def listanezet(self) -> str:
+        if self._ajanlat_kon and self._projekt_kon:
+            ajanlatkeres = self._ajanlat_kon.select("ajanlatkeres", azonosito=self.ajanlatkeres).fetchone()
             ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
-            ajanlatkeres.projekt_kon = self._projekt_kon
-            ajanlatkeres.kontakt_kon = self._kontakt_kon
-            ajanlatkeres.szemely_kon = self._szemely_kon
-            ajanlatkeres.szervezet_kon = self._szervezet_kon
-            return "{ajanlatkeres}: {ar}".format(ajanlatkeres=ajanlatkeres.listanezet(), ar=self.ajanlatiar)
+            jelleg = self._projekt_kon.select("jelleg", azonosito=ajanlatkeres.jelleg).fetchone()
+            jelleg = Jelleg(**jelleg)
+            jelleg.projekt_kon = self._projekt_kon
+            return "{jelleg}: {ar}".format(jelleg=jelleg.listanezet(), ar=self.ajanlatiar)
         else:
             raise NotImplementedError
     

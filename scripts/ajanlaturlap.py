@@ -3,16 +3,10 @@ from tkinter import simpledialog
 from tkinter import messagebox
 from datetime import date, timedelta
 from tkinter.ttk import LabelFrame
-from jelleg import Jelleg
 from urlap import Valaszto
-from projekt import Projekt
-from munkaresz import Munkaresz
-from szervezet import Szervezet
-from szemely import Szemely
-from kontakt import Kontakt
 from ajanlatkeres import Ajanlatkeres
 from ajanlat import Ajanlat
-from konstans import WEVIK
+from konstans import Esely
 
 
 class AjanlatUrlap(LabelFrame):
@@ -22,11 +16,11 @@ class AjanlatUrlap(LabelFrame):
         self._ajanlatiar = StringVar()
         self._leadva = StringVar()
         self._ervenyes = StringVar()
-        self._esely = IntVar()
         self._megjegyzes = StringVar()
+        self._esely = IntVar()
 
         rovidek = Frame(self)
-        
+
         ar = LabelFrame(rovidek, text="ajánlati ár")
         self._fokusz = Entry(ar, textvariable=self._ajanlatiar, width=10)
         self._fokusz.pack(ipadx=2, ipady=2, side=LEFT)
@@ -43,9 +37,11 @@ class AjanlatUrlap(LabelFrame):
 
         rovidek.pack(ipadx=2, ipady=2, fill=BOTH)
 
-        esely = LabelFrame(self, text="esély")
-        Scale(esely, variable=self._esely, label="%", orient=HORIZONTAL, from_=0, to=100, tick=10, length=300)\
-            .pack(ipadx=2, ipady=2)
+        esely = LabelFrame(self, text="esélylatolgatás")
+        Radiobutton(esely, variable=self._esely, text="bukott", value=Esely.BUKOTT.ertek).pack(ipadx=2, ipady=2, side=LEFT)
+        Radiobutton(esely, variable=self._esely, text="normál", value=Esely.NORMAL.ertek).pack(ipadx=2, ipady=2, side=LEFT)
+        Radiobutton(esely, variable=self._esely, text="érdekes", value=Esely.ERDEKES.ertek).pack(ipadx=2, ipady=2, side=LEFT)
+        Radiobutton(esely, variable=self._esely, text="végső", value=Esely.VEGSO.ertek).pack(ipadx=2, ipady=2)
         esely.pack(ipadx=2, ipady=2, fill=BOTH)
 
         megjegyzes = LabelFrame(self, text="megjegyzés")
@@ -60,6 +56,8 @@ class AjanlatUrlap(LabelFrame):
         self._ajanlatiar.set(ajanlat.ajanlatiar)
         self._leadva.set(ajanlat.leadva)
         self._ervenyes.set(ajanlat.ervenyes)
+        if ajanlat.esely not in [esely.value for esely in Esely]:
+            ajanlat.esely = Esely.NORMAL.ertek
         self._esely.set(ajanlat.esely)
         self._megjegyzes.set(ajanlat.megjegyzes)
 
@@ -70,157 +68,55 @@ class AjanlatUrlap(LabelFrame):
                        esely=self._esely.get(),
                        megjegyzes=self._megjegyzes.get())
 
+    def datum_ervenyes(self):
+        """Dátumok formátumának és sorrendjének ellenőrzése"""
+        try:
+            leadva = date.fromisoformat(self._leadva.get())
+            ervenyes = date.fromisoformat(self._ervenyes.get())
+        except ValueError:
+            return False
+        if leadva > ervenyes:
+            return False
+        return True
+
 
 class UjAjanlatUrlap(simpledialog.Dialog):
-    def __init__(self, szulo, ajanlat_kon, szemely_kon, szervezet_kon, kontakt_kon, projekt_kon):
-        self._szemely_kon = szemely_kon  # super() előtt kell legyenek
-        self._szervezet_kon = szervezet_kon
-        self._kontakt_kon = kontakt_kon
-        self._projekt_kon = projekt_kon
-        self._ajanlat_kon = ajanlat_kon
+    def __init__(self, szulo, kon):
+        self._kon = kon
         super().__init__(szulo, title="Új ajánlat rögzítése")
 
     def body(self, szulo):
-        self._erkezett = StringVar()
-        self._hatarido = StringVar()
-        self._megjegyzes = StringVar()
-
-        ajanlatkeres = LabelFrame(self, text="ajánlatkérés")
-
-        self._kontakt_valaszto = Valaszto("ajánlatkérő", self._kontaktszemelyek(), ajanlatkeres)
-        self._kontakt_valaszto.pack(ipadx=2, ipady=2)
-        self._jelleg_valaszto = Valaszto("projekt", self._jellegek(), ajanlatkeres)
-        self._jelleg_valaszto.pack(ipadx=2, ipady=2)
-
-        megjegyzes = LabelFrame(ajanlatkeres, text="megjegyzés")
-        Entry(megjegyzes, textvariable=self._megjegyzes, width=40).pack(ipadx=2, ipady=2, side=LEFT)
-        megjegyzes.pack(ipadx=2, ipady=2, side=BOTTOM, fill=BOTH)
-
-        self._temafelelos_valaszto = Valaszto("témafelelős", self._kontaktszemelyek(WEVIK.azonosito), ajanlatkeres)
-        self._temafelelos_valaszto.pack(ipadx=2, ipady=2, side=BOTTOM)
-
-        erkezett = LabelFrame(ajanlatkeres, text="érkezett")
-        Entry(erkezett, textvariable=self._erkezett, width=10).pack(ipadx=2, ipady=2)
-        erkezett.pack(ipadx=2, ipady=2, side=LEFT)
-        hatarido = LabelFrame(ajanlatkeres, text="leadási határidő")
-        Entry(hatarido, textvariable=self._hatarido, width=10).pack(ipadx=2, ipady=2)
-        hatarido.pack(ipadx=2, ipady=2, side=LEFT)        
-        ma = date.isoformat(date.today())
-        egyhetmulva = date.isoformat(date.today() + timedelta(days=7))
-        self._erkezett.set(ma)
-        self._hatarido.set(egyhetmulva)
-
-        ajanlatkeres.pack(padx=2, pady=2, ipadx=2, ipady=2, fill=BOTH)
+        self._ajanlatkeres_valaszto = Valaszto("ajánlatkérés", self._ajanlatkeresek(), self)
+        self._ajanlatkeres_valaszto.set_callback(self._alapertelmezes)
+        self._ajanlatkeres_valaszto.pack(ipadx=2, ipady=2, fill=BOTH)
 
         self._ajanlat_urlap = AjanlatUrlap(self)
-        ma = date.isoformat(date.today())
-        egyhonapmulva = date.isoformat(date.today() + timedelta(days=30))
-        ures = Ajanlat(ajanlatiar="", leadva=ma, ervenyes=egyhonapmulva, esely=10, megjegyzes="")
-        self._ajanlat_urlap.beallit(ures)
         self._ajanlat_urlap.pack(padx=2, pady=2, ipadx=2, ipady=2, fill=BOTH)
 
-        return self._kontakt_valaszto.valaszto
+        self._alapertelmezes(1)
+        return self._ajanlatkeres_valaszto.valaszto
 
     def validate(self):
-        ajanlatkeres = self._get_ajanlatkeres()
-        if ajanlatkeres.meglevo(self._ajanlat_kon):
-            messagebox.showwarning("Létező ajánlatkérés!", "Megjegyzésben különböztesd meg!", parent=self)
+        if not bool(self._ajanlat_urlap.export()):
+            messagebox.showwarning("Hiányos adat!", "Add meg az ajánlati árat!", parent=self)
             return False
-        ajanlat = self._ajanlat_urlap.export()
-        # dátumformátumok ellenőrzése
-        try:
-            erkezett = date.fromisoformat(ajanlatkeres.erkezett)
-            hatarido = date.fromisoformat(ajanlatkeres.hatarido)
-            leadva = date.fromisoformat(ajanlat.leadva)
-            ervenyes = date.fromisoformat(ajanlat.ervenyes)
-        except ValueError:
-            messagebox.showwarning("Dátumhiba!", "Legalább egy dátum formátuma nem jó!", parent=self)
-            return False
-        # dátumok egymásutániságának ellenőrzése
-        if erkezett > hatarido or leadva < erkezett or leadva > ervenyes:
-            messagebox.showwarning("Dátumhiba!", "A dátumok nem jól követik egymást!", parent=self)
+        if not self._ajanlat_urlap.datum_ervenyes():
+            messagebox.showwarning("Dátumhiba!", "Formátum vagy sorrend hibás!", parent=self)
             return False
         return True
 
     def apply(self):
-        ajanlatkeres = self._get_ajanlatkeres()
-        ajanlatkeres_azonosito = ajanlatkeres.ment(self._ajanlat_kon)
-        if ajanlatkeres_azonosito:
-            print("Árajánlatkérés mentve.")
-            ajanlat = self._ajanlat_urlap.export()
-            if ajanlat.ajanlatiar:
-                ajanlat.ajanlatkeres = ajanlatkeres_azonosito
-                if ajanlat.ment(self._ajanlat_kon):
-                    print("Árajánlat mentve.")
-                else:
-                    print("Az árajánlatot nem sikerült elmenteni!")
-            return
-        print("Nem sikerült elmenteni!")
-    
-    def _kontaktszemelyek(self, szervezet_id=None):
-        if szervezet_id:
-            kontaktok = self._kontakt_kon.select("kontakt", szervezet=szervezet_id)
-        else:
-            kontaktok = self._kontakt_kon.select("kontakt")
-        return sorted(map(self._kontaktszemely, kontaktok), key=repr)
-    
-    def _kontaktszemely(self, kontakt):
-        kontaktszemely = Kontakt(**kontakt)
-        kontaktszemely.szemely_kon = self._szemely_kon
-        kontaktszemely.szervezet_kon = self._szervezet_kon
-        return kontaktszemely
-    
-    def _jellegek(self):
-        jellegek = self._projekt_kon.select("jelleg")
-        return sorted(map(self._jelleg, jellegek), key=repr)
-    
-    def _jelleg(self, jelleg):
-        jelleg = Jelleg(**jelleg)
-        jelleg.projekt_kon = self._projekt_kon
-        return jelleg
-    
-    def _get_ajanlatkeres(self):
-        return Ajanlatkeres(jelleg=self._jelleg_valaszto.elem.azonosito,
-                            ajanlatkero=self._kontakt_valaszto.elem.azonosito,
-                            temafelelos=self._temafelelos_valaszto.elem.azonosito,
-                            erkezett=self._erkezett.get(),
-                            hatarido=self._hatarido.get(),
-                            megjegyzes=self._megjegyzes.get())
-
-
-class AjanlatTorloUrlap(simpledialog.Dialog):
-    """Csak ajánlatkérést lehet törölni, és csak olyat, amire nem született még ajánlat."""
-    def __init__(self, szulo,
-                 ajanlat_kon=None,
-                 szemely_kon=None,
-                 szervezet_kon=None,
-                 kontakt_kon=None,
-                 projekt_kon=None):
-        self._szemely_kon = szemely_kon  # super() előtt kell legyenek
-        self._szervezet_kon = szervezet_kon
-        self._kontakt_kon = kontakt_kon
-        self._projekt_kon = projekt_kon
-        self._ajanlat_kon = ajanlat_kon
-        super().__init__(szulo, title="Ajánlatkérés törlése")
-
-    def body(self, szulo):
-        self._ajanlatkeres_valaszto = Valaszto("ajánlatkérés", self._ajanlatkeresek(), szulo)
-        self._ajanlatkeres_valaszto.pack(ipadx=2, ipady=2)
-        return self._ajanlatkeres_valaszto.valaszto
-
-    def validate(self):
-        return messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
-
-    def apply(self):
         ajanlatkeres = self._ajanlatkeres_valaszto.elem
-        if ajanlatkeres.torol(self._ajanlat_kon):
-            print("Bejegyzés törölve.")
+        ajanlat = self._ajanlat_urlap.export()
+        ajanlat.ajanlatkeres = ajanlatkeres.azonosito
+        if ajanlat.ment(self._kon.ajanlat):
+            print("Árajánlat mentve.")
         else:
-            print("Nem sikerült törölni!")
+            print("Az árajánlatot nem sikerült elmenteni!")
 
     def _ajanlatkeresek(self):
         # azok az ajánlatkérések kellenek, melyekre még nem született ajánlat
-        ajanlatkeresek = self._ajanlat_kon.execute("""
+        ajanlatkeresek = self._kon.ajanlat.execute("""
             SELECT *
             FROM ajanlatkeres
             WHERE azonosito NOT IN (
@@ -230,76 +126,106 @@ class AjanlatTorloUrlap(simpledialog.Dialog):
             );
             """)
         return sorted(map(self._kon_setter, ajanlatkeresek), key=repr)
-    
+
     def _kon_setter(self, ajanlatkeres):
         ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
-        ajanlatkeres.kontakt_kon = self._kontakt_kon
-        ajanlatkeres.projekt_kon = self._projekt_kon
-        ajanlatkeres.szemely_kon = self._szemely_kon
-        ajanlatkeres.szervezet_kon = self._szervezet_kon
+        ajanlatkeres.kontakt_kon = self._kon.kontakt
+        ajanlatkeres.projekt_kon = self._kon.projekt
+        ajanlatkeres.szemely_kon = self._kon.szemely
+        ajanlatkeres.szervezet_kon = self._kon.szervezet
         return ajanlatkeres
+
+    def _alapertelmezes(self, event):
+        ma = date.isoformat(date.today())
+        egyhonapmulva = date.isoformat(date.today() + timedelta(days=30))
+        self._ajanlat_urlap.beallit(Ajanlat(ajanlatiar="", leadva=ma, ervenyes=egyhonapmulva, megjegyzes=""))
+
+
+class AjanlatTorloUrlap(simpledialog.Dialog):
+    """Csak ajánlatkérést lehet törölni, és csak olyat, amire nem született még ajánlat."""
+    def __init__(self, szulo, kon):
+        self._kon = kon
+        super().__init__(szulo, title="Ajánlat törlése")
+
+    def body(self, szulo):
+        self._ajanlat_valaszto = Valaszto("ajánlat", self._ajanlatok(), szulo)
+        self._ajanlat_valaszto.pack(ipadx=2, ipady=2)
+        return self._ajanlat_valaszto.valaszto
+
+    def validate(self):
+        return messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
+
+    def apply(self):
+        ajanlat = self._ajanlat_valaszto.elem
+        if ajanlat.torol(self._kon.ajanlat):
+            print("Bejegyzés törölve.")
+        else:
+            print("Nem sikerült törölni!")
+
+    def _ajanlatok(self):
+        ajanlatok = self._kon.ajanlat.select("ajanlat")
+        return sorted(map(self._kon_setter, ajanlatok), key=repr)
+
+    def _kon_setter(self, ajanlat):
+        ajanlat = Ajanlat(**ajanlat)
+        ajanlat.ajanlat_kon = self._kon.ajanlat
+        ajanlat.projekt_kon = self._kon.projekt
+        return ajanlat
 
 
 class AjanlatModositoUrlap(simpledialog.Dialog):
-    def __init__(self, szulo,
-                 ajanlat_kon=None,
-                 szemely_kon=None,
-                 szervezet_kon=None,
-                 kontakt_kon=None,
-                 projekt_kon=None):
-        self._szemely_kon = szemely_kon  # super() előtt kell legyenek
-        self._szervezet_kon = szervezet_kon
-        self._kontakt_kon = kontakt_kon
-        self._projekt_kon = projekt_kon
-        self._ajanlat_kon = ajanlat_kon
+    def __init__(self, szulo, kon):
+        self._kon = kon
         super().__init__(szulo, title="Ajánlat módosítása")
-    
+
     def body(self, szulo):
-        self._ajanlatkeres_valaszto = Valaszto("ajánlatkérés", self._ajanlatkeresek(), self)
-        self._ajanlatkeres_valaszto.set_callback(self._aktiv_ajanlat)
-        self._ajanlatkeres_valaszto.pack(ipadx=2, ipady=2)
-        
+
+        self._ajanlat_valaszto = Valaszto("ajánlat", self._ajanlatok(), self)
+        self._ajanlat_valaszto.set_callback(self._reszletek)
+        self._ajanlat_valaszto.pack(ipadx=2, ipady=2)
+
         self._ajanlat_urlap = AjanlatUrlap(self)
         self._ajanlat_urlap.pack(padx=2, pady=2, ipadx=2, ipady=2, fill=BOTH)
 
-        self._aktiv_ajanlat(1)
-        return self._ajanlatkeres_valaszto.valaszto        
+        self._reszletek(1)
+        return self._ajanlat_valaszto.valaszto
 
     def validate(self):
+        if not bool(self._ajanlat_urlap.export()):
+            messagebox.showwarning("Hiányos adat!", "Add meg az ajánlati árat!", parent=self)
+            return False
+        if not self._ajanlat_urlap.datum_ervenyes():
+            messagebox.showwarning("Dátumhiba!", "Formátum vagy sorrend hibás!", parent=self)
+            return False
         return True
-    
+
     def apply(self):
-        ajanlat = self._ajanlat_urlap.export()
-        if self._ajanlat:
-            self._ajanlat.adatok = ajanlat
-            ajanlat = self._ajanlat
-        else:
-            ajanlat.ajanlatkeres = self._ajanlatkeres_valaszto.elem.azonosito
-        if ajanlat.ment(self._ajanlat_kon):
+        meglevo_ajanlat = self._ajanlat_valaszto.elem
+        modositott_ajanlat = self._ajanlat_urlap.export()
+        meglevo_ajanlat.adatok = modositott_ajanlat
+        if meglevo_ajanlat.ment(self._kon.ajanlat):
             print("Bejegyzés módosítva.")
         else:
             print("Nem sikerült módosítani!")
 
-    def _ajanlatkeresek(self):
-        return sorted(map(self._ajanlatkeres_kon_setter, self._ajanlat_kon.select("ajanlatkeres")), key=repr)
+    def _ajanlatok(self):
+        return sorted(map(self._ajanlat_kon_setter, self._kon.ajanlat.select("ajanlat")), key=repr)
 
-    def _ajanlatkeres_kon_setter(self, ajanlatkeres):
-        ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
-        ajanlatkeres.kontakt_kon = self._kontakt_kon
-        ajanlatkeres.projekt_kon = self._projekt_kon
-        ajanlatkeres.szemely_kon = self._szemely_kon
-        ajanlatkeres.szervezet_kon = self._szervezet_kon
-        return ajanlatkeres
+    def _ajanlat_kon_setter(self, ajanlat):
+        ajanlat = Ajanlat(**ajanlat)
+        ajanlat.ajanlat_kon = self._kon.ajanlat
+        ajanlat.kontakt_kon = self._kon.kontakt
+        ajanlat.projekt_kon = self._kon.projekt
+        ajanlat.szemely_kon = self._kon.szemely
+        ajanlat.szervezet_kon = self._kon.szervezet
+        return ajanlat
     
-    def _aktiv_ajanlat(self, event):
-        ajanlatkeres=self._ajanlatkeres_valaszto.elem.azonosito
-        ajanlat = self._ajanlat_kon.select("ajanlat", ajanlatkeres=ajanlatkeres).fetchone()
-        if ajanlat:
-            ajanlat = Ajanlat(**ajanlat)
-            self._ajanlat = ajanlat
-        else:
-            self._ajanlat = None
-            ma = date.isoformat(date.today())
-            egyhonapmulva = date.isoformat(date.today() + timedelta(days=30))
-            ajanlat = Ajanlat(ajanlatiar="", leadva=ma, ervenyes=egyhonapmulva, esely=10, megjegyzes="")
-        self._ajanlat_urlap.beallit(ajanlat)
+    def _reszletek(self, event):
+        """Megjeleníti a kiválasztott ajánlat módosítható részleteit.
+        event: tkinter esemény-paraméter (itt nincs rá szükség)"""
+        meglevo_ajanlat = self._ajanlat_valaszto.elem
+        if not meglevo_ajanlat.leadva:
+            meglevo_ajanlat.leadva = date.isoformat(date.today())
+        if not meglevo_ajanlat.ervenyes:
+            meglevo_ajanlat.ervenyes = date.isoformat(date.today() + timedelta(days=30))
+        self._ajanlat_urlap.beallit(meglevo_ajanlat)

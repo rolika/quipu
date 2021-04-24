@@ -22,7 +22,7 @@ class Projekt(Csomo):
 
     def __str__(self):
         """Projekt kiíratása emberi használatra"""
-        return "{}/{} {}{}".format(self.ev, self.szam, self.megnevezes, self._nullazo(self.megjegyzes))
+        return "{}/{:03} {}{}".format(self.ev, self.szam, self.megnevezes, self._nullazo(self.megjegyzes))
 
     def __repr__(self):
         """Projekt elnevezése sorbarendezéshez"""
