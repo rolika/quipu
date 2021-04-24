@@ -143,7 +143,7 @@ class UjAjanlatkeresUrlap(simpledialog.Dialog):
 class AjanlatkeresTorloUrlap(simpledialog.Dialog):
     """Csak ajánlatkérést lehet törölni, és csak olyat, amire nem született még ajánlat."""
     def __init__(self, szulo, kon):
-        self._kon =_kon
+        self._kon = kon
         super().__init__(szulo, title="Ajánlatkérés törlése")
 
     def body(self, szulo):
