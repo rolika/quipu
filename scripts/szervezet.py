@@ -62,7 +62,7 @@ class Szervezet(Csomo):
 
     def listanezet(self):
         """Szervezet megjelenítése kiválasztáshoz (Combobox)"""
-        return str(self)
+        return self.rovidnev
 
 
 if __name__ == "__main__":
