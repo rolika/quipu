@@ -26,74 +26,215 @@ SOFTWARE.
 
 from tkinter import *
 import tamer
-import sqlite3
-import urlap
 import menu
+from konstans import MAGANSZEMELY, WEVIK, VITYA, ROLI
+from kontakt import Kontakt
+from konnektor import Konnektor
 
 
 class Quipu(Frame):
-    """ Fő alkalmazás """
-    def __init__(self, master=None, **kwargs):
+    """ Fő alkalmazás 
+    A kipu, más néven csomóírás vagy zsinórírás egy különleges, tízes számrendszerbeli információtárolási rendszer,
+    melynek segítségével helyettesítették az írást az Inka Birodalomban. A kipu a kecsuák nyelvén csomót jelent, 
+    használati gyakorlatáról bebizonyították, hogy afféle textil abakusz, ahol a csomók jelentést hordoznak.
+    A kipukon rögzített értékeket meglepő módon egy kettes számrendszeren alapuló, kövek helyzetével operáló, számoló
+    eszközzel, egy ősi számítógéppel dolgozták fel. [Wikipedia nyomán]
+    """
+    def __init__(self, master=None, **kwargs) -> Frame:
+        """A fő alkalmazás egy tkinter.Frame-ben indul. Ha a szülője None, mint az alapértelmezés, akkor saját
+        ablakot nyit magának.
+        master: szülő widget
+        kwargs: tkinter.Frame tulajdonságait szabályozó értékek"""
         super().__init__(master=master, **kwargs)
-        self.init_szemely_db()
-        menu.Fomenu(self, self.szemely_kon)
+
+        # adatbázis konnektorok
+        kon = Konnektor(szemely=self._init_szemely_db(),
+                        szervezet=self._init_szervezet_db(),
+                        kontakt=self._init_kontakt_db(),
+                        projekt=self._init_projekt_db(),
+                        ajanlat=self._init_ajanlat_db())
+
+        # alapadatok beírása
+        if not WEVIK.meglevo(kon.szervezet):  # feltételezem, hogy a céggel együtt a többet se írta még be
+            MAGANSZEMELY.ment(kon.szervezet)  # SQL PRIMARY KEY 1
+            wevik_id = WEVIK.ment(kon.szervezet)  # SQL PRIMARY KEY 2
+            vitya_id = VITYA.ment(kon.szemely)  # SQL PRIMARY KEY 1
+            roli_id = ROLI.ment(kon.szemely)  # SQL PRIMARY KEY 2
+            Kontakt(szemely=vitya_id, szervezet=wevik_id).ment(kon.kontakt)  # SQL PRIMARY KEY 1
+            Kontakt(szemely=roli_id, szervezet=wevik_id).ment(kon.kontakt)  # SQL PRIMARY KEY 2
+        MAGANSZEMELY.azonosito = 1
+        WEVIK.azonosito = 2
+        VITYA.azonosito = 1  # a fenti mentési sorrend miatt kontaktszemély-azonosítóként is használandó
+        ROLI.azonosito = 2  # ez is
+
+        # főmenü megjelenítése
+        menu.Fomenu(self, kon)
         self.grid()
+
+        # és pörgés :-)
         self.mainloop()
 
-    def init_szemely_db(self):
+    def _init_szemely_db(self) -> tamer.Tamer:
         """ Személy adatbázis inicializálása  """
-        self.szemely_kon = tamer.Tamer("szemely.db")
+        szemely_kon = tamer.Tamer("szemely.db")
 
-        self.szemely_kon.create("megszolitas", nem="TEXT PRIMARY KEY", megszolitas="TEXT NOT NULL")
-        self.szemely_kon.insert("megszolitas", nem="nő", megszolitas="Hölgyem")
-        self.szemely_kon.insert("megszolitas", nem="férfi", megszolitas="Uram")
+        szemely_kon.create("szemely",
+            azonosito="INTEGER PRIMARY KEY",
+            elotag="TEXT DEFAULT ''",
+            vezeteknev="TEXT NOT NULL",
+            keresztnev="TEXT",
+            becenev="TEXT",
+            nem="TEXT",
+            megjegyzes="TEXT DEFAULT ''")
 
-        self.szemely_kon.create("szemely", azonosito="INTEGER PRIMARY KEY", elotag="TEXT",
-            vezeteknev="TEXT NOT NULL", keresztnev="TEXT NOT NULL", nem="TEXT NOT NULL REFERENCES megszolitas",
-            megjegyzes="TEXT")
+        szemely_kon.create("telefon",
+            azonosito="INTEGER PRIMARY KEY",
+            szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
+            telefonszam="TEXT NOT NULL",
+            megjegyzes="TEXT DEFAULT ''")
 
-        self.szemely_kon.create("telefon", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            telefonszam="TEXT NOT NULL", megjegyzes="TEXT")
+        szemely_kon.create("email",
+            azonosito="INTEGER PRIMARY KEY",
+            szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
+            emailcim="TEXT NOT NULL",
+            megjegyzes="TEXT DEFAULT ''")
 
-        self.szemely_kon.create("email", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            emailcim="TEXT NOT NULL", megjegyzes="TEXT")
+        szemely_kon.create("cim",
+            azonosito="INTEGER PRIMARY KEY",
+            szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
+            orszag="TEXT DEFAULT 'H'",
+            megye="TEXT DEFAULT ''",
+            iranyitoszam="TEXT DEFAULT ''",
+            helyseg="TEXT NOT NULL",
+            utca="TEXT DEFAULT ''",
+            hrsz="TEXT DEFAULT ''",
+            postafiok="TEXT DEFAULT ''",
+            honlap="TEXT DEFAULT ''",
+            megjegyzes="TEXT DEFAULT ''")
+                                
+        return szemely_kon
 
-        self.szemely_kon.create("cim", azonosito="INTEGER PRIMARY KEY", szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            orszag="TEXT DEFAULT 'H'", iranyitoszam="TEXT", helyseg="TEXT", utca="TEXT", megjegyzes="TEXT")
+    def _init_szervezet_db(self) -> tamer.Tamer:
+        """Szervezet adatbázis inicializálása"""
+        szervezet_kon = tamer.Tamer("szervezet.db")
 
-        self.szemely_kon.create("kontakt", azonosito="INTEGER PRIMARY KEY",
-            szemely="INTEGER NOT NULL REFERENCES szemely", szervezet="INTEGER", megjegyzes="TEXT")
+        szervezet_kon.create("szervezet",
+            azonosito="INTEGER PRIMARY KEY",
+            rovidnev="TEXT NOT NULL",
+            teljesnev="TEXT",
+            gyakorisag="INTEGER DEFAULT 0",
+            megjegyzes="TEXT DEFAULT ''")
 
-        self.szemely_kon.executescript("""
-            PRAGMA foreign_keys = ON;
+        szervezet_kon.create("telefon",
+            azonosito="INTEGER PRIMARY KEY",
+            szervezet="INTEGER NOT NULL REFERENCES szervezet",
+            telefonszam="TEXT NOT NULL",
+            megjegyzes="TEXT DEFAULT ''")
 
-            CREATE VIEW IF NOT EXISTS nev(szemely, nev) AS
-                SELECT azonosito, ltrim(printf('%s %s, %s', vezeteknev, keresztnev, elotag))
-                    FROM szemely;
+        szervezet_kon.create("email",
+            azonosito="INTEGER PRIMARY KEY",
+            szervezet="INTEGER NOT NULL REFERENCES szervezet",
+            emailcim="TEXT NOT NULL",
+            megjegyzes="TEXT DEFAULT ''")
 
-            CREATE VIEW IF NOT EXISTS teljescim(szemely, cim) AS
-                SELECT szemely, printf('%s-%s %s, %s', orszag, iranyitoszam, helyseg, utca)
-                    FROM cim;
+        szervezet_kon.create("cim",
+            azonosito="INTEGER PRIMARY KEY",
+            szervezet="INTEGER NOT NULL REFERENCES szervezet",
+            orszag="TEXT DEFAULT 'H'",
+            megye="TEXT DEFAULT ''",
+            iranyitoszam="TEXT DEFAULT ''",
+            helyseg="TEXT NOT NULL",
+            utca="TEXT DEFAULT ''",
+            hrsz="TEXT DEFAULT ''",
+            postafiok="TEXT DEFAULT ''",
+            honlap="TEXT DEFAULT ''",
+            megjegyzes="TEXT DEFAULT ''")
 
-            CREATE VIEW IF NOT EXISTS elerhetoseg(szemely, elerhetoseg) AS
-                SELECT nev.szemely, printf('%s: %s, %s', nev, telefonszam, emailcim)
-                    FROM nev, telefon, email
-                        WHERE nev.szemely=telefon.szemely
-                            AND nev.szemely=email.szemely
-                            AND telefon.megjegyzes='elsődleges'
-                            AND email.megjegyzes='elsődleges';
+        return szervezet_kon
 
-            CREATE VIEW IF NOT EXISTS koszontes(szemely, koszontes) AS
-                SELECT szemely.azonosito, printf('Tisztelt %s!', megszolitas)
-                    FROM szemely, megszolitas
-                        WHERE szemely.nem=megszolitas.nem;
+    def _init_kontakt_db(self) -> tamer.Tamer:
+        """Kontaktszemélyek adatbázisának inicializálása"""
+        kontakt_kon = tamer.Tamer("kontakt.db")
 
-            -- automatikusan add hozzá a kontaktszemélyhez is
-            CREATE TRIGGER IF NOT EXISTS kntkt AFTER INSERT ON szemely
-                BEGIN
-                    INSERT INTO kontakt(szemely) VALUES(last_insert_rowid());
-                END;
-        """)
+        kontakt_kon.create("kontakt",
+            azonosito="INTEGER PRIMARY KEY",
+            szemely="INTEGER",
+            szervezet="INTEGER",
+            gyakorisag="INTEGER DEFAULT 0",
+            megjegyzes="TEXT DEFAULT ''")
+        
+        kontakt_kon.create("beosztas",
+            azonosito="INTEGER PRIMARY KEY",
+            kontakt="INTEGER REFERENCES kontakt",
+            megnevezes="TEXT NOT NULL",
+            megjegyzes="TEXT DEFAULT ''")
+
+        return kontakt_kon
+
+    def _init_projekt_db(self) -> tamer.Tamer:
+        """Projekt adatbázis inicializálása"""
+        projekt_kon = tamer.Tamer("projekt.db")
+
+        projekt_kon.create("projekt",
+            azonosito="INTEGER PRIMARY KEY",
+            megnevezes="TEXT NOT NULL",
+            rovidnev="TEXT",
+            ev="INTEGER NOT NULL",
+            szam="INTEGER NOT NULL",
+            gyakorisag="INTEGER DEFAULT 0",
+            megjegyzes="TEXT DEFAULT ''")
+
+        projekt_kon.create("munkaresz",
+            azonosito="INTEGER PRIMARY KEY",
+            projekt="INTEGER NOT NULL REFERENCES projekt",
+            megnevezes="TEXT NOT NULL",
+            enaplo="INTEGER",
+            megjegyzes="TEXT DEFAULT ''")
+
+        projekt_kon.create("cim",
+            azonosito="INTEGER PRIMARY KEY",
+            munkaresz="INTEGER NOT NULL REFERENCES munkaresz",
+            orszag="TEXT DEFAULT 'H'",
+            megye="TEXT DEFAULT ''",
+            iranyitoszam="TEXT DEFAULT ''",
+            helyseg="TEXT NOT NULL",
+            utca="TEXT DEFAULT ''",
+            hrsz="TEXT DEFAULT ''",
+            postafiok="TEXT DEFAULT ''",
+            honlap="TEXT DEFAULT ''",
+            megjegyzes="TEXT DEFAULT ''")
+
+        projekt_kon.create("jelleg",
+            azonosito="INTEGER PRIMARY KEY",
+            munkaresz="INTEGER NOT NULL REFERENCES munkaresz",
+            megnevezes="TEXT NOT NULL",
+            megjegyzes="TEXT DEFAULT ''")
+
+        return projekt_kon
+
+    def _init_ajanlat_db(self) -> tamer.Tamer:
+        """Ajánlat adatbázis inicializálása"""
+        ajanlat_kon = tamer.Tamer("ajanlat.db")
+
+        ajanlat_kon.create("ajanlatkeres",
+            azonosito="INTEGER PRIMARY KEY",
+            jelleg="INTEGER NOT NULL",
+            ajanlatkero="INTEGER NOT NULL",
+            temafelelos="INTEGER NOT NULL",
+            erkezett="TEXT DEFAULT CURRENT_DATE",
+            hatarido="TEXT DEFAULT ''",
+            megjegyzes="TEXT DEFAULT ''")
+        
+        ajanlat_kon.create("ajanlat",
+            azonosito="INTEGER PRIMARY KEY",
+            ajanlatkeres="INTEGER NOT NULL REFERENCES ajanlatkeres",
+            ajanlatiar="INTEGER NOT NULL",
+            leadva="TEXT DEFAULT CURRENT_DATE",
+            ervenyes="TEXT DEFAULT ''",
+            esely="INTEGER DEFAULT 5",
+            megjegyzes="TEXT DEFAULT ''")
+    
+        return ajanlat_kon
 
 
 if __name__ == "__main__":

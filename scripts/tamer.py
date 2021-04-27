@@ -123,6 +123,7 @@ class Tamer(sqlite3.Connection):
                                         verified.
                             orderby:    specify the ORDER BY clause
                             ordering:   defaults to ASC, specify DESC if you want descending order
+                            distinct:   select distinct values
 
         Returns:
             Cursor-object of resulting query (powered as row_factory) or
@@ -132,10 +133,14 @@ class Tamer(sqlite3.Connection):
             https://sqlite.org/lang_select.html
             https://www.w3schools.com/sql/sql_and_or.asp
         """
+        distinct = kwargs.pop("distinct", "")
+        if distinct:
+            distinct = " DISTINCT"
+
         if cols:
-            select_stmnt = """SELECT {}""".format(", ".join(col for col in cols))
+            select_stmnt = """SELECT{} {}""".format(distinct, ", ".join(col for col in cols))
         else:
-            select_stmnt = """SELECT *"""
+            select_stmnt = """SELECT{} *""".format(distinct)
         select_stmnt += """ FROM {}"""
 
         logic = kwargs.pop("logic", "OR")
@@ -371,6 +376,50 @@ class Tamer(sqlite3.Connection):
         except sqlite3.Error as err:
             print("Couldn't retrieve table names:", err, file=sys.stderr)
             return None
+    
+
+    def attach(self, **kwargs):
+        """Add another database file to the current database connection.
+
+        Args:
+            kwargs: schemaname=filename key-value pairs
+        
+        Returns:
+            boolean value depending on wether the attach was successful or not
+        
+        Reading:
+            https://sqlite.org/lang_attach.html
+        """
+        try:
+            with self:
+                for schemaname, filename in kwargs.items():
+                    self.execute("""ATTACH DATABASE ? AS ?;""", (filename, schemaname))
+            return True        
+        except sqlite3.Error as err:
+            print("Couldn't attach database:", err, file=sys.stderr)
+            return False
+    
+
+    def detach(self, *schemanames):
+        """Detach an additional database connection previously attached using the ATTACH statement.
+
+        Args:            
+            schemanames:    reference name(s) of the database file
+        
+        Returns:
+            boolean value depending on wether the detach was successful or not
+        
+        Reading:
+            https://sqlite.org/lang_detach.html
+        """
+        try:
+            with self:
+                for schemaname in schemanames:
+                    self.execute("""DETACH DATABASE ?;""", (schemaname, ))
+            return True        
+        except sqlite3.Error as err:
+            print("Couldn't detach database:", err, file=sys.stderr)
+            return False
 
 
     @staticmethod

@@ -1,402 +1,153 @@
 from tkinter import *
 from tkinter.ttk import Combobox
-from szemely import Szemely
 from telefon import Telefon
+from email import Email
+from cim import Cim
+from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS, ORSZAG, MEGYE
 
 
-class SzemelyUrlap(LabelFrame):
+class TelefonszamUrlap(Frame):
     def __init__(self, master=None, **kw):
-        super().__init__(master=master, text="személy", **kw)
+        super().__init__(master=master, **kw)
 
-        self.elotag = StringVar()
-        self.vezeteknev = StringVar()
-        self.keresztnev = StringVar()
-        self.nem = StringVar()
-        self.megjegyzes = StringVar()
-
-        Label(self, text="előtag").grid(row=0, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.elotag, width=8).grid(row=0, column=1, sticky=W, padx=2, pady=2)
-
-        Label(self, text="vezetéknév").grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.vezeteknev, width=32)\
-            .grid(row=1, column=1, columnspan=2, sticky=W, padx=2, pady=2)
-
-        Label(self, text="keresztnév").grid(row=2, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.keresztnev, width=32)\
-            .grid(row=2, column=1, columnspan=2, sticky=W, padx=2, pady=2)
-
-        Label(self, text="nem").grid(row=3, column=0, sticky=W, padx=2, pady=2)
-        Radiobutton(self, text="nő", value="nő", variable=self.nem).grid(row=3, column=1, sticky=W, padx=2, pady=2)
-        Radiobutton(self, text="férfi", value="férfi", variable=self.nem).grid(row=3, column=2, sticky=W, padx=2, pady=2)
-        self.nem.set("férfi")
-
-        Label(self, text="megjegyzés").grid(row=4, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.megjegyzes, width=32)\
-            .grid(row=4, column=1, columnspan=2, sticky=W, padx=2, pady=2)
-
-    def beallit(self, szemely):
-        self.elotag.set(szemely.elotag)
-        self.vezeteknev.set(szemely.vezeteknev)
-        self.keresztnev.set(szemely.keresztnev)
-        self.nem.set(szemely.nem)
-        self.megjegyzes.set(szemely.megjegyzes)
-
-    def export(self):
-        return Szemely(elotag=self.elotag.get(),
-                      vezeteknev=self.vezeteknev.get(),
-                      keresztnev=self.keresztnev.get(),
-                      nem=self.nem.get(),
-                      megjegyzes=self.megjegyzes.get())
-
-
-class TelefonszamUrlap(LabelFrame):
-    def __init__(self, master=None, **kw):
-        super().__init__(master=master, text="telefonszám", **kw)
-
-        self.telefonszam = StringVar()
-        self.megjegyzes = StringVar()
-        megjegyzes = ("alapértelmezett", "munkahelyi", "privát")
-        self.megjegyzes.set(megjegyzes[0])
+        self._telefonszam = StringVar()
+        self._megjegyzes = StringVar()
+        self._megjegyzes.set(ELERHETOSEG_TIPUS[0])
 
         Label(self, text="telefonszám").grid(row=0, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self.telefonszam, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._telefonszam, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
         Label(self, text="megjegyzés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        OptionMenu(self, self.megjegyzes, *megjegyzes).grid(row=1, column=1, sticky=W, padx=2, pady=2)
-
-        self.grid()
+        OptionMenu(self, self._megjegyzes, *ELERHETOSEG_TIPUS).grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
     def beallit(self, telefon):
-        self.telefonszam.set(telefon.telefonszam)
-        self.megjegyzes.set(telefon.megjegyzes)
+        self._telefonszam.set(telefon.telefonszam)
+        self._megjegyzes.set(telefon.megjegyzes)
 
     def export(self):
-        return Telefon(telefonszam=self.telefonszam.get(), megjegyzes=self.megjegyzes.get())
+        return Telefon(telefonszam=self._telefonszam.get(), megjegyzes=self._megjegyzes.get())
+
+
+class EmailcimUrlap(Frame):
+    def __init__(self, master=None, **kw):
+        super().__init__(master=master, **kw)
+
+        self._emailcim = StringVar()
+        self._megjegyzes = StringVar()
+        self._megjegyzes.set(ELERHETOSEG_TIPUS[0])
+
+        Label(self, text="email-cím").grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._emailcim, width=32).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="megjegyzés").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self._megjegyzes, *ELERHETOSEG_TIPUS).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+
+    def beallit(self, email):
+        self._emailcim.set(email.emailcim)
+        self._megjegyzes.set(email.megjegyzes)
+
+    def export(self):
+        return Email(emailcim=self._emailcim.get(), megjegyzes=self._megjegyzes.get())
+
+
+class CimUrlap(Frame):
+    def __init__(self, master=None, **kw):
+        super().__init__(master=master, **kw)
+
+        self._orszag = StringVar()
+        self._megye = StringVar()
+        self._megye.set("")
+        self._iranyitoszam = StringVar()
+        self._helyseg = StringVar()
+        self._utca = StringVar()
+        self._hrsz = StringVar()
+        self._postafiok = StringVar()
+        self._honlap = StringVar()
+        self._megjegyzes = StringVar()
+        self._orszag.set("Magyarország")
+        self._megjegyzes.set(CIM_TIPUS[0])
+
+        Label(self, text="ország").grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self._orszag, *ORSZAG.keys()).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="megye").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        Combobox(self, textvariable=self._megye, values=MEGYE).grid(row=1, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="irányítószám").grid(row=2, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._iranyitoszam, width=8).grid(row=2, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="helység").grid(row=3, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._helyseg, width=32).grid(row=3, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="utca, házszám").grid(row=4, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._utca, width=32).grid(row=4, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="helyrajzi szám").grid(row=5, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._hrsz, width=8).grid(row=5, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="postafiók").grid(row=6, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._postafiok, width=8).grid(row=6, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="honlap").grid(row=7, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._honlap, width=32).grid(row=7, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="megjegyzés").grid(row=8, column=0, sticky=W, padx=2, pady=2)
+        OptionMenu(self, self._megjegyzes, *CIM_TIPUS).grid(row=8, column=1, sticky=W, padx=2, pady=2)
+
+    def beallit(self, cim):
+        self._orszag.set(self._kodbol_orszag(cim.orszag))
+        self._megye.set(cim.megye)
+        self._iranyitoszam.set(cim.iranyitoszam)
+        self._helyseg.set(cim.helyseg)
+        self._utca.set(cim.utca)
+        self._hrsz.set(cim.hrsz)
+        self._postafiok.set(cim.postafiok)
+        self._honlap.set(cim.honlap)
+        self._megjegyzes.set(cim.megjegyzes)
+
+    def export(self):
+        return Cim(
+            orszag=ORSZAG[self._orszag.get()],
+            megye=self._megye.get(),
+            iranyitoszam=self._iranyitoszam.get(),
+            helyseg=self._helyseg.get(),
+            utca=self._utca.get(),
+            hrsz=self._hrsz.get(),
+            postafiok=self._postafiok.get(),
+            honlap=self._honlap.get(),
+            megjegyzes=self._megjegyzes.get()
+        )
+
+    def _kodbol_orszag(self, kod):
+        for orszagnev, orszagkod in ORSZAG.items():
+            if orszagkod == kod:
+                return orszagnev  # mindig lesz találat
 
 
 class Valaszto(LabelFrame):
     def __init__(self, cimke, valasztek, master=None, **kw):
         super().__init__(master=master, text=cimke, **kw)
-        self.valasztek = valasztek
-        self.valaszto = Combobox(self, width=32)
+        self._valasztek = valasztek
+        self._valaszto = Combobox(self, width=42)
         self.beallit(valasztek)
-        self.valaszto.grid()
+        self._valaszto.grid()
 
     def beallit(self, valasztek):
-        self.valaszto["values"] = [elem.listanezet() for elem in valasztek]
+        self._valasztek = valasztek
+        self._valaszto["values"] = [elem.listanezet() for elem in valasztek]
         try:
-            self.valaszto.current(0)
+            self._valaszto.current(0)
         except TclError:
-            self.valaszto.set("")
+            self._valaszto.set("")
 
-    def azonosito(self):
+    @property
+    def valaszto(self):
+        return self._valaszto
+
+    @property
+    def elem(self):
         try:
-            return self.valasztek[self.valaszto.current()].azonosito
+            return self._valasztek[self._valaszto.current()]
         except IndexError:
             return None
-
-
-class KezeloGomb(Frame):
-    def __init__(self, master=None, **kw):
-        super().__init__(master=master, **kw)
-
-        self.master = master
-        self.valasz = False
-
-        self.megse = Button(self, text="mégse", command=self.winfo_toplevel().destroy, width=8)
-        self.ok = Button(self, text="OK", command=self.rendben, width=8)
-
-        self.megse.grid(row=0, column=0, padx=2, pady=2)
-        self.ok.grid(row=0, column=1, padx=2, pady=2)
-
-    def rendben(self):
-        self.valasz = True
-        self.winfo_toplevel().destroy()
-
-
-class UjSzemelyUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
-
-        self.kon = kon
-
-        self.szemelyurlap = SzemelyUrlap(self)
-        self.kezelogomb = KezeloGomb(self)
-        self.kezelogomb.megse["command"] = master.destroy
-        self.kezelogomb.ok["text"] = "mentés"
-        self.kezelogomb.ok["command"] = self.ment
-
-        self.szemelyurlap.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
-
-        self.grid()
-
-    def ment(self):
-        szemely = self.szemelyurlap.export()
-        if szemely:
-            if self.kon.select("szemely", logic="AND", **szemely).fetchone():
-                Figyelmeztetes("Ez a személy már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!",
-                               Toplevel())
-                return
-            szemely.pop("azonosito")  # majd az Sqlite megadja
-            if self.kon.insert("szemely", **szemely):
-                print("Új bejegyzés mentve.")
-        else:
-                Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
-
-
-class SzemelyTorloUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
-
-        self.kon = kon
-
-        self.lista = Valaszto("Személy törlése", self.nevsor(), self)
-
-        self.kezelogomb = KezeloGomb(self)
-        self.kezelogomb.megse["text"] = "vissza"
-        self.kezelogomb.ok["text"] = "törlés"
-        self.kezelogomb.megse["command"] = master.destroy
-        self.kezelogomb.ok["command"] = self.torol
-
-        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=1, column=0, ipadx=2, ipady=2)
-
-        self.grid()
-
-    def nevsor(self):
-        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
-
-    def torol(self):
-        azonosito = self.lista.azonosito()
-        if azonosito:
-            biztos = Figyelmeztetes("Biztos vagy benne?\nMINDEN VÉGLEGESEN törlődik!", Toplevel(), csak_ok=False)
-            biztos.wait_window(biztos)
-            if biztos.gombok.valasz:
-                self.kon.delete("telefon", szemely=azonosito)
-                self.kon.delete("email", szemely=azonosito)
-                self.kon.delete("cim", szemely=azonosito)
-                self.kon.delete("kontakt", szemely=azonosito)
-                if self.kon.delete("szemely", azonosito=azonosito):
-                    print("Bejegyzés törölve.")
-                self.lista.beallit(self.nevsor())
-
-
-class SzemelyModositoUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
-
-        self.kon = kon
-
-        self.lista = Valaszto("Személy módosítása", self.nevsor(), self)
-        self.lista.valaszto.bind("<<ComboboxSelected>>", self.megjelenit)
-
-        self.kezelogomb = KezeloGomb(self)
-        self.kezelogomb.megse["text"] = "vissza"
-        self.kezelogomb.ok["text"] = "módosít"
-        self.kezelogomb.megse["command"] = master.destroy
-        self.kezelogomb.ok["command"] = self.modosit
-
-        self.szemelyurlap = SzemelyUrlap(self)
-        self.megjelenit(1)
-
-        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.szemelyurlap.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
-
-        self.grid()
-
-    def nevsor(self):
-        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
-
-    def megjelenit(self, event):
-        szemely = Szemely.adatbazisbol(self.kon.select("szemely", azonosito=self.lista.azonosito()).fetchone())
-        self.szemelyurlap.beallit(szemely)
-
-    def modosit(self):
-        azonosito = self.lista.azonosito()
-        if azonosito:
-            szemely = self.szemelyurlap.export()
-            if szemely:
-                if self.kon.select("szemely", logic="AND", **szemely).fetchone():
-                    Figyelmeztetes("Ez a személy már szerepel az adatbázisban.\nKülönböztesd meg a megjegyzésben!",
-                                   Toplevel())
-                    return
-                szemely.pop("azonosito")  # majd az Sqlite megadja
-                if self.kon.update("szemely", szemely, azonosito=azonosito):
-                    print("Bejegyzés módosítva.")
-                    self.lista.beallit(self.nevsor())
-                    self.megjelenit(1)
-            else:
-                Figyelmeztetes("Legalább az egyik nevet add meg!", Toplevel())
-
-
-class UjTelefonUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
-
-        self.kon = kon
-
-        self.lista = Valaszto("Telefon hozzáadása", self.nevsor(), self)
-        self.telefon = TelefonszamUrlap(self)
-
-        self.kezelogomb = KezeloGomb(self)
-        self.kezelogomb.megse["command"] = master.destroy
-        self.kezelogomb.ok["text"] = "mentés"
-        self.kezelogomb.ok["command"] = self.ment
-
-        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.telefon.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
-
-        self.grid()
-
-    def nevsor(self):
-        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
-
-    def ment(self):
-        uj = self.telefon.export()
-        if uj.telefonszam:
-            uj["szemely"] = self.lista.azonosito()
-            uj.pop("azonosito")  # majd az Sqlite megadja
-            self.kon.insert("telefon", **uj)
-            print("Bejegyzés mentve.")
-        else:
-            Figyelmeztetes("A telefonszám nem maradhat üresen!", Toplevel())
-
-
-class TelefonTorloUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
-
-        self.kon = kon
-
-        self.lista = Valaszto("Személy", self.nevsor(), self)
-        self.lista.valaszto.bind("<<ComboboxSelected>>", self.megjelenit)
-
-        self.telefon = Valaszto("Törlendő telefonszám", self.telefonszamok(), self)
-
-        self.kezelogomb = KezeloGomb(self)
-        self.kezelogomb.megse["text"] = "vissza"
-        self.kezelogomb.ok["text"] = "törlés"
-        self.kezelogomb.megse["command"] = master.destroy
-        self.kezelogomb.ok["command"] = self.torol
-
-        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.telefon.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=2, column=0, ipadx=2, ipady=2)
-
-        self.grid()
-
-    def nevsor(self):
-        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
-
-    def telefonszamok(self):
-        return sorted(map(lambda telefon: Telefon.adatbazisbol(telefon),
-                                                               self.kon.select("telefon",
-                                                               szemely=self.lista.azonosito())),
-                                                               key=repr)
-
-    def megjelenit(self, event):
-        self.telefon.beallit(self.telefonszamok())
-
-    def torol(self):
-        azonosito = self.lista.azonosito()
-        if azonosito:
-            biztos = Figyelmeztetes("Biztos vagy benne?\nVÉGLEGESEN törlődik!", Toplevel(), csak_ok=False)
-            biztos.wait_window(biztos)
-            if biztos.gombok.valasz:
-                if self.kon.delete("telefon", szemely=azonosito):
-                    print("Bejegyzés törölve.")
-                    self.megjelenit(1)
-
-
-class TelefonModositoUrlap(Frame):
-    def __init__(self, master=None, kon=None, **kw):
-        super().__init__(master=master, **kw)
-
-        self.kon = kon
-
-        self.lista = Valaszto("Személy", self.nevsor(), self)
-        self.lista.valaszto.bind("<<ComboboxSelected>>", self.megjelenit)
-
-        self.telefon = Valaszto("Módosítandó telefonszám", self.telefonszamok(), self)
-        self.telefon.valaszto.bind("<<ComboboxSelected>>", self.kiir)
-
-        self.modosito = TelefonszamUrlap(self)
-        self.megjelenit(1)
-
-        self.kezelogomb = KezeloGomb(self)
-        self.kezelogomb.megse["text"] = "vissza"
-        self.kezelogomb.ok["text"] = "módosít"
-        self.kezelogomb.megse["command"] = master.destroy
-        self.kezelogomb.ok["command"] = self.modosit
-
-        self.lista.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
-        self.telefon.grid(row=1, column=0, sticky=W, ipadx=2, ipady=2)
-        self.modosito.grid(row=2, column=0, sticky=W, ipadx=2, ipady=2)
-        self.kezelogomb.grid(row=3, column=0, ipadx=2, ipady=2)
-
-        self.grid()
-
-    def nevsor(self):
-        return sorted(map(lambda szemely: Szemely.adatbazisbol(szemely), self.kon.select("szemely")), key=repr)
-
-    def telefonszamok(self):
-        return sorted(map(lambda telefon: Telefon.adatbazisbol(telefon),
-                                                               self.kon.select("telefon",
-                                                               szemely=self.lista.azonosito())),
-                                                               key=repr)
-
-    def megjelenit(self, event):
-        self.telefon.beallit(self.telefonszamok())
-        self.kiir(1)
-
-    def kiir(self, event):
-        azonosito = self.telefon.azonosito()
-        try:
-            telefonszam = next(filter(lambda telefonszam: telefonszam.azonosito == azonosito, self.telefonszamok()))
-        except StopIteration:            
-            telefonszam = Telefon(telefonszam="", megjegyzes="")
-        self.modosito.beallit(telefonszam)
-
-    def modosit(self):
-        telefonszam = self.modosito.export()
-        if telefonszam and self.telefonszamok():
-            telefonszam.pop("azonosito")  # majd az Sqlite megadja
-            telefonszam.szemely = self.lista.azonosito()
-            self.kon.update("telefon", telefonszam, azonosito=self.telefon.azonosito())
-            self.megjelenit(1)
-            print("Bejegyzés módosítva.")
-
-
-class Figyelmeztetes(Frame):
-    def __init__(self, szoveg, master=None, csak_ok=True, **kw):
-        super().__init__(master=master, **kw)
-
-        Message(self, text=szoveg, aspect=200).grid(row=0, column=0, sticky=W, padx=2, pady=2)
-        self.gombok = KezeloGomb(self)
-        if csak_ok:
-            self.gombok.megse.destroy()
-        self.gombok.grid(row=1, column=0, padx=2, pady=2)
-
-        self.grid()
-
-
-if __name__ == "__main__":
-    import tamer
-    #szemelyurlap = SzemelyUrlap(kon = tamer.Tamer("szemely.db"), azonosito=1)
-    #szemelyurlap.mainloop()
-    #telefonurlap = TelefonUrlap(tamer.Tamer("szemely.db"))
-    #telefonurlap.mainloop()
-    """nevsor = kon.select("nev").fetchall()
-    nevek = {nev["nev"]: nev["szemely"] for nev in nevsor}
-    nevsor = [nev["nev"] for nev in nevsor]
-    ablak = Tk()
-    v = Valaszto("személy", nevsor, ablak)
-    ablak.mainloop()
-    print(nevek[v.valasztas.get()])"""
-
-    # Figyelmeztetes("Ez a név már szerepel az adatbázisban.", Tk()).mainloop()
-
-    TelefonszamUrlap().mainloop()
-
+    
+    def set_callback(self, fv_ref):
+        self._valaszto.bind("<<ComboboxSelected>>", fv_ref)
