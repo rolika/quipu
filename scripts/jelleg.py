@@ -47,7 +47,7 @@ class Jelleg(Csomo):
     
     def listanezet(self) -> str:
         """Egy adott azonosítójú jelleghez egy munkarész, így egy projekt tartozik."""
-        assert self.kon
-        munkaresz = self.kon.projekt.select("munkaresz", azonosito=self.munkaresz).fetchone()
+        assert self._kon
+        munkaresz = self._kon.projekt.select("munkaresz", azonosito=self.munkaresz).fetchone()
         munkaresz = Munkaresz(kon=self._kon, **munkaresz)
         return "{}, {}".format(munkaresz.listanezet(), self.megnevezes)

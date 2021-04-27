@@ -72,9 +72,9 @@ class Ajanlatkeres(Csomo):
         return self._adatok.get("hatarido")
     
     def listanezet(self):
-        assert self.kon
-        jelleg = self.kon.projekt.select("jelleg", azonosito=self.jelleg).fetchone()
+        assert self._kon
+        jelleg = self._kon.projekt.select("jelleg", azonosito=self.jelleg).fetchone()
         jelleg = Jelleg(kon=self._kon, **jelleg)
-        kontakt = self.kon.kontakt.select("kontakt", azonosito=self.ajanlatkero).fetchone()
+        kontakt = self._kon.kontakt.select("kontakt", azonosito=self.ajanlatkero).fetchone()
         kontakt = Kontakt(kon=self._kon, **kontakt)
         return "{jelleg} / {ajanlatkero}".format(jelleg=jelleg.listanezet(), ajanlatkero=kontakt.listanezet())

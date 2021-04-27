@@ -48,11 +48,11 @@ class Kontakt(Csomo):
         return self._adatok.get("szervezet")
     
     def listanezet(self):
-        assert self.kon
-        szemely = self.kon.szemely.select("szemely", azonosito=self.szemely).fetchone()
+        assert self._kon
+        szemely = self._kon.szemely.select("szemely", azonosito=self.szemely).fetchone()
         szemely = Szemely(kon=self._kon, **szemely)
-        szervezet = self.kon.szervezet.select("szervezet", azonosito=self.szervezet).fetchone()
-        szervezet = Szervezet(kon=self.kon, **szervezet)
+        szervezet = self._kon.szervezet.select("szervezet", azonosito=self.szervezet).fetchone()
+        szervezet = Szervezet(kon=self._kon, **szervezet)
         if szervezet == MAGANSZEMELY:  # __eq__ használata
             szervezet.rovidnev = ""
         return "{nev}{ceg}".format(nev=szemely.listanezet(), ceg=szervezet.listanezet())

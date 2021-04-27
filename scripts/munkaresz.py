@@ -53,9 +53,9 @@ class Munkaresz(Csomo):
         self._adatok["projekt"] = projekt
 
     def listanezet(self):
-        assert self.kon
-        projekt = self.kon.projekt.select("projekt", azonosito=self.projekt).fetchone()
+        assert self._kon
+        projekt = self._kon.projekt.select("projekt", azonosito=self.projekt).fetchone()
         projekt = Projekt(**projekt)
-        cim = self.kon.projekt.select("cim", munkaresz=self.azonosito).fetchone()
+        cim = self._kon.projekt.select("cim", munkaresz=self.azonosito).fetchone()
         cim = Cim(**cim)
         return "{}, {}, {}".format(projekt.listanezet(), cim.helyseg, self.megnevezes)

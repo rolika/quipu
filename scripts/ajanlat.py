@@ -88,10 +88,10 @@ class Ajanlat(Csomo):
         self._adatok["esely"] = uj
     
     def listanezet(self) -> str:
-        assert self.kon
-        ajanlatkeres = self.kon.ajanlat.select("ajanlatkeres", azonosito=self.ajanlatkeres).fetchone()
+        assert self._kon
+        ajanlatkeres = self._kon.ajanlat.select("ajanlatkeres", azonosito=self.ajanlatkeres).fetchone()
         ajanlatkeres = Ajanlatkeres(kon=self._kon, **ajanlatkeres)
-        jelleg = self.kon.projekt.select("jelleg", azonosito=ajanlatkeres.jelleg).fetchone()
+        jelleg = self._kon.projekt.select("jelleg", azonosito=ajanlatkeres.jelleg).fetchone()
         jelleg = Jelleg(kon=self._kon, **jelleg)
         return "{jelleg}: {ar}".format(jelleg=jelleg.listanezet(), ar=self.ajanlatiar)
     
