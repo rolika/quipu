@@ -9,7 +9,7 @@ class Kontakt(Csomo):
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
-        super().__init__()
+        super().__init__(kwargs.pop("kon", None))
         if kwargs:
             self._adatok = dict(kwargs)
         else:
@@ -48,14 +48,11 @@ class Kontakt(Csomo):
         return self._adatok.get("szervezet")
     
     def listanezet(self):
-        if self._szemely_kon and self._szervezet_kon:
-            szemely = self._szemely_kon.select("szemely", azonosito=self.szemely).fetchone()
-            szemely = Szemely(**szemely)
-            szervezet = self._szervezet_kon.select("szervezet", azonosito=self.szervezet).fetchone()
-            szervezet = Szervezet(**szervezet)
-            if szervezet.azonosito == MAGANSZEMELY.azonosito:
-                szervezet.rovidnev = ""
-            return "{nev}{ceg}".format(nev=szemely.listanezet(), 
-                                       ceg=self._nullazo(str(szervezet), zarojel="", elvalasztojel="/"))
-        else:
-            raise NotImplementedError
+        assert self.kon
+        szemely = self.kon.szemely.select("szemely", azonosito=self.szemely).fetchone()
+        szemely = Szemely(kon=self._kon, **szemely)
+        szervezet = self.kon.szervezet.select("szervezet", azonosito=self.szervezet).fetchone()
+        szervezet = Szervezet(kon=self.kon, **szervezet)
+        if szervezet == MAGANSZEMELY:  # __eq__ használata
+            szervezet.rovidnev = ""
+        return "{nev}{ceg}".format(nev=szemely.listanezet(), ceg=szervezet.listanezet())

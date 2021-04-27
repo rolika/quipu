@@ -1,13 +1,11 @@
 from csomo import Csomo
-from projekt import Projekt
 from munkaresz import Munkaresz
-from cim import Cim
 
 
 class Jelleg(Csomo):
     "Munkarész jellegének megvalósítása. Egyszerű csomó, egy külső kulcsra támaszkodik."
     def __init__(self, **kwargs):
-        super().__init__()
+        super().__init__(kwargs.pop("kon", None))
         if kwargs:
             self._adatok = dict(kwargs)
         else:
@@ -47,18 +45,9 @@ class Jelleg(Csomo):
     def munkaresz(self, munkaresz):
         self._adatok["munkaresz"] = munkaresz
     
-    def listanezet(self):
+    def listanezet(self) -> str:
         """Egy adott azonosítójú jelleghez egy munkarész, így egy projekt tartozik."""
-        if self._projekt_kon:
-            munkaresz = self._projekt_kon.select("munkaresz", azonosito=self.munkaresz).fetchone()
-            munkaresz = Munkaresz(**munkaresz)
-            cim = self._projekt_kon.select("cim", munkaresz=munkaresz.azonosito).fetchone()
-            cim = Cim(**cim)
-            projekt = self._projekt_kon.select("projekt", azonosito=munkaresz.projekt).fetchone()
-            projekt = Projekt(**projekt)
-            return "{projekt}, {hely}, {munkaresz}, {jelleg}".format(projekt=str(projekt),
-                                                                     hely=cim.helyseg,
-                                                                     munkaresz=str(munkaresz),
-                                                                     jelleg=str(self))
-        else:
-            raise NotImplementedError
+        assert self.kon
+        munkaresz = self.kon.projekt.select("munkaresz", azonosito=self.munkaresz).fetchone()
+        munkaresz = Munkaresz(kon=self._kon, **munkaresz)
+        return "{}, {}".format(munkaresz.listanezet(), self.megnevezes)
