@@ -118,7 +118,7 @@ class JellegUrlap(Frame):
 class UjProjektUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon):
         # super() előtt kell legyenek
-        self._kon = kon.projekt
+        self._kon = kon
         self._ev = date.today().strftime("%y")
         self._szam = self._kovetkezo_projektszam()
 
@@ -160,10 +160,10 @@ class UjProjektUrlap(simpledialog.Dialog):
                                    parent=self)
             return False
 
-        if projekt.meglevo(self._kon)\
-            and cim.meglevo(self._kon)\
-                and munkaresz.meglevo(self._kon)\
-                    and jelleg.meglevo(self._kon):
+        if projekt.meglevo(self._kon.projekt)\
+            and cim.meglevo(self._kon.projekt)\
+                and munkaresz.meglevo(self._kon.projekt)\
+                    and jelleg.meglevo(self._kon.projekt):
             messagebox.showwarning("Létező projekt!", "Pontosítsd!",
                                    parent=self)
             return False
@@ -177,13 +177,13 @@ class UjProjektUrlap(simpledialog.Dialog):
         projekt.szam = self._szam
         projekt.gyakorisag = 0
 
-        if not (projekt_azonosito := projekt.ment(self._kon)):
+        if not (projekt_azonosito := projekt.ment(self._kon.projekt)):
             print("Nem sikerült elmenteni!")
             return
 
         munkaresz = self._munkaresz_urlap.export()
         munkaresz.projekt = projekt_azonosito
-        if not (munkaresz_azonosito := munkaresz.ment(self._kon)):
+        if not (munkaresz_azonosito := munkaresz.ment(self._kon.projekt)):
             print("A munkarészt nem sikerült elmenteni!")
             return
 
@@ -191,7 +191,7 @@ class UjProjektUrlap(simpledialog.Dialog):
         cim.munkaresz = munkaresz_azonosito
         jelleg = self._jelleg_urlap.export()
         jelleg.munkaresz = munkaresz_azonosito
-        if not (cim.ment(self._kon) and jelleg.ment(self._kon)):
+        if not (cim.ment(self._kon.projekt) and jelleg.ment(self._kon.projekt)):
             print("A címet/jelleget nem sikerült elmenteni!")
             return
 
@@ -204,7 +204,7 @@ class UjProjektUrlap(simpledialog.Dialog):
 
 class ProjektTorloUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon):
-        self._kon = kon.projekt  # super() előtt kell legyen
+        self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Projekt törlése")
 
     def body(self, szulo):
@@ -218,16 +218,16 @@ class ProjektTorloUrlap(simpledialog.Dialog):
     def apply(self):
         hiba = False
         projekt = self._projekt_valaszto.elem
-        for munkaresz in map(lambda mr: Munkaresz(**mr), self._kon.select("munkaresz", projekt=projekt.azonosito)):
-            for cim in map(lambda cm: Cim(**cm), self._kon.select("cim", munkaresz=munkaresz.azonosito)):
-                if not cim.torol(self._kon):
+        for munkaresz in map(lambda mr: Munkaresz(**mr), self._kon.projekt.select("munkaresz", projekt=projekt.azonosito)):
+            for cim in map(lambda cm: Cim(**cm), self._kon.projekt.select("cim", munkaresz=munkaresz.azonosito)):
+                if not cim.torol(self._kon.projekt):
                     hiba = True
-            for jelleg in map(lambda jg: Jelleg(**jg), self._kon.select("jelleg", munkaresz=munkaresz.azonosito)):
-                if not jelleg.torol(self._kon):
+            for jelleg in map(lambda jg: Jelleg(**jg), self._kon.projekt.select("jelleg", munkaresz=munkaresz.azonosito)):
+                if not jelleg.torol(self._kon.projekt):
                     hiba = True
-            if not munkaresz.torol(self._kon):
+            if not munkaresz.torol(self._kon.projekt):
                 hiba = True
-        if not projekt.torol(self._kon):
+        if not projekt.torol(self._kon.projekt):
             hiba = True
         if hiba:
             print("Nem sikerült törölni.")
@@ -236,13 +236,13 @@ class ProjektTorloUrlap(simpledialog.Dialog):
             self._projekt_valaszto.beallit(self._projektek())
 
     def _projektek(self):
-        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
+        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.projekt.select("projekt")),
                       key=lambda elem: (elem.gyakorisag, repr(elem)))
 
 
 class ProjektModositoUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon):
-        self._kon = kon.projekt  # super() előtt kell legyen
+        self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Projekt módosítása")
 
     def body(self, szulo):
@@ -264,7 +264,7 @@ class ProjektModositoUrlap(simpledialog.Dialog):
 
     def apply(self):
         projekt = self._modositott_projekt()
-        if projekt.ment(self._kon):
+        if projekt.ment(self._kon.projekt):
             print("{}: Bejegyzés módosítva.".format(projekt))
         else:
             print("Nem sikerült módosítani.")
@@ -272,7 +272,7 @@ class ProjektModositoUrlap(simpledialog.Dialog):
         self._projekt_megjelenit(1)
 
     def _projektek(self):
-        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
+        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.projekt.select("projekt")),
                       key=lambda elem: (elem.gyakorisag, repr(elem)))
 
     def _projekt_megjelenit(self, event):
@@ -286,7 +286,7 @@ class ProjektModositoUrlap(simpledialog.Dialog):
 
 class UjMunkareszUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon):
-        self._kon = kon.projekt  # super() előtt kell legyen
+        self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Új munkarész felvitele")
 
     def body(self, szulo):
@@ -321,7 +321,7 @@ class UjMunkareszUrlap(simpledialog.Dialog):
             messagebox.showwarning("Hiányos adat!", "Legalább a nevet add meg!", parent=self)
             return False
 
-        if munkaresz.meglevo(self._kon) and cim.meglevo(self._kon) and jelleg.meglevo(self._kon):
+        if munkaresz.meglevo(self._kon.projekt) and cim.meglevo(self._kon.projekt) and jelleg.meglevo(self._kon.projekt):
             messagebox.showwarning("Létező munkarész!", "Pontosítsd!", parent=self)
             return False
 
@@ -334,7 +334,7 @@ class UjMunkareszUrlap(simpledialog.Dialog):
 
         munkaresz = self._munkaresz_urlap.export()
         munkaresz.projekt = projekt.azonosito
-        if not (munkaresz_azonosito := munkaresz.ment(self._kon)):
+        if not (munkaresz_azonosito := munkaresz.ment(self._kon.projekt)):
             print("A munkarészt nem sikerült elmenteni!")
             return
 
@@ -342,20 +342,20 @@ class UjMunkareszUrlap(simpledialog.Dialog):
         cim.munkaresz = munkaresz_azonosito
         jelleg = self._jelleg_urlap.export()
         jelleg.munkaresz = munkaresz_azonosito
-        if not (cim.ment(self._kon) and jelleg.ment(self._kon)):
+        if not (cim.ment(self._kon.projekt) and jelleg.ment(self._kon.projekt)):
             print("A címet/jelleget nem sikerült elmenteni!")
             return
 
         print("Bejegyzés mentve.")
 
     def _projektek(self):
-        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
+        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.projekt.select("projekt")),
                       key=lambda elem: (elem.gyakorisag, repr(elem)))
 
     def _cim_megjelenit(self, event):
         projekt = self._projekt_valaszto.elem
-        if (munkaresz := self._kon.select("munkaresz", projekt=projekt.azonosito).fetchone())\
-            and (cim := self._kon.select("cim", munkaresz=Munkaresz(**munkaresz).azonosito).fetchone()):
+        if (munkaresz := self._kon.projekt.select("munkaresz", projekt=projekt.azonosito).fetchone())\
+            and (cim := self._kon.projekt.select("cim", munkaresz=Munkaresz(**munkaresz).azonosito).fetchone()):
             self._cim_urlap.beallit(Cim(**cim))
         else:
             self._cim_urlap.beallit(Cim())
@@ -363,7 +363,7 @@ class UjMunkareszUrlap(simpledialog.Dialog):
 
 class MunkareszTorloUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon):
-        self._kon = kon.projekt  # super() előtt kell legyen
+        self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Munkarész törlése")
 
     def body(self, szulo):
@@ -383,13 +383,13 @@ class MunkareszTorloUrlap(simpledialog.Dialog):
     def apply(self):
         hiba = False
         munkaresz = self._munkaresz_valaszto.elem
-        for cim in map(lambda cm: Cim(**cm), self._kon.select("cim", munkaresz=munkaresz.azonosito)):
-            if not cim.torol(self._kon):
+        for cim in map(lambda cm: Cim(**cm), self._kon.projekt.select("cim", munkaresz=munkaresz.azonosito)):
+            if not cim.torol(self._kon.projekt):
                 hiba = True
-        for jelleg in map(lambda jg: Jelleg(**jg), self._kon.select("jelleg", munkaresz=munkaresz.azonosito)):
-            if not jelleg.torol(self._kon):
+        for jelleg in map(lambda jg: Jelleg(**jg), self._kon.projekt.select("jelleg", munkaresz=munkaresz.azonosito)):
+            if not jelleg.torol(self._kon.projekt):
                 hiba = True
-        if not munkaresz.torol(self._kon):
+        if not munkaresz.torol(self._kon.projekt):
             hiba = True
         if hiba:
             print("Nem sikerült törölni.")
@@ -397,13 +397,13 @@ class MunkareszTorloUrlap(simpledialog.Dialog):
             print("{}: Bejegyzés törölve.".format(munkaresz))
 
     def _projektek(self):
-        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
+        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.projekt.select("projekt")),
                       key=lambda elem: (elem.gyakorisag, repr(elem)))
 
     def _munkareszek(self):
         projekt = self._projekt_valaszto.elem
-        return sorted(map(lambda munkaresz: Munkaresz(**munkaresz),
-                          self._kon.select("munkaresz", projekt=projekt.azonosito)), key=repr)
+        return sorted(map(lambda munkaresz: Munkaresz(kon=self._kon, **munkaresz),
+                          self._kon.projekt.select("munkaresz", projekt=projekt.azonosito)), key=repr)
 
     def _munkaresz_megjelenit(self, event):
         self._munkaresz_valaszto.beallit(self._munkareszek())
@@ -411,7 +411,7 @@ class MunkareszTorloUrlap(simpledialog.Dialog):
 
 class MunkareszModositoUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon):
-        self._kon = kon.projekt  # super() előtt kell legyen
+        self._kon = kon  # super() előtt kell legyen
         super().__init__(szulo, title="Munkarész módosítása")
 
     def body(self, szulo):
@@ -450,7 +450,7 @@ class MunkareszModositoUrlap(simpledialog.Dialog):
             messagebox.showwarning("Hiányos adat!", "Legalább a nevet add meg!", parent=self)
             return False
 
-        if munkaresz.meglevo(self._kon) and cim.meglevo(self._kon) and jelleg.meglevo(self._kon):
+        if munkaresz.meglevo(self._kon.projekt) and cim.meglevo(self._kon.projekt) and jelleg.meglevo(self._kon.projekt):
             messagebox.showwarning("Létező munkarész!", "Pontosítsd!", parent=self)
             return False
 
@@ -458,19 +458,19 @@ class MunkareszModositoUrlap(simpledialog.Dialog):
 
     def apply(self):
         munkaresz, cim, jelleg = self._modositott_munkaresz()
-        if munkaresz.ment(self._kon) and cim.ment(self._kon) and jelleg.ment(self._kon):
+        if munkaresz.ment(self._kon.projekt) and cim.ment(self._kon.projekt) and jelleg.ment(self._kon.projekt):
             print("Bejegyzés mentve.")
         else:
             print("Nem sikerült elmenteni!")
 
     def _projektek(self):
-        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.select("projekt")),
+        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.projekt.select("projekt")),
                       key=lambda elem: (elem.gyakorisag, repr(elem)))
     
     def _munkareszek(self):
         projekt = self._projekt_valaszto.elem
-        return sorted(map(lambda munkaresz: Munkaresz(**munkaresz),
-                          self._kon.select("munkaresz", projekt=projekt.azonosito)), key=repr)
+        return sorted(map(lambda munkaresz: Munkaresz(kon=self._kon, **munkaresz),
+                          self._kon.projekt.select("munkaresz", projekt=projekt.azonosito)), key=repr)
     
     def _munkaresz_kivalaszt(self, event):
         self._munkaresz_valaszto.beallit(self._munkareszek())
@@ -484,9 +484,9 @@ class MunkareszModositoUrlap(simpledialog.Dialog):
     
     def _meglevo_munkaresz(self):
         munkaresz = self._munkaresz_valaszto.elem
-        cim = self._kon.select("cim", munkaresz=munkaresz.azonosito).fetchone()
+        cim = self._kon.projekt.select("cim", munkaresz=munkaresz.azonosito).fetchone()
         cim = Cim(**cim)
-        jelleg = self._kon.select("jelleg", munkaresz=munkaresz.azonosito).fetchone()
+        jelleg = self._kon.projekt.select("jelleg", munkaresz=munkaresz.azonosito).fetchone()
         jelleg = Jelleg(**jelleg)
         return (munkaresz, cim, jelleg)
     

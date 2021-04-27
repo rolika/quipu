@@ -55,14 +55,11 @@ class AjanlatkeresUrlap(Frame):
     
     def beallit(self, ajanlatkeres):
         ajanlatkero = self._kon.kontakt.select("kontakt", azonosito=ajanlatkeres.ajanlatkero).fetchone()
-        ajanlatkero = Kontakt(**ajanlatkero)
-        ajanlatkero.szemely_kon = self._kon.szemely
-        ajanlatkero.szervezet_kon = self._kon.szervezet
+        ajanlatkero = Kontakt(kon = self._kon, **ajanlatkero)
         jelleg = self._kon.projekt.select("jelleg", azonosito=ajanlatkeres.jelleg).fetchone()
-        jelleg = Jelleg(**jelleg)
-        jelleg.projekt_kon = self._kon.projekt
+        jelleg = Jelleg(kon = self._kon, **jelleg)
         temafelelos = self._kon.kontakt.select("kontakt", azonosito=ajanlatkeres.temafelelos).fetchone()
-        temafelelos = Kontakt(**temafelelos)
+        temafelelos = Kontakt(kon = self._kon, **temafelelos)
         temafelelosok = self._kontaktszemelyek(2)
 
         self._kontakt_valaszto.beallit((ajanlatkero, ))
@@ -94,22 +91,11 @@ class AjanlatkeresUrlap(Frame):
             kontaktok = self._kon.kontakt.select("kontakt", szervezet=szervezet_id)
         else:
             kontaktok = self._kon.kontakt.select("kontakt")
-        return sorted(map(self._kontaktszemely, kontaktok), key=repr)
-    
-    def _kontaktszemely(self, kontakt):
-        kontaktszemely = Kontakt(**kontakt)
-        kontaktszemely.szemely_kon = self._kon.szemely
-        kontaktszemely.szervezet_kon = self._kon.szervezet
-        return kontaktszemely
+        return sorted(map(lambda kontakt: Kontakt(kon=self._kon, **kontakt), kontaktok), key=repr)
     
     def _jellegek(self):
         jellegek = self._kon.projekt.select("jelleg")
-        return sorted(map(self._jelleg, jellegek), key=repr)
-    
-    def _jelleg(self, jelleg):
-        jelleg = Jelleg(**jelleg)
-        jelleg.projekt_kon = self._kon.projekt
-        return jelleg
+        return sorted(map(lambda jelleg: Jelleg(kon = self._kon, **jelleg), jellegek), key=repr)
 
 
 class UjAjanlatkeresUrlap(simpledialog.Dialog):
@@ -172,15 +158,7 @@ class AjanlatkeresTorloUrlap(simpledialog.Dialog):
                 ON ajanlatkeres.azonosito = ajanlat.ajanlatkeres
             );
             """)
-        return sorted(map(self._kon_setter, ajanlatkeresek), key=repr)
-    
-    def _kon_setter(self, ajanlatkeres):
-        ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
-        ajanlatkeres.kontakt_kon = self._kon.kontakt
-        ajanlatkeres.projekt_kon = self._kon.projekt
-        ajanlatkeres.szemely_kon = self._kon.szemely
-        ajanlatkeres.szervezet_kon = self._kon.szervezet
-        return ajanlatkeres
+        return sorted(map(lambda ajanlatkeres: Ajanlatkeres(kon = self._kon, **ajanlatkeres), ajanlatkeresek), key=repr)
 
 
 class AjanlatkeresModositoUrlap(simpledialog.Dialog):
@@ -229,12 +207,4 @@ class AjanlatkeresModositoUrlap(simpledialog.Dialog):
                 ON ajanlatkeres.azonosito = ajanlat.ajanlatkeres
             );
             """)
-        return sorted(map(self._kon_setter, ajanlatkeresek), key=repr)
-    
-    def _kon_setter(self, ajanlatkeres):
-        ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
-        ajanlatkeres.kontakt_kon = self._kon.kontakt
-        ajanlatkeres.projekt_kon = self._kon.projekt
-        ajanlatkeres.szemely_kon = self._kon.szemely
-        ajanlatkeres.szervezet_kon = self._kon.szervezet
-        return ajanlatkeres
+        return sorted(map(lambda ajanlatkeres: Ajanlatkeres(kon = self._kon, **ajanlatkeres), ajanlatkeresek), key=repr)
