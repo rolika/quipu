@@ -1,10 +1,12 @@
 from csomo import Csomo
+from projekt import Projekt
+from cim import Cim
 
 
 class Munkaresz(Csomo):
     """Munkarész megvalósítása. Egyszerű csomó, egy külső kulcsra támaszkodik."""
     def __init__(self, **kwargs):
-        super().__init__()
+        super().__init__(kwargs.pop("kon", None))
         if kwargs:
             self._adatok = dict(kwargs)
         else:
@@ -23,9 +25,6 @@ class Munkaresz(Csomo):
 
     def __bool__(self):
         return bool(self.megnevezes)
-
-    def listanezet(self):
-        return str(self)
 
     @property
     def adatok(self):
@@ -52,3 +51,11 @@ class Munkaresz(Csomo):
     @projekt.setter
     def projekt(self, projekt):
         self._adatok["projekt"] = projekt
+
+    def listanezet(self):
+        assert self._kon
+        projekt = self._kon.projekt.select("projekt", azonosito=self.projekt).fetchone()
+        projekt = Projekt(**projekt)
+        cim = self._kon.projekt.select("cim", munkaresz=self.azonosito).fetchone()
+        cim = Cim(**cim)
+        return "{}, {}, {}".format(projekt.listanezet(), cim.helyseg, self.megnevezes)

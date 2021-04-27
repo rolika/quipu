@@ -15,7 +15,7 @@ class Ajanlatkeres(Csomo):
     megjegyzés:     az ajánlatkéréshez fűzött megjegyzés (szöveg)
     """
     def __init__(self, **kwargs):
-        super().__init__()
+        super().__init__(kwargs.pop("kon", None))
         if kwargs:
             self._adatok = dict(kwargs)
         else:
@@ -72,15 +72,9 @@ class Ajanlatkeres(Csomo):
         return self._adatok.get("hatarido")
     
     def listanezet(self):
-        if self._szemely_kon and self._szervezet_kon and self._kontakt_kon and self._projekt_kon:
-            jelleg = self._projekt_kon.select("jelleg", azonosito=self.jelleg).fetchone()
-            jelleg = Jelleg(**jelleg)
-            jelleg.projekt_kon = self._projekt_kon
-            kontakt = self._kontakt_kon.select("kontakt", azonosito=self.ajanlatkero).fetchone()
-            kontakt = Kontakt(**kontakt)
-            kontakt.szemely_kon = self._szemely_kon
-            kontakt.szervezet_kon = self._szervezet_kon
-            return "{jelleg} / {ajanlatkero}".format(jelleg=jelleg.listanezet(),
-                                                     ajanlatkero=kontakt.listanezet())
-        else:
-            raise NotImplementedError
+        assert self._kon
+        jelleg = self._kon.projekt.select("jelleg", azonosito=self.jelleg).fetchone()
+        jelleg = Jelleg(kon=self._kon, **jelleg)
+        kontakt = self._kon.kontakt.select("kontakt", azonosito=self.ajanlatkero).fetchone()
+        kontakt = Kontakt(kon=self._kon, **kontakt)
+        return "{jelleg} / {ajanlatkero}".format(jelleg=jelleg.listanezet(), ajanlatkero=kontakt.listanezet())

@@ -6,7 +6,7 @@ class Szervezet(Csomo):
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
-        super().__init__()
+        super().__init__(kwargs.pop("kon", None))
         if kwargs:
             self._adatok = dict(kwargs)
         else:  # űrlap mezőinek törléséhez
@@ -62,7 +62,7 @@ class Szervezet(Csomo):
 
     def listanezet(self):
         """Szervezet megjelenítése kiválasztáshoz (Combobox)"""
-        return str(self)
+        return self.rovidnev
 
 
 if __name__ == "__main__":

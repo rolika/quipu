@@ -14,7 +14,7 @@ class Ajanlat(Csomo):
     megjegyzés:     az ajánlathoz fűzött megjegyzés (szöveg)
     """
     def __init__(self, **kwargs):
-        super().__init__()
+        super().__init__(kwargs.pop("kon", None))
         if kwargs:
             self._adatok = dict(kwargs)
         else:
@@ -88,13 +88,10 @@ class Ajanlat(Csomo):
         self._adatok["esely"] = uj
     
     def listanezet(self) -> str:
-        if self._ajanlat_kon and self._projekt_kon:
-            ajanlatkeres = self._ajanlat_kon.select("ajanlatkeres", azonosito=self.ajanlatkeres).fetchone()
-            ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
-            jelleg = self._projekt_kon.select("jelleg", azonosito=ajanlatkeres.jelleg).fetchone()
-            jelleg = Jelleg(**jelleg)
-            jelleg.projekt_kon = self._projekt_kon
-            return "{jelleg}: {ar}".format(jelleg=jelleg.listanezet(), ar=self.ajanlatiar)
-        else:
-            raise NotImplementedError
+        assert self._kon
+        ajanlatkeres = self._kon.ajanlat.select("ajanlatkeres", azonosito=self.ajanlatkeres).fetchone()
+        ajanlatkeres = Ajanlatkeres(kon=self._kon, **ajanlatkeres)
+        jelleg = self._kon.projekt.select("jelleg", azonosito=ajanlatkeres.jelleg).fetchone()
+        jelleg = Jelleg(kon=self._kon, **jelleg)
+        return "{jelleg}: {ar}".format(jelleg=jelleg.listanezet(), ar=self.ajanlatiar)
     

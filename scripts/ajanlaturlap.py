@@ -125,15 +125,7 @@ class UjAjanlatUrlap(simpledialog.Dialog):
                 ON ajanlatkeres.azonosito = ajanlat.ajanlatkeres
             );
             """)
-        return sorted(map(self._kon_setter, ajanlatkeresek), key=repr)
-
-    def _kon_setter(self, ajanlatkeres):
-        ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
-        ajanlatkeres.kontakt_kon = self._kon.kontakt
-        ajanlatkeres.projekt_kon = self._kon.projekt
-        ajanlatkeres.szemely_kon = self._kon.szemely
-        ajanlatkeres.szervezet_kon = self._kon.szervezet
-        return ajanlatkeres
+        return sorted(map(lambda ajanlatkeres: Ajanlatkeres(kon=self._kon, **ajanlatkeres), ajanlatkeresek), key=repr)
 
     def _alapertelmezes(self, event):
         ma = date.isoformat(date.today())
@@ -164,13 +156,7 @@ class AjanlatTorloUrlap(simpledialog.Dialog):
 
     def _ajanlatok(self):
         ajanlatok = self._kon.ajanlat.select("ajanlat")
-        return sorted(map(self._kon_setter, ajanlatok), key=repr)
-
-    def _kon_setter(self, ajanlat):
-        ajanlat = Ajanlat(**ajanlat)
-        ajanlat.ajanlat_kon = self._kon.ajanlat
-        ajanlat.projekt_kon = self._kon.projekt
-        return ajanlat
+        return sorted(map(lambda ajanlat: Ajanlat(kon=self._kon, **ajanlat), ajanlatok), key=repr)
 
 
 class AjanlatModositoUrlap(simpledialog.Dialog):
@@ -209,16 +195,8 @@ class AjanlatModositoUrlap(simpledialog.Dialog):
             print("Nem sikerült módosítani!")
 
     def _ajanlatok(self):
-        return sorted(map(self._ajanlat_kon_setter, self._kon.ajanlat.select("ajanlat")), key=repr)
-
-    def _ajanlat_kon_setter(self, ajanlat):
-        ajanlat = Ajanlat(**ajanlat)
-        ajanlat.ajanlat_kon = self._kon.ajanlat
-        ajanlat.kontakt_kon = self._kon.kontakt
-        ajanlat.projekt_kon = self._kon.projekt
-        ajanlat.szemely_kon = self._kon.szemely
-        ajanlat.szervezet_kon = self._kon.szervezet
-        return ajanlat
+        ajanlatok = self._kon.ajanlat.select("ajanlat")
+        return sorted(map(lambda ajanlat: Ajanlat(kon=self._kon, **ajanlat), ajanlatok), key=repr)
     
     def _reszletek(self, event):
         """Megjeleníti a kiválasztott ajánlat módosítható részleteit.
