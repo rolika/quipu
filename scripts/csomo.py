@@ -1,6 +1,3 @@
-from konnektor import Konnektor  # csak function annotation miatt
-
-
 class Csomo:
     """A kipu egy csomóírás. Ez az alkalmazás is alapvető csomókból áll."""
     def __init__(self, kon=None) -> object:
