@@ -4,7 +4,7 @@ from konnektor import Konnektor  # csak function annotation miatt
 class Csomo:
     """A kipu egy csomóírás. Ez az alkalmazás is alapvető csomókból áll."""
     def __init__(self, kon=None) -> object:
-        """A csomó bázispéldánya. Önmagában nem jó semmire, a le kell származtatni.
+        """A csomó bázispéldánya. Önmagában nem jó semmire, le kell származtatni.
         kon:    Konnektor() adabázis-gyűjtőkapcsolat"""
         self._adatok = dict()
         self._tabla = None
