@@ -55,4 +55,4 @@ class Kontakt(Csomo):
         szervezet = Szervezet(kon=self._kon, **szervezet)
         if szervezet == MAGANSZEMELY:  # __eq__ használata
             szervezet.rovidnev = ""
-        return "{nev}{ceg}".format(nev=szemely.listanezet(), ceg=szervezet.listanezet())
+        return "{nev}{ceg}".format(nev=szemely.listanezet(), ceg=self._nullazo(szervezet.listanezet(), zarojel="", elvalasztojel=" / "))
