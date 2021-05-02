@@ -6,7 +6,7 @@ from cim import Cim
 class Munkaresz(Csomo):
     """Munkarész megvalósítása. Egyszerű csomó, egy külső kulcsra támaszkodik."""
     def __init__(self, **kwargs):
-        super().__init__(kwargs.pop("kon", None))
+        super().__init__()
         if kwargs:
             self._adatok = dict(kwargs)
         else:
@@ -53,8 +53,7 @@ class Munkaresz(Csomo):
         self._adatok["projekt"] = projekt
 
     def listanezet(self):
-        assert self._kon
-        projekt = self._kon.projekt.select("projekt", azonosito=self.projekt).fetchone()
+        projekt = Csomo.kon.projekt.select("projekt", azonosito=self.projekt).fetchone()
         projekt = Projekt(**projekt)
         cim = self._kon.projekt.select("cim", munkaresz=self.azonosito).fetchone()
         cim = Cim(**cim)

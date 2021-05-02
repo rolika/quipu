@@ -1,7 +1,6 @@
 from csomo import Csomo
 from jelleg import Jelleg
 from kontakt import Kontakt
-import copy
 
 
 class Ajanlatkeres(Csomo):
@@ -15,7 +14,7 @@ class Ajanlatkeres(Csomo):
     megjegyzés:     az ajánlatkéréshez fűzött megjegyzés (szöveg)
     """
     def __init__(self, **kwargs):
-        super().__init__(kwargs.pop("kon", None))
+        super().__init__()
         if kwargs:
             self._adatok = dict(kwargs)
         else:
@@ -72,9 +71,8 @@ class Ajanlatkeres(Csomo):
         return self._adatok.get("hatarido")
     
     def listanezet(self):
-        assert self._kon
-        jelleg = self._kon.projekt.select("jelleg", azonosito=self.jelleg).fetchone()
-        jelleg = Jelleg(kon=self._kon, **jelleg)
-        kontakt = self._kon.kontakt.select("kontakt", azonosito=self.ajanlatkero).fetchone()
-        kontakt = Kontakt(kon=self._kon, **kontakt)
+        jelleg = Csomo.kon.projekt.select("jelleg", azonosito=self.jelleg).fetchone()
+        jelleg = Jelleg(**jelleg)
+        kontakt = Csomo.kon.kontakt.select("kontakt", azonosito=self.ajanlatkero).fetchone()
+        kontakt = Kontakt(**kontakt)
         return "{jelleg} / {ajanlatkero}".format(jelleg=jelleg.listanezet(), ajanlatkero=kontakt.listanezet())

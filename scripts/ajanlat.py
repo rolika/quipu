@@ -14,7 +14,7 @@ class Ajanlat(Csomo):
     megjegyzés:     az ajánlathoz fűzött megjegyzés (szöveg)
     """
     def __init__(self, **kwargs):
-        super().__init__(kwargs.pop("kon", None))
+        super().__init__()
         if kwargs:
             self._adatok = dict(kwargs)
         else:
@@ -88,10 +88,9 @@ class Ajanlat(Csomo):
         self._adatok["esely"] = uj
     
     def listanezet(self) -> str:
-        assert self._kon
-        ajanlatkeres = self._kon.ajanlat.select("ajanlatkeres", azonosito=self.ajanlatkeres).fetchone()
-        ajanlatkeres = Ajanlatkeres(kon=self._kon, **ajanlatkeres)
-        jelleg = self._kon.projekt.select("jelleg", azonosito=ajanlatkeres.jelleg).fetchone()
-        jelleg = Jelleg(kon=self._kon, **jelleg)
+        ajanlatkeres = Csomo.kon.ajanlat.select("ajanlatkeres", azonosito=self.ajanlatkeres).fetchone()
+        ajanlatkeres = Ajanlatkeres(**ajanlatkeres)
+        jelleg = Csomo.kon.projekt.select("jelleg", azonosito=ajanlatkeres.jelleg).fetchone()
+        jelleg = Jelleg(**jelleg)
         return "{jelleg}: {ar}".format(jelleg=jelleg.listanezet(), ar=self.ajanlatiar)
     

@@ -14,12 +14,11 @@ class Csomo:
         ajanlat=Tamer("ajanlat.db")
     )
 
-    def __init__(self, kon=None) -> object:
+    def __init__(self) -> object:
         """A csomó bázispéldánya. Önmagában nem jó semmire, le kell származtatni.
         kon:    Konnektor() adabázis-gyűjtőkapcsolat"""
         self._adatok = dict()
         self._tabla = None
-        self._kon = kon
 
     def __str__(self) -> str:
         """Csomó szöveges megjelenítése, elsősorban debugoláshoz."""

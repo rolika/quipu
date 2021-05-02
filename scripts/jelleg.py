@@ -5,7 +5,7 @@ from munkaresz import Munkaresz
 class Jelleg(Csomo):
     "Munkarész jellegének megvalósítása. Egyszerű csomó, egy külső kulcsra támaszkodik."
     def __init__(self, **kwargs):
-        super().__init__(kwargs.pop("kon", None))
+        super().__init__()
         if kwargs:
             self._adatok = dict(kwargs)
         else:
@@ -47,7 +47,6 @@ class Jelleg(Csomo):
     
     def listanezet(self) -> str:
         """Egy adott azonosítójú jelleghez egy munkarész, így egy projekt tartozik."""
-        assert self._kon
-        munkaresz = self._kon.projekt.select("munkaresz", azonosito=self.munkaresz).fetchone()
-        munkaresz = Munkaresz(kon=self._kon, **munkaresz)
+        munkaresz = Csomo.kon.projekt.select("munkaresz", azonosito=self.munkaresz).fetchone()
+        munkaresz = Munkaresz(**munkaresz)
         return "{}, {}".format(munkaresz.listanezet(), self.megnevezes)
