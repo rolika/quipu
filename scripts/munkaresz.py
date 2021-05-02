@@ -21,7 +21,7 @@ class Munkaresz(Csomo):
         return "{}{}".format(self.megnevezes, self._nullazo(self.megjegyzes))
 
     def __repr__(self):
-        return self._ascii_rep("{}{}".format(self.megnevezes, self._nullazo(self.megjegyzes)))
+        return self._ascii_rep(self.listanezet())
 
     def __bool__(self):
         return bool(self.megnevezes)

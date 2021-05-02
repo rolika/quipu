@@ -30,11 +30,11 @@ class Ajanlat(Csomo):
 
     def __bool__(self):
         """Az ajánlat akkor érvényes, ha 0-nál nagyobb egész számra konvertálható az ajánlati ár."""
-        #try:
-        assert int(self.ajanlatiar) > 0
-        return True
-        #except (ValueError, AssertionError):
-        return False
+        try:
+            assert int(self.ajanlatiar) > 0
+            return True
+        except (ValueError, AssertionError):
+            return False
     
     def __repr__(self):
         return self._ascii_rep(self.listanezet())

@@ -16,7 +16,7 @@ class Jelleg(Csomo):
         self._tabla = "jelleg"
     
     def __str__(self):
-        return "{}{}".format(self.megnevezes, self._nullazo(self.megjegyzes))
+        return "{}{}".format(self.listanezet(), self._nullazo(self.megjegyzes))
     
     def __repr__(self):
         return self._ascii_rep(self.listanezet())

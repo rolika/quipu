@@ -18,16 +18,15 @@ class Szervezet(Csomo):
             }
         self._tabla = "szervezet"
 
-    def __str__(self):
-        """Szervezeti adatok megjelenítése, elsősorban debugoláshoz"""
-        megjegyzes = self._nullazo(self.megjegyzes)
-        return "{}{}".format(self.rovidnev, megjegyzes)
+    def __str__(self) -> str:
+        """Szervezeti adatok megjelenítése terminál-nézethez."""
+        return "{nev}{meg}".format(nev=self.teljesnev or self.rovidnev, meg=self._nullazo(self.megjegyzes))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Név megjelenítése sorbarendezéshez"""
-        return self._ascii_rep(self.listanezet())
+        return self._ascii_rep(self.teljesnev or self.rovidnev)
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         """Egy szervezet akkor meghatározott, ha legalább a rövid neve adott"""
         return bool(self.rovidnev)
 
@@ -60,11 +59,14 @@ class Szervezet(Csomo):
     def gyakorisag(self):
         return self._adatok.get("gyakorisag")
 
-    def listanezet(self):
+    def listanezet(self) -> str:
         """Szervezet megjelenítése kiválasztáshoz (Combobox)"""
         return self.rovidnev
 
 
 if __name__ == "__main__":
     """Egyszerű tesztelés"""
-    pass
+    wevik = Szervezet(rovidnev="Wevik")
+    print(wevik)
+    pohlen = Szervezet(rovidnev="Pohlen-Dach", teljesnev="Pohlen-Dach Hungária Bt.", megjegyzes="nagy cég")
+    print(pohlen)
