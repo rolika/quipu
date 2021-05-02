@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter.ttk import Combobox
 from telefon import Telefon
-from email import Email
+from e_mail import Email
 from cim import Cim
 from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS, ORSZAG, MEGYE
 

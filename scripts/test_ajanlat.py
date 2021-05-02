@@ -16,7 +16,7 @@ from collections import namedtuple
 from tamer import Tamer
 from szemely import Szemely
 from telefon import Telefon
-from email import Email
+from e_mail import Email
 from szervezet import Szervezet
 from kontakt import Kontakt
 from projekt import Projekt

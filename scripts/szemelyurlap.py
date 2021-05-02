@@ -10,7 +10,7 @@ from tkinter.ttk import Combobox
 from urlap import TelefonszamUrlap, EmailcimUrlap, CimUrlap, Valaszto
 from szemely import Szemely
 from telefon import Telefon
-from email import Email
+from e_mail import Email
 from cim import Cim
 from szervezet import Szervezet
 from kontakt import Kontakt
