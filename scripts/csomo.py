@@ -1,5 +1,19 @@
+from konnektor import Konnektor
+from tamer import Tamer
+
+
 class Csomo:
     """A kipu egy csomóírás. Ez az alkalmazás is alapvető csomókból áll."""
+
+    # class attribute - egy pldányban létezik és minden leszármazott ismeri
+    kon = Konnektor(
+        szemely=Tamer("szemely.db"),
+        szervezet=Tamer("szervezet.db"),
+        kontakt=Tamer("kontakt.db"),
+        projekt=Tamer("projekt.db"),
+        ajanlat=Tamer("ajanlat.db")
+    )
+
     def __init__(self, kon=None) -> object:
         """A csomó bázispéldánya. Önmagában nem jó semmire, le kell származtatni.
         kon:    Konnektor() adabázis-gyűjtőkapcsolat"""
@@ -43,23 +57,26 @@ class Csomo:
         """Csomó szöveges megjelenítése kiválasztáshoz (pl. Combobox)."""
         raise NotImplementedError
 
-    def meglevo(self, kon) -> bool:
+    def meglevo(self, konkret_kon) -> bool:
         """Ellenőrzi, hogy a csomó szerepel-e az adatbázisban.
-        kon:    tamer modul adatbázis konnektora"""
-        return True if self.azonosito else kon.select(self._tabla, logic="AND", **self._adatok).fetchone()
+        konkret_kon:    tamer modul adatbázis konnektora - class attribute konkrét attribútuma"""
+        assert self._tabla  # gyerek.osztályokban kell pontosítani
+        return True if self.azonosito else konkret_kon.select(self._tabla, logic="AND", **self._adatok).fetchone()
 
-    def ment(self, kon) -> bool:
+    def ment(self, konkret_kon) -> bool:
         """Menti vagy módosítja a csomó adatait.
-        kon:    tamer modul adatbázis konnektora"""
+        konkret_kon:    tamer modul adatbázis konnektora - class attribute konkrét attribútuma"""
+        assert self._tabla  # gyerek.osztályokban kell pontosítani
         if self.azonosito:
-            return kon.update(self._tabla, self._adatok, azonosito=self.azonosito)  # True vagy False
+            return konkret_kon.update(self._tabla, self._adatok, azonosito=self.azonosito)  # True vagy False
         else:
-            return kon.insert(self._tabla, **self._adatok)  # lastrowid vagy None
+            return konkret_kon.insert(self._tabla, **self._adatok)  # lastrowid vagy None
 
-    def torol(self, kon) -> bool:
+    def torol(self, konkret_kon) -> bool:
         """Törli az adatbázisból a csomót.
-        kon:    tamer modul adatbázis konnektora"""
-        return kon.delete(self._tabla, azonosito=self.azonosito)
+        konkret_kon:    tamer modul adatbázis konnektora - class attribute konkrét attribútuma"""
+        assert self._tabla  # gyerek.osztályokban kell pontosítani
+        return konkret_kon.delete(self._tabla, azonosito=self.azonosito)
 
     def _ascii_rep(self, szoveg) -> str:
         """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez

@@ -25,11 +25,11 @@ SOFTWARE.
 """
 
 from tkinter import *
-import tamer
-import menu
+from tamer import Tamer
+from menu import Fomenu
 from konstans import MAGANSZEMELY, WEVIK, VITYA, ROLI
 from kontakt import Kontakt
-from konnektor import Konnektor
+from csomo import Csomo
 
 
 class Quipu(Frame):
@@ -47,12 +47,13 @@ class Quipu(Frame):
         kwargs: tkinter.Frame tulajdonságait szabályozó értékek"""
         super().__init__(master=master, **kwargs)
 
-        # adatbázis konnektorok
-        kon = Konnektor(szemely=self._init_szemely_db(),
-                        szervezet=self._init_szervezet_db(),
-                        kontakt=self._init_kontakt_db(),
-                        projekt=self._init_projekt_db(),
-                        ajanlat=self._init_ajanlat_db())
+        # adatbázis inicializálása
+        self._init_szemely_db()
+        self._init_szervezet_db()
+        self._init_kontakt_db()
+        self._init_projekt_db()
+        self._init_ajanlat_db()
+        kon = Csomo.kon
 
         # alapadatok beírása
         if not WEVIK.meglevo(kon.szervezet):  # feltételezem, hogy a céggel együtt a többet se írta még be
@@ -68,15 +69,15 @@ class Quipu(Frame):
         ROLI.azonosito = 2  # ez is
 
         # főmenü megjelenítése
-        menu.Fomenu(self, kon)
+        Fomenu(self, kon)
         self.grid()
 
         # és pörgés :-)
         self.mainloop()
 
-    def _init_szemely_db(self) -> tamer.Tamer:
+    def _init_szemely_db(self) -> None:
         """ Személy adatbázis inicializálása  """
-        szemely_kon = tamer.Tamer("szemely.db")
+        szemely_kon = Tamer("szemely.db")
 
         szemely_kon.create("szemely",
             azonosito="INTEGER PRIMARY KEY",
@@ -112,11 +113,11 @@ class Quipu(Frame):
             honlap="TEXT DEFAULT ''",
             megjegyzes="TEXT DEFAULT ''")
                                 
-        return szemely_kon
+        szemely_kon.close()
 
-    def _init_szervezet_db(self) -> tamer.Tamer:
+    def _init_szervezet_db(self) -> None:
         """Szervezet adatbázis inicializálása"""
-        szervezet_kon = tamer.Tamer("szervezet.db")
+        szervezet_kon = Tamer("szervezet.db")
 
         szervezet_kon.create("szervezet",
             azonosito="INTEGER PRIMARY KEY",
@@ -150,11 +151,11 @@ class Quipu(Frame):
             honlap="TEXT DEFAULT ''",
             megjegyzes="TEXT DEFAULT ''")
 
-        return szervezet_kon
+        szervezet_kon.close()
 
-    def _init_kontakt_db(self) -> tamer.Tamer:
+    def _init_kontakt_db(self) -> None:
         """Kontaktszemélyek adatbázisának inicializálása"""
-        kontakt_kon = tamer.Tamer("kontakt.db")
+        kontakt_kon = Tamer("kontakt.db")
 
         kontakt_kon.create("kontakt",
             azonosito="INTEGER PRIMARY KEY",
@@ -169,11 +170,11 @@ class Quipu(Frame):
             megnevezes="TEXT NOT NULL",
             megjegyzes="TEXT DEFAULT ''")
 
-        return kontakt_kon
+        kontakt_kon.close()
 
-    def _init_projekt_db(self) -> tamer.Tamer:
+    def _init_projekt_db(self) -> None:
         """Projekt adatbázis inicializálása"""
-        projekt_kon = tamer.Tamer("projekt.db")
+        projekt_kon = Tamer("projekt.db")
 
         projekt_kon.create("projekt",
             azonosito="INTEGER PRIMARY KEY",
@@ -210,11 +211,11 @@ class Quipu(Frame):
             megnevezes="TEXT NOT NULL",
             megjegyzes="TEXT DEFAULT ''")
 
-        return projekt_kon
+        projekt_kon.close()
 
-    def _init_ajanlat_db(self) -> tamer.Tamer:
+    def _init_ajanlat_db(self) -> None:
         """Ajánlat adatbázis inicializálása"""
-        ajanlat_kon = tamer.Tamer("ajanlat.db")
+        ajanlat_kon = Tamer("ajanlat.db")
 
         ajanlat_kon.create("ajanlatkeres",
             azonosito="INTEGER PRIMARY KEY",
@@ -234,7 +235,7 @@ class Quipu(Frame):
             esely="INTEGER DEFAULT 5",
             megjegyzes="TEXT DEFAULT ''")
     
-        return ajanlat_kon
+        ajanlat_kon.close()
 
 
 if __name__ == "__main__":

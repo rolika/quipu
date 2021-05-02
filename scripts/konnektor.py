@@ -12,17 +12,6 @@ class Konnektor:
         """
         for nev, kon in kwargs.items():
             setattr(self, nev, kon)
-    
-    def szemelyhez_rendelt_szervezetek(self, szemelyazonosito):
-        self._kon.szemely.execute("""
-            SELECT *
-            FROM szervezet
-            WHERE azonosito IN (
-                SELECT szervezet
-                FROM kontakt
-                WHERE szemely = ?
-            );
-        """, (szemelyazonosito, ))
 
 
 # az elv tesztelése
