@@ -198,7 +198,7 @@ class UjProjektUrlap(simpledialog.Dialog):
         print("Bejegyzés mentve.")
 
     def _kovetkezo_projektszam(self):
-        utolso = self._kon.select("projekt", "szam", ev=self._ev, orderby="szam", ordering="DESC").fetchone()
+        utolso = self._kon.projekt.select("projekt", "szam", ev=self._ev, orderby="szam", ordering="DESC").fetchone()
         return utolso["szam"] + 1 if utolso else 1
 
 
@@ -367,46 +367,33 @@ class MunkareszTorloUrlap(simpledialog.Dialog):
         super().__init__(szulo, title="Munkarész törlése")
 
     def body(self, szulo):
-        self._projekt_valaszto = Valaszto("projekt", self._projektek(), self)
-        self._projekt_valaszto.set_callback(self._munkaresz_megjelenit)
-        self._projekt_valaszto.pack(ipadx=2, ipady=2)
-
         self._munkaresz_valaszto = Valaszto("munkarész", self._munkareszek(), self)
         self._munkaresz_valaszto.pack(ipadx=2, ipady=2)
-
-        self._munkaresz_megjelenit(1)
-        return self._projekt_valaszto.valaszto
+        return self._munkaresz_valaszto.valaszto
 
     def validate(self):
         return messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!", parent=self)
 
     def apply(self):
         hiba = False
-        munkaresz = self._munkaresz_valaszto.elem
-        for cim in map(lambda cm: Cim(**cm), self._kon.projekt.select("cim", munkaresz=munkaresz.azonosito)):
-            if not cim.torol(self._kon.projekt):
-                hiba = True
-        for jelleg in map(lambda jg: Jelleg(**jg), self._kon.projekt.select("jelleg", munkaresz=munkaresz.azonosito)):
-            if not jelleg.torol(self._kon.projekt):
-                hiba = True
-        if not munkaresz.torol(self._kon.projekt):
+        jelleg = self._munkaresz_valaszto.elem
+        munkaresz = self._kon.projekt.select("munkaresz", azonosito=jelleg.munkaresz).fetchone()
+        munkaresz = Munkaresz(**munkaresz)
+        cim = self._kon.projekt.select("cim", munkaresz=munkaresz.azonosito).fetchone()
+        cim = Cim(**cim)
+        if not cim.torol(self._kon.projekt):
             hiba = True
+        if not jelleg.torol(self._kon.projekt):
+            hiba = True
+        # TODO Ha a munkarésznek nincs több jellege, címe, akkor a munkarészt is törölni kell
         if hiba:
             print("Nem sikerült törölni.")
         else:
             print("{}: Bejegyzés törölve.".format(munkaresz))
 
-    def _projektek(self):
-        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.projekt.select("projekt")),
-                      key=lambda elem: (elem.gyakorisag, repr(elem)))
-
     def _munkareszek(self):
-        projekt = self._projekt_valaszto.elem
-        return sorted(map(lambda munkaresz: Munkaresz(kon=self._kon, **munkaresz),
-                          self._kon.projekt.select("munkaresz", projekt=projekt.azonosito)), key=repr)
-
-    def _munkaresz_megjelenit(self, event):
-        self._munkaresz_valaszto.beallit(self._munkareszek())
+        return sorted(map(lambda jelleg: Jelleg(kon=self._kon, **jelleg),
+                          self._kon.projekt.select("jelleg")), key=repr)
 
 
 class MunkareszModositoUrlap(simpledialog.Dialog):
@@ -415,10 +402,6 @@ class MunkareszModositoUrlap(simpledialog.Dialog):
         super().__init__(szulo, title="Munkarész módosítása")
 
     def body(self, szulo):
-        self._projekt_valaszto = Valaszto("projekt", self._projektek(), self)
-        self._projekt_valaszto.set_callback(self._munkaresz_kivalaszt)
-        self._projekt_valaszto.pack(ipadx=2, ipady=2)
-
         self._munkaresz_valaszto = Valaszto("munkarész", self._munkareszek(), self)
         self._munkaresz_valaszto.set_callback(self._munkaresz_megjelenit)
         self._munkaresz_valaszto.pack(ipadx=2, ipady=2)
@@ -438,8 +421,8 @@ class MunkareszModositoUrlap(simpledialog.Dialog):
         self._jelleg_urlap.pack(ipadx=2, ipady=2)
         jelleg.pack(fill=X, padx=2, pady=2)
 
-        self._munkaresz_kivalaszt(1)
-        return self._projekt_valaszto.valaszto
+        self._munkaresz_megjelenit(1)
+        return self._munkaresz_valaszto.valaszto
 
     def validate(self):
         munkaresz = self._munkaresz_urlap.export()
@@ -462,15 +445,10 @@ class MunkareszModositoUrlap(simpledialog.Dialog):
             print("Bejegyzés mentve.")
         else:
             print("Nem sikerült elmenteni!")
-
-    def _projektek(self):
-        return sorted(map(lambda projekt: Projekt(**projekt), self._kon.projekt.select("projekt")),
-                      key=lambda elem: (elem.gyakorisag, repr(elem)))
     
     def _munkareszek(self):
-        projekt = self._projekt_valaszto.elem
-        return sorted(map(lambda munkaresz: Munkaresz(kon=self._kon, **munkaresz),
-                          self._kon.projekt.select("munkaresz", projekt=projekt.azonosito)), key=repr)
+        return sorted(map(lambda jelleg: Jelleg(kon=self._kon, **jelleg),
+                          self._kon.projekt.select("jelleg")), key=repr)
     
     def _munkaresz_kivalaszt(self, event):
         self._munkaresz_valaszto.beallit(self._munkareszek())
@@ -483,11 +461,11 @@ class MunkareszModositoUrlap(simpledialog.Dialog):
         self._jelleg_urlap.beallit(jelleg)
     
     def _meglevo_munkaresz(self):
-        munkaresz = self._munkaresz_valaszto.elem
+        jelleg = self._munkaresz_valaszto.elem
+        munkaresz = self._kon.projekt.select("munkaresz", azonosito=jelleg.munkaresz).fetchone()
+        munkaresz = Munkaresz(**munkaresz)
         cim = self._kon.projekt.select("cim", munkaresz=munkaresz.azonosito).fetchone()
         cim = Cim(**cim)
-        jelleg = self._kon.projekt.select("jelleg", munkaresz=munkaresz.azonosito).fetchone()
-        jelleg = Jelleg(**jelleg)
         return (munkaresz, cim, jelleg)
     
     def _modositott_munkaresz(self):        

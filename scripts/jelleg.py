@@ -19,7 +19,7 @@ class Jelleg(Csomo):
         return "{}{}".format(self.listanezet(), self._nullazo(self.megjegyzes))
     
     def __repr__(self):
-        return self._ascii_rep(self.listanezet())
+        return "{}{}".format(repr(self._munkaresz()), self._ascii_rep(self.megnevezes))
 
     def __bool__(self):
         return bool(self.megnevezes)
@@ -45,9 +45,13 @@ class Jelleg(Csomo):
     def munkaresz(self, munkaresz):
         self._adatok["munkaresz"] = munkaresz
     
-    def listanezet(self) -> str:
-        """Egy adott azonosítójú jelleghez egy munkarész, így egy projekt tartozik."""
+    def _munkaresz(self) -> Munkaresz:
+        """Munkarész adatai."""
         assert self._kon
         munkaresz = self._kon.projekt.select("munkaresz", azonosito=self.munkaresz).fetchone()
-        munkaresz = Munkaresz(kon=self._kon, **munkaresz)
-        return "{}, {}".format(munkaresz.listanezet(), self.megnevezes)
+        return Munkaresz(kon=self._kon, **munkaresz)
+
+    
+    def listanezet(self) -> str:
+        """Egy adott azonosítójú jelleghez egy munkarész, így egy projekt tartozik."""
+        return "{}, {}".format(self._munkaresz().listanezet(), self.megnevezes)
