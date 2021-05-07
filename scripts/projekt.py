@@ -22,18 +22,19 @@ class Projekt(Csomo):
 
     def __str__(self):
         """Projekt kiíratása emberi használatra"""
-        return "{}/{:03} {}{}".format(self.ev, self.szam, self.megnevezes, self._nullazo(self.megjegyzes))
+        return "{}/{} {}{}".format(self.ev, self.szam, self.megnevezes, self._nullazo(self.megjegyzes))
 
     def __repr__(self):
         """Projekt elnevezése sorbarendezéshez"""
-        return "{}{:03}{}{}".format(self.ev, self.szam, self._ascii_rep(self.megnevezes), self._ascii_rep(self.megjegyzes))
+        return "{}{:03}{}".format(self.ev, self.szam, self._ascii_rep(self.megnevezes))
 
     def __bool__(self):
         """ A projekt meghatározott, ha adott a megnevezése."""
         return bool(self.megnevezes)
 
     def listanezet(self):
-        return str(self)
+        """Projekt szöveges megjelenítése kiválasztáshoz (pl. Combobox)."""
+        return "{}/{} {}".format(self.ev, self.szam, self.megnevezes)
 
     @property
     def adatok(self):

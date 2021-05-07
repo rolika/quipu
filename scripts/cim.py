@@ -11,7 +11,7 @@ class Cim(Csomo):
             self._adatok = dict(kwargs)
         else:  # űrlap mezőinek törléséhez
             self._adatok = {
-                "orszag": "",
+                "orszag": "H",
                 "megye": "",
                 "iranyitoszam": "",
                 "helyseg": "",

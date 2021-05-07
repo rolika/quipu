@@ -9,7 +9,7 @@ import enum
 ELERHETOSEG_TIPUS = ("alapértelmezett", "munkahelyi", "privát")
 CIM_TIPUS = ("alapértelmezett", "székhely", "telephely", "levelezési cím", "lakhely", "tartózkodási hely")
 BEOSZTAS = ("műszaki előkészítő", "képviselő", "projektvezető", "építésvezető", "csoportvezető", "felvételis", "dolgozó")
-JELLEG = ("új", "felújítás", "javítás", "karbantartás", "bővítés", "átalakítás")
+JELLEG = ("új", "felújítás", "javítás", "karbantartás", "bővítés", "átalakítás", "anyageladás")
 MUNKARESZ = ("szigetelés", "lapostető-szigetelés", "alépítményi szigetelés", "terasz-szigetelés")
 MEGYE = ("Baranya", "Bács-Kiskun", "Békés", "Borsod-Abaúj-Zemplén", "Budapest", "Csongrád-Csanád", "Fejér",
          "Győr-Moson-Sopron", "Hajdú-Bihar", "Heves", "Jász-Nagykun-Szolnok", "Komárom-Esztergom", "Nógrád", "Pest",

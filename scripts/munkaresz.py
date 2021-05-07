@@ -21,7 +21,9 @@ class Munkaresz(Csomo):
         return "{}{}".format(self.megnevezes, self._nullazo(self.megjegyzes))
 
     def __repr__(self):
-        return self._ascii_rep("{}{}".format(self.megnevezes, self._nullazo(self.megjegyzes)))
+        return "{projekt}{hely}{nev}".format(projekt=repr(self._projekt()),
+                                             hely=self._ascii_rep(self._cim().helyseg),
+                                             nev=self._ascii_rep(self.megnevezes))
 
     def __bool__(self):
         return bool(self.megnevezes)
@@ -51,11 +53,19 @@ class Munkaresz(Csomo):
     @projekt.setter
     def projekt(self, projekt):
         self._adatok["projekt"] = projekt
-
-    def listanezet(self):
+    
+    def _projekt(self) -> Projekt:
+        """Projekt adatai."""
         assert self._kon
         projekt = self._kon.projekt.select("projekt", azonosito=self.projekt).fetchone()
-        projekt = Projekt(**projekt)
+        return Projekt(kon=self._kon, **projekt)
+    
+    def _cim(self) -> Cim:
+        """Cím adatai."""
         cim = self._kon.projekt.select("cim", munkaresz=self.azonosito).fetchone()
-        cim = Cim(**cim)
-        return "{}, {}, {}".format(projekt.listanezet(), cim.helyseg, self.megnevezes)
+        return Cim(**cim)
+
+    def listanezet(self):
+        return "{projekt}, {hely}, {nev}".format(projekt=self._projekt().listanezet(),
+                                                 hely=self._cim().helyseg,
+                                                 nev=self.megnevezes)

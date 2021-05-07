@@ -20,14 +20,17 @@ class Szemely(Csomo):
         self._tabla = "szemely"
 
     def __str__(self):
-        """Személyi adatok megjelenítése, elsősorban debugoláshoz"""
-        elotag = self._nullazo(self.elotag)
-        megjegyzes = self._nullazo(self.megjegyzes)
-        return "{}{} {}, {}{}".format(elotag, self.vezeteknev, self.keresztnev, self.nem, megjegyzes)
+        """Személyi adatok megjelenítése terminál-nézethez."""
+        return "{vezeteknev} {keresztnev}{elotag} ({nem}{megjegyzes})".format(\
+            vezeteknev=self.vezeteknev,
+            keresztnev=self.keresztnev,
+            elotag=self._nullazo(self.elotag, zarojel="", elvalasztojel=", "),
+            nem=self.nem,
+            megjegyzes=self._nullazo(self.megjegyzes, zarojel="", elvalasztojel=", "))
 
     def __repr__(self):
         """Név megjelenítése sorbarendezéshez"""
-        return self._ascii_rep(self.listanezet())
+        return self._ascii_rep("{vezetek} {kereszt}".format(vezetek=self.vezeteknev, kereszt=self.keresztnev))
 
     def __bool__(self):
         """Egy személy akkor meghatározott, ha legalább az egyik név adott"""
@@ -53,21 +56,21 @@ class Szemely(Csomo):
 
     @property
     def vezeteknev(self):
-        return self._adatok.get("vezeteknev")
+        return self._adatok.get("vezeteknev", "")
 
     @property
     def keresztnev(self):
-        return self._adatok.get("keresztnev")
+        return self._adatok.get("keresztnev", "")
 
     @property
     def nem(self):
         return self._adatok.get("nem")
 
-    def listanezet(self):
+    def listanezet(self) -> str:
         """Személy megjelenítése kiválasztáshoz (Combobox)"""
-        megjegyzes = self._nullazo(self.megjegyzes)
-        elotag = self._nullazo(self.elotag, zarojel="")
-        return "{}{} {}{}".format(elotag, self.vezeteknev, self.keresztnev, megjegyzes)
+        return "{elotag}{vezeteknev} {keresztnev}".format(elotag=self._nullazo(self.elotag, zarojel="", hatul=True),
+                                                          vezeteknev=self.vezeteknev,
+                                                          keresztnev=self.keresztnev)
 
     def megszolitas(self):
         return "Tisztelt {}!".format("Uram" if self.nem == "férfi" else "Hölgyem")
@@ -75,8 +78,10 @@ class Szemely(Csomo):
 
 if __name__ == "__main__":
     """Egyszerű tesztelés"""
-    szemely = Szemely(vezeteknev="Árvíztűrő", keresztnev="Tükörfúrógép")
-    print(repr(szemely))  # arvizturo tukorfurogep
+    szemely = Szemely(vezeteknev="Árvíz-tűrő", keresztnev="Tükör+fúrógép", elotag="Mr.", nem="SDS", megjegyzes="Max")
+    print(repr(szemely))  # arvizturotukorfurogep
+    print(szemely)
+    print(szemely.listanezet())
     szemely = Szemely(elotag="dr")
     if not szemely:
         print("Nincs elegendő adat")  # ki kell írnia

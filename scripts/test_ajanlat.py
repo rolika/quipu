@@ -73,6 +73,7 @@ class ProjektlistaTest(unittest.TestCase):
                     if not bool(szervezet):
                         szervezet_id = 1  # magánszemély azonosítója
                     else:
+                        szervezet.rovidnev = szervezet.rovidnev.split()[0]
                         meglevo = szervezet.meglevo(self._kon.szervezet)  # kezeli a agánszemélyt is, ami mindig meglévő
                         if meglevo:
                             szervezet_id = Szervezet(**meglevo).azonosito
