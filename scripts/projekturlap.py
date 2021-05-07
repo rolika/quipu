@@ -385,11 +385,13 @@ class MunkareszTorloUrlap(simpledialog.Dialog):
             hiba = True
         if not jelleg.torol(self._kon.projekt):
             hiba = True
-        # TODO Ha a munkarésznek nincs több jellege, címe, akkor a munkarészt is törölni kell
+        if not self._kon.projekt.select("jelleg", munkaresz=jelleg.munkaresz).fetchone():
+            if not munkaresz.torol(self._kon.projekt):
+                hiba = True
         if hiba:
             print("Nem sikerült törölni.")
         else:
-            print("{}: Bejegyzés törölve.".format(munkaresz))
+            print("Bejegyzés törölve.")
 
     def _munkareszek(self):
         return sorted(map(lambda jelleg: Jelleg(kon=self._kon, **jelleg),
