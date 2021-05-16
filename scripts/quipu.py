@@ -33,9 +33,9 @@ from konnektor import Konnektor
 
 
 class Quipu(Frame):
-    """ Fő alkalmazás 
+    """ Fő alkalmazás
     A kipu, más néven csomóírás vagy zsinórírás egy különleges, tízes számrendszerbeli információtárolási rendszer,
-    melynek segítségével helyettesítették az írást az Inka Birodalomban. A kipu a kecsuák nyelvén csomót jelent, 
+    melynek segítségével helyettesítették az írást az Inka Birodalomban. A kipu a kecsuák nyelvén csomót jelent,
     használati gyakorlatáról bebizonyították, hogy afféle textil abakusz, ahol a csomók jelentést hordoznak.
     A kipukon rögzített értékeket meglepő módon egy kettes számrendszeren alapuló, kövek helyzetével operáló, számoló
     eszközzel, egy ősi számítógéppel dolgozták fel. [Wikipedia nyomán]
@@ -52,7 +52,8 @@ class Quipu(Frame):
                         szervezet=self._init_szervezet_db(),
                         kontakt=self._init_kontakt_db(),
                         projekt=self._init_projekt_db(),
-                        ajanlat=self._init_ajanlat_db())
+                        ajanlat=self._init_ajanlat_db(),
+                        raktar=self._init_raktar_db())
 
         # alapadatok beírása
         if not WEVIK.meglevo(kon.szervezet):  # feltételezem, hogy a céggel együtt a többet se írta még be
@@ -111,7 +112,7 @@ class Quipu(Frame):
             postafiok="TEXT DEFAULT ''",
             honlap="TEXT DEFAULT ''",
             megjegyzes="TEXT DEFAULT ''")
-                                
+
         return szemely_kon
 
     def _init_szervezet_db(self) -> tamer.Tamer:
@@ -162,7 +163,7 @@ class Quipu(Frame):
             szervezet="INTEGER",
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
-        
+
         kontakt_kon.create("beosztas",
             azonosito="INTEGER PRIMARY KEY",
             kontakt="INTEGER REFERENCES kontakt",
@@ -213,7 +214,7 @@ class Quipu(Frame):
         return projekt_kon
 
     def _init_ajanlat_db(self) -> tamer.Tamer:
-        """Ajánlat adatbázis inicializálása"""
+        """Ajánlat adatbázis inicializálása."""
         ajanlat_kon = tamer.Tamer("ajanlat.db")
 
         ajanlat_kon.create("ajanlatkeres",
@@ -224,7 +225,7 @@ class Quipu(Frame):
             erkezett="TEXT DEFAULT CURRENT_DATE",
             hatarido="TEXT DEFAULT ''",
             megjegyzes="TEXT DEFAULT ''")
-        
+
         ajanlat_kon.create("ajanlat",
             azonosito="INTEGER PRIMARY KEY",
             ajanlatkeres="INTEGER NOT NULL REFERENCES ajanlatkeres",
@@ -233,8 +234,56 @@ class Quipu(Frame):
             ervenyes="TEXT DEFAULT ''",
             esely="INTEGER DEFAULT 5",
             megjegyzes="TEXT DEFAULT ''")
-    
+
         return ajanlat_kon
+
+    def _init_raktar_db(self):
+        """Raktárkészlet-adatbázis inicializálása."""
+        raktar_kon = tamer.Tamer("raktar.db")
+
+        raktar_kon.create("termek",
+            azonosito="INTEGER PRIMARY KEY",
+            gyarto="INTEGER",
+            nev="TEXT",
+            cikkszam="TEXT",
+            egyseg="TEXT",
+            kiszereles_nev="TEXT",
+            kiszereles="REAL",
+            csomagolas_nev="TEXT",
+            csomagolas="REAL",
+            kritikus="REAL",
+            szallitasi_ido="INTEGER",
+            megjegyzes="TEXT")
+
+        raktar_kon.create("aru",
+            azonosito="INTEGER PRIMARY KEY",
+            termek="INTEGER",
+            egysegar="INTEGER",
+            ervenyes="DATE",
+            megjegyzes="TEXT")
+
+        raktar_kon.create("keszlet",
+            azonosito="INTEGER PRIMARY KEY",
+            aru="INTEGER",
+            mennyiseg="REAL",
+            erkezett="DATE",
+            eltarthato="DATE",
+            modositva="DATETIME",
+            megjegyzes="TEXT")
+        
+        raktar_kon.create("szallitolevel",
+            azonosito="INTEGER PRIMARY KEY",
+            jelleg="INTEGER",
+            szam="TEXT",
+            datum="DATETIME",
+            megjegyzes="TEXT")
+
+        raktar_kon.create("tetel",
+            azonosito="INTEGER PRIMARY KEY",
+            szallitolevel="INTEGER",
+            aru="INTEGER",
+            mennyiseg="REAL",
+            megjegyzes="TEXT")
 
 
 if __name__ == "__main__":

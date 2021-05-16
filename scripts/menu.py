@@ -4,6 +4,8 @@ import szervezeturlap
 import projekturlap
 import ajanlatkeresurlap
 import ajanlaturlap
+import termekurlap
+import raktarurlap
 
 
 class Fomenu(Frame):
@@ -27,6 +29,7 @@ class Fomenu(Frame):
         szemelymenu = SzemelyMenu(szemelymb, kon)
         szervezetmenu = SzervezetMenu(szervezetmb, kon)
         projektmenu = ProjektMenu(projektmb, kon)
+        raktarmenu = RaktarMenu(raktarmb, kon)
 
         szemelymb.grid(row=0, column=0, sticky=W, ipadx=2, ipady=2)
         szervezetmb.grid(row=0, column=1, sticky=W, ipadx=2, ipady=2)
@@ -79,6 +82,19 @@ class ProjektMenu(Menu):
         self.add("cascade", label="ajánlat", menu=AjanlatAlmenu(mb, kon))
 
 
+class RaktarMenu(Menu):
+    """Raktártmenü létrehozása és megjelenítése. A tkinter.Menu osztályból származtatva."""
+    def __init__(self, mb, kon) -> Menu:
+        """Raktártmenü példányosítása.
+        mb:     tkinter.Menubutton példánya (amolyan szülő widget)
+        kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
+        super().__init__(mb, tearoff=0)
+        mb["menu"] = self
+        self.add("cascade", label="termék", menu=TermekAlmenu(mb, kon))
+        self.add("cascade", label="áru", menu=AruAlmenu(mb, kon))
+        self.add("cascade", label="szállítólevél", menu=SzallitolevelAlmenu(mb, kon))
+
+
 class Alapmenu(Menu):
     def __init__(self, mb, kon=None) -> Menu:
         """Minden menüpont alatt elvégezhető parancsok.
@@ -107,7 +123,7 @@ class Alapmenu(Menu):
 class SzemelyAlmenu(Alapmenu):
     """Személykezelő alapmenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Személykezelő menüpontok élesítése.        
+        """Személykezelő menüpontok élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -128,7 +144,7 @@ class SzemelyAlmenu(Alapmenu):
 class SzemelyTelefonAlmenu(Alapmenu):
     """Személyek telefonos elérhetőségeit kezelő alapmenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Személyek telefonkezelő menüpontjainak élesítése.        
+        """Személyek telefonkezelő menüpontjainak élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -149,7 +165,7 @@ class SzemelyTelefonAlmenu(Alapmenu):
 class SzemelyEmailAlmenu(Alapmenu):
     """Személyek email elérhetőségeit kezelő alapmenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Személyek emailkezelő menüpontjainak élesítése.        
+        """Személyek emailkezelő menüpontjainak élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -170,7 +186,7 @@ class SzemelyEmailAlmenu(Alapmenu):
 class SzemelyCimAlmenu(Alapmenu):
     """Személyek cím elérhetőségeit kezelő alapmenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Személyek címkezelő menüpontjainak élesítése.        
+        """Személyek címkezelő menüpontjainak élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -191,7 +207,7 @@ class SzemelyCimAlmenu(Alapmenu):
 class SzervezetAlmenu(Alapmenu):
     """Szervezetkezelő alapmenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Szervezetkezelő menüpontok élesítése.        
+        """Szervezetkezelő menüpontok élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -212,7 +228,7 @@ class SzervezetAlmenu(Alapmenu):
 class SzervezetTelefonAlmenu(Alapmenu):
     """Szervezetek telefonos elérhetőségeit kezelő alapmenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Szervezetek telefonkezelő menüpontjainak élesítése.        
+        """Szervezetek telefonkezelő menüpontjainak élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -233,7 +249,7 @@ class SzervezetTelefonAlmenu(Alapmenu):
 class SzervezetEmailAlmenu(Alapmenu):
     """Szervezetek email elérhetőségeit kezelő alapmenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Szervezetek emailkezelő menüpontjainak élesítése.        
+        """Szervezetek emailkezelő menüpontjainak élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -254,7 +270,7 @@ class SzervezetEmailAlmenu(Alapmenu):
 class SzervezetCimAlmenu(Alapmenu):
     """Szervezetek cím elérhetőségeit kezelő alapmenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Szervezetek címkezelő menüpontjainak élesítése.        
+        """Szervezetek címkezelő menüpontjainak élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -275,7 +291,7 @@ class SzervezetCimAlmenu(Alapmenu):
 class SzervezetKontaktAlmenu(Alapmenu):
     """Szervezet kontaktszemélyeit kezelő almenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Szervezetek kontaktszemély-kezelő menüpontjainak élesítése.        
+        """Szervezetek kontaktszemély-kezelő menüpontjainak élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -302,7 +318,7 @@ class SzervezetKontaktAlmenu(Alapmenu):
 class SzemelyKontaktAlmenu(Alapmenu):
     """Kontaktszemélyhez rendelt szervezeteket kezelő almenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Kontaktszemélyhez rendelt szervezetek kezelő menüpontjainak élesítése.        
+        """Kontaktszemélyhez rendelt szervezetek kezelő menüpontjainak élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -329,7 +345,7 @@ class SzemelyKontaktAlmenu(Alapmenu):
 class ProjektAlmenu(Alapmenu):
     """Projektkezelő alapmenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Projektkezelő menüpontok élesítése.        
+        """Projektkezelő menüpontok élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -351,7 +367,7 @@ class ProjektAlmenu(Alapmenu):
 class MunkareszAlmenu(Alapmenu):
     """Munkarész-kezelő alapmenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Munkarész-kezelő menüpontok élesítése.        
+        """Munkarész-kezelő menüpontok élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -372,7 +388,7 @@ class MunkareszAlmenu(Alapmenu):
 class AjanlatkeresAlmenu(Alapmenu):
     """Ajánlatkérés-kezelő alapmenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Ajánlatkérés-kezelő menüpontok élesítése.        
+        """Ajánlatkérés-kezelő menüpontok élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -403,7 +419,7 @@ class AjanlatkeresAlmenu(Alapmenu):
 class AjanlatAlmenu(Alapmenu):
     """Ajánlatkezelő alapmenü."""
     def __init__(self, mb, kon) -> Menu:
-        """Ajánlatkezelő menüpontok élesítése.        
+        """Ajánlatkezelő menüpontok élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő widget)
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, kon)
@@ -419,6 +435,85 @@ class AjanlatAlmenu(Alapmenu):
     def modosit(self) -> None:
         """Űrlap megjelenítése meglévő ajánlat módosítására."""
         ajanlaturlap.AjanlatModositoUrlap(self._mb.winfo_toplevel(), self._kon)
+
+
+class TermekAlmenu(Alapmenu):
+    """Termékeket kezelő almenü."""
+    def __init__(self, mb, kon) -> Menu:
+        """Termékkezelő menüpontok élesítése.
+        mb:     tkinter.Menubutton példánya (amolyan szülő-widget)
+        kon:    konnektor.Konnektor adatbázis gyűjtőkapcsolat"""
+        super().__init__(mb, kon)
+
+    def uj(self) -> None:
+        """Űrlap megjelenítése új termék létrehozására."""
+        termekurlap.UjTermekUrlap(self._mb.winfo_toplevel(), self._kon)
+
+    def torol(self) -> None:
+        """Űrlap megjelenítése meglévő termék törlésére."""
+        termekurlap.TermekTorloUrlap(self._mb.winfo_toplevel(), self._kon)
+
+    def modosit(self) -> None:
+        """Űrlap megjelenítése meglévő termék módosítására."""
+        termekurlap.TermekModositoUrlap(self._mb.winfo_toplevel(), self._kon)
+
+
+class AruAlmenu(Alapmenu):
+    """Árukat (árazott termékeket) kezelő almenü."""
+    def __init__(self, mb, kon) -> Menu:
+        """Árukezelő menüpontok élesítése.
+        mb:     tkinter.Menubutton példánya (amolyan szülő-widget)
+        kon:    konnektor.Konnektor adatbázis gyűjtőkapcsolat"""
+        super().__init__(mb, kon)
+
+    def uj(self) -> None:
+        """Űrlap megjelenítése új áru létrehozására."""
+        termekurlap.UjAruUrlap(self._mb.winfo_toplevel(), self._kon)
+
+    def torol(self) -> None:
+        """Űrlap megjelenítése meglévő áru törlésére."""
+        termekurlap.AruTorloUrlap(self._mb.winfo_toplevel(), self._kon)
+
+    def modosit(self) -> None:
+        """Űrlap megjelenítése meglévő áru módosítására."""
+        termekurlap.AruModositoUrlap(self._mb.winfo_toplevel(), self._kon)
+
+
+class SzallitolevelAlmenu(Menu):
+    """Raktárkészlet kezelése"""
+    def __init__(self, mb, kon) -> Menu:
+        """Kivétel-kezelő menüpontok élesítése.
+        mb:     tkinter.Menubutton példánya (amolyan szülő-widget)
+        kon:    konnektor.Konnektor adatbázis gyűjtőkapcsolat"""
+        self._mb = mb
+        self._kon = kon
+        super().__init__(mb, tearoff=0)
+
+        self.add("command", label="kivét", command=self._kivet)
+        self.add("command", label="visszvét", command=self._visszvet)
+        self.add("command", label="bevét", command=self._bevet)
+        self.add("command", label="töröl", command=self._torol)
+        self.add("command", label="módosít", command=self._modosit)
+
+    def _kivet(self) -> None:
+        """Űrlap megjelenítése új kivételező szállítólevél létrehozására."""
+        raktarurlap.UjKivetSzallitolevelUrlap(self._mb.winfo_toplevel(), self._kon)
+
+    def _visszvet(self) -> None:
+        """Űrlap megjelenítése új visszavételező szállítólevél létrehozására."""
+        raktarurlap.UjVisszvetSzallitolevelUrlap(self._mb.winfo_toplevel(), self._kon)
+
+    def _bevet(self) -> None:
+        """Űrlap megjelenítése új bevételező szállítólevél létrehozására."""
+        raktarurlap.UjBevetSzallitolevelUrlap(self._mb.winfo_toplevel(), self._kon)
+
+    def _torol(self) -> None:
+        """Űrlap megjelenítése meglévő szállítólevél törlésére."""
+        raktarurlap.SzallitolevelTorloUrlap(self._mb.winfo_toplevel(), self._kon)
+
+    def _modosit(self) -> None:
+        """Űrlap megjelenítése meglévő szállítólevél módosítására."""
+        raktarurlap.SzallitolevelModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 if __name__ == "__main__":
