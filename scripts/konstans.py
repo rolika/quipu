@@ -25,12 +25,14 @@ ORSZAG = {
             "USA": "USA",
             "Románia": "RO"
         }
+TIPUS = ("szigetelés", "rezsi", "vízszigetelés", "kötőelem", "hőszigetelés", "párazárás", "szórás", "kiegészítők")
+
 
 # a magánszemély egy különleges szervezet, hogy a magánszemélyek is kontaktok lehessenek
 MAGANSZEMELY = Szervezet(rovidnev="#magánszemély",
                          teljesnev="")
 
-WEVIK = Szervezet(rovidnev="Wevik Engineer Kft.", 
+WEVIK = Szervezet(rovidnev="Wevik Engineer Kft.",
                   teljesnev="Wevik Engineer Kft.")
 
 VITYA = Szemely(vezeteknev="Weisz",
