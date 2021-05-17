@@ -123,7 +123,14 @@ class CimUrlap(Frame):
 
 
 class Valaszto(LabelFrame):
+    """Csomók megjelenítésére szabott Combobox, egy LabelFrame-be ágyazva.
+        A csomók listanézetét jeleníti meg választékként."""
     def __init__(self, cimke, valasztek, master=None, **kw):
+        """LabelFrane benépesítése.
+        cimke:  LabelFrame címkéje, a választó neve
+        valasztek:  csomók iterábilisa, listanézetük kell legyen
+        master:     szülő-widget
+        kw:         LabelFrame jellemzői"""
         super().__init__(master=master, text=cimke, **kw)
         self._valasztek = valasztek
         self._valaszto = Combobox(self, width=42)
@@ -131,6 +138,8 @@ class Valaszto(LabelFrame):
         self._valaszto.grid()
 
     def beallit(self, valasztek):
+        """Frissít ia választékot.
+        valasztek:  csomók iterábilisa, listanézetük kell legyen"""
         self._valasztek = valasztek
         self._valaszto["values"] = [elem.listanezet() for elem in valasztek]
         try:
@@ -140,14 +149,18 @@ class Valaszto(LabelFrame):
 
     @property
     def valaszto(self):
+        """Maga a Combobox."""
         return self._valaszto
 
     @property
     def elem(self):
+        """Az éppen kiválasztott csomó."""
         try:
             return self._valasztek[self._valaszto.current()]
         except IndexError:
             return None
-    
+
     def set_callback(self, fv_ref):
+        """Callback-függvény beállítása kívülről.
+        fv_ref: függvény referenciája () nélkül"""
         self._valaszto.bind("<<ComboboxSelected>>", fv_ref)
