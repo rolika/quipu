@@ -28,7 +28,7 @@ class Termek(Csomo):
         return self.listanezet()
 
     def __repr__(self) -> str:
-        return self._ascii_rep("{gyarto}{nev}".format(gyarto=self._gyarto(), nev=self.nev))
+        return self._ascii_rep("{gyarto}{nev}".format(gyarto=self._gyarto().listanezet(), nev=self.nev))
 
     def __bool__(self) -> bool:
         """A termék meghatározott, ha van neve és egysége."""
@@ -106,4 +106,4 @@ class Termek(Csomo):
         return Szervezet(kon=self._kon, **gyarto)
 
     def listanezet(self):
-        return "{gyarto} {nev}".format(gyarto=self._gyarto(), nev=self.nev)
+        return "{gyarto} {nev}".format(gyarto=self._gyarto().listanezet(), nev=self.nev)
