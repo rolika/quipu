@@ -29,9 +29,9 @@ class Jelleg(Csomo):
         return self._adatok
 
     @adatok.setter
-    def adatok(self, projekt):
-        self._adatok["megnevezes"] = projekt.megnevezes
-        self._adatok["megjegyzes"] = projekt.megjegyzes
+    def adatok(self, jelleg):
+        self._adatok["megnevezes"] = jelleg.megnevezes
+        self._adatok["megjegyzes"] = jelleg.megjegyzes
 
     @property
     def megnevezes(self):
