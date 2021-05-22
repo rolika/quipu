@@ -253,13 +253,16 @@ class Quipu(Frame):
             csomagolas="REAL",
             kritikus="REAL",
             szallitasi_ido="INTEGER",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
 
         raktar_kon.create("aru",
             azonosito="INTEGER PRIMARY KEY",
             termek="INTEGER",
+            projekt="INTEGER DEFAULT 0",
             egysegar="INTEGER",
             ervenyes="DATE",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
 
         raktar_kon.create("keszlet",
