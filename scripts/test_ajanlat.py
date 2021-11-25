@@ -45,7 +45,7 @@ class ProjektlistaTest(unittest.TestCase):
             "szig", "m2ar", "eurom2ar"])
 
         with open("projektlista.csv", newline='') as projektek:
-            for projekt in map(ProjektRekord._make, csv.reader(projektek, delimiter=";")):
+            for projekt in map(ProjektRekord._make, csv.reader(projektek, delimiter=",")):
                 projekt_id = None
                 szemely_id = None
                 szervezet_id = None
@@ -109,7 +109,8 @@ class ProjektlistaTest(unittest.TestCase):
                             ajanlatkeres_id = ajanlatkeres.ment(self._kon.ajanlat)
 
                     # ajánlat
-                    if ajanlatkeres_id and projekt.ar and int(projekt.ar) > 0:  # ár nélkül nem írom be az ajánlatok közé
+                    ar = _extrakt_szam(projekt.ar)
+                    if ajanlatkeres_id and ar and int(ar) > 0:  # ár nélkül nem írom be az ajánlatok közé
                         esely = projekt.esely.rstrip("%")
                         try:
                             esely = int(esely)
@@ -120,6 +121,12 @@ class ProjektlistaTest(unittest.TestCase):
                             ajanlat.ment(self._kon.ajanlat)
 
         return True
+    
+
+def _extrakt_szam(szoveg):
+        szoveg = [betu for betu in szoveg if betu in "0123456789"]
+        return ''.join(szoveg)
+        
 
 if __name__ == "__main__":
     ProjektlistaTest()
