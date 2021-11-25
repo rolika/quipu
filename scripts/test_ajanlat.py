@@ -116,7 +116,7 @@ class ProjektlistaTest(unittest.TestCase):
                             esely = int(esely)
                         except ValueError:
                             esely = Esely.NORMAL
-                        ajanlat = Ajanlat(kon=self._kon, ajanlatkeres=ajanlatkeres_id, ajanlatiar=projekt.ar, leadva="", ervenyes="", esely=esely, megjegyzes="")
+                        ajanlat = Ajanlat(kon=self._kon, ajanlatkeres=ajanlatkeres_id, ajanlatiar=ar, leadva="", ervenyes="", esely=esely, megjegyzes="")
                         if not ajanlat.meglevo(self._kon.ajanlat):
                             ajanlat.ment(self._kon.ajanlat)
 
@@ -126,7 +126,7 @@ class ProjektlistaTest(unittest.TestCase):
 def _extrakt_szam(szoveg):
         szoveg = [betu for betu in szoveg if betu in "0123456789"]
         return ''.join(szoveg)
-        
+
 
 if __name__ == "__main__":
     ProjektlistaTest()
