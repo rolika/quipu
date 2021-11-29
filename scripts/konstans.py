@@ -25,7 +25,6 @@ ORSZAG = {
             "USA": "USA",
             "Románia": "RO"
         }
-TERMEK_TIPUS = ("szigetelés", "rezsi", "vízszigetelés", "kötőelem", "hőszigetelés", "párazárás", "szórás", "kiegészítők")
 
 
 # a magánszemély egy különleges szervezet, hogy a magánszemélyek is kontaktok lehessenek
@@ -47,9 +46,27 @@ ROLI = Szemely(vezeteknev="Weisz",
 class Esely(enum.IntEnum):
     """Ajánlat elnyerésének esélye."""
     BUKOTT = 0
-    NORMAL = 5
+    NORMAL = 5  # alapértelmezés
     ERDEKES = 50
     VEGSO = 90
+
+    @property
+    def ertek(self):
+        return self.value
+
+
+class TermekTipus(enum.Enum):
+    """Terméktípusok felsorolása."""
+    SZIG = "szigetelőanyag"  # alapértelmezés
+    REZSI = "rezsianyag"
+    FOLIA = "szigetelőfólia"
+    BIT = "bitumenes lemez"
+    HOSZIG = "hőszigetelés"
+    KOTO = "kötőelem"
+    PARA = "párazáró"
+    SZORT = "szórt anyag"
+    KENT = "kent anyag"
+    KIEG = "kiegészítő"
 
     @property
     def ertek(self):

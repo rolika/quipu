@@ -1,5 +1,6 @@
 from csomo import Csomo
 from szervezet import Szervezet
+from konstans import TermekTipus
 
 
 class Termek(Csomo):
@@ -10,9 +11,12 @@ class Termek(Csomo):
             self._adatok = dict(kwargs)
         else:
             self._adatok = {  # űrlap alaphelyzetbe állítására
-                "nev": "",
-                "tipus": "",
                 "cikkszam": "",
+                "nev": "",
+                "tipus" : TermekTipus.SZIG,
+                "leiras": "",
+                "szin": "",
+                "szinkod": "",
                 "egyseg": "",
                 "kiszereles_nev": "",
                 "kiszereles": 0,
@@ -40,9 +44,12 @@ class Termek(Csomo):
 
     @adatok.setter
     def adatok(self, termek) -> None:
+        self._adatok["cikkszam"] = termek.cikkszam
         self._adatok["nev"] = termek.nev
         self._adatok["tipus"] = termek.tipus
-        self._adatok["cikkszam"] = termek.cikkszam
+        self._adatok["leiras"] = termek.leiras
+        self._adatok["szin"] = termek.szin
+        self._adatok["szinkod"] = termek.szinkod
         self._adatok["egyseg"] = termek.egyseg
         self._adatok["kiszereles_nev"] = termek.kiszereles_nev
         self._adatok["kiszereles"] = termek.kiszereles
@@ -61,6 +68,10 @@ class Termek(Csomo):
         self._adatok["gyarto"] = gyarto
 
     @property
+    def cikkszam(self):
+        return self._adatok["cikkszam"]
+
+    @property
     def nev(self):
         return self._adatok["nev"]
 
@@ -69,8 +80,16 @@ class Termek(Csomo):
         return self._adatok["tipus"]
 
     @property
-    def cikkszam(self):
-        return self._adatok["cikkszam"]
+    def leiras(self):
+        return self._adatok["leiras"]
+
+    @property
+    def szin(self):
+        return self._adatok["szin"]
+
+    @property
+    def szinkod(self):
+        return self._adatok["szinkod"]
 
     @property
     def egyseg(self):
