@@ -637,18 +637,21 @@ class UjKontaktUrlap(simpledialog.Dialog):
             print("Bejegyzés mentve.")
         else:
             print("Nem sikerült elmenteni.")
+
         if self._vevo.get():
             vevo = Vevo(kon=self._kon, kontakt=kontakt_azonosito)
             if vevo.ment(self._kon.kontakt):
                 print("Vevő mentve.")
             else:
                 print("Nem sikerült elmenteni.")
+
         if self._szallito.get():
             szallito = Szallito(kon=self._kon, kontakt=kontakt_azonosito)
             if szallito.ment(self._kon.kontakt):
                 print("Szállító mentve.")
             else:
                 print("Nem sikerült elmenteni.")
+                
         if self._gyarto.get():
             gyarto = Gyarto(kon=self._kon, kontakt=kontakt_azonosito)
             if gyarto.ment(self._kon.kontakt):
@@ -699,6 +702,30 @@ class KontaktTorloUrlap(simpledialog.Dialog):
             print("Bejegyzés törölve.")
         else:
             print("Nem sikerült törölni.")
+        
+        vevo = self._kon.kontakt.select("vevo", kontakt=kontakt.azonosito).fetchone()
+        if vevo:
+            vevo = Vevo(**vevo)
+            if vevo.torol(self._kon.kontakt):
+                print("Vevő törölve.")
+            else:
+                print("Nem sikerült a vevőt törölni.")
+        
+        szallito = self._kon.kontakt.select("szallito", kontakt=kontakt.azonosito).fetchone()
+        if szallito:
+            szallito = Szallito(**szallito)
+            if szallito.torol(self._kon.kontakt):
+                print("Szállító törölve.")
+            else:
+                print("Nem sikerült a szállítót törölni.")
+        
+        gyarto = self._kon.kontakt.select("gyarto", kontakt=kontakt.azonosito).fetchone()
+        if gyarto:
+            gyarto = Gyarto(**gyarto)
+            if gyarto.torol(self._kon.kontakt):
+                print("Gyártó törölve.")
+            else:
+                print("Nem sikerült a gyártót törölni.")
 
     def _szemelynevsor(self):
         return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
