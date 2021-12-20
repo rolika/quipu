@@ -14,6 +14,9 @@ from e_mail import Email
 from cim import Cim
 from szervezet import Szervezet
 from kontakt import Kontakt
+from vevo import Vevo
+from szallito import Szallito
+from gyarto import Gyarto
 from konstans import VITYA, ROLI
 
 
@@ -606,6 +609,17 @@ class UjKontaktUrlap(simpledialog.Dialog):
         self._szervezetvalaszto = Valaszto("szervezet", self._szervezetnevsor(), self)
         self._szervezetvalaszto.pack(ipadx=2, ipady=2)
 
+        vevo_fr = Frame(self)
+        self._vevo = IntVar()
+        self._vevo_cb = Checkbutton(vevo_fr, text="vevő", variable=self._vevo)
+        self._vevo_cb.select()
+        self._vevo_cb.pack(side=LEFT, ipadx=2, ipady=2)
+        self._szallito = IntVar()
+        Checkbutton(vevo_fr, text="szállító", variable=self._szallito).pack(side=LEFT, ipadx=2, ipady=2)
+        self._gyarto = IntVar()
+        Checkbutton(vevo_fr, text="gyártó", variable=self._gyarto).pack(side=BOTTOM, ipadx=2, ipady=2)
+        vevo_fr.pack()
+
         self._megjegyzes = StringVar()
         Label(self, text="megjegyzés").pack(ipadx=2, ipady=2)
         Entry(self, textvariable=self._megjegyzes, width=32).pack(ipadx=2, ipady=2)
@@ -613,16 +627,34 @@ class UjKontaktUrlap(simpledialog.Dialog):
         return self._szemelyvalaszto
 
     def validate(self):
-        return True
+        return self._vevo.get() or self._szallito.get() or self._gyarto.get()
 
     def apply(self):
         kontakt = Kontakt(szemely=self._szemelyvalaszto.elem.azonosito,
                           szervezet=self._szervezetvalaszto.elem.azonosito,
                           megjegyzes=self._megjegyzes.get())
-        if kontakt.ment(self._kon.kontakt):
+        if kontakt_azonosito := kontakt.ment(self._kon.kontakt):
             print("Bejegyzés mentve.")
         else:
             print("Nem sikerült elmenteni.")
+        if self._vevo.get():
+            vevo = Vevo(kon=self._kon, kontakt=kontakt_azonosito)
+            if vevo.ment(self._kon.kontakt):
+                print("Vevő mentve.")
+            else:
+                print("Nem sikerült elmenteni.")
+        if self._szallito.get():
+            szallito = Szallito(kon=self._kon, kontakt=kontakt_azonosito)
+            if szallito.ment(self._kon.kontakt):
+                print("Szállító mentve.")
+            else:
+                print("Nem sikerült elmenteni.")
+        if self._gyarto.get():
+            gyarto = Gyarto(kon=self._kon, kontakt=kontakt_azonosito)
+            if gyarto.ment(self._kon.kontakt):
+                print("Gyártó mentve.")
+            else:
+                print("Nem sikerült elmenteni.")
 
     def _szemelynevsor(self):
         return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
@@ -630,7 +662,7 @@ class UjKontaktUrlap(simpledialog.Dialog):
     def _szervezetnevsor(self):
         szemelyazonosito = self._szemelyvalaszto.elem.azonosito
         szemelyhez_nem_rendelt_szervezetek = self._kon.szemely.execute("""
-            SELECT * FROM szervezet WHERE azonosito IN (SELECT szervezet FROM kontakt WHERE szemely <> ?);
+            SELECT * FROM szervezet WHERE azonosito NOT IN (SELECT szervezet FROM kontakt WHERE szemely = ?);
         """, (szemelyazonosito, ))
         return sorted(map(lambda szervezet: Szervezet(**szervezet), szemelyhez_nem_rendelt_szervezetek), key=repr)
 
