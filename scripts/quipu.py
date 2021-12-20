@@ -164,11 +164,17 @@ class Quipu(Frame):
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
-        kontakt_kon.create("beosztas",
+        kontakt_kon.create("vevo",
             azonosito="INTEGER PRIMARY KEY",
-            kontakt="INTEGER REFERENCES kontakt",
-            megnevezes="TEXT NOT NULL",
-            megjegyzes="TEXT DEFAULT ''")
+            kontakt="INTEGER UNIQUE REFERENCES kontakt")
+
+        kontakt_kon.create("szallito",
+            azonosito="INTEGER PRIMARY KEY",
+            kontakt="INTEGER UNIQUE REFERENCES kontakt")
+
+        kontakt_kon.create("gyarto",
+            azonosito="INTEGER PRIMARY KEY",
+            kontakt="INTEGER UNIQUE REFERENCES kontakt")
 
         return kontakt_kon
 

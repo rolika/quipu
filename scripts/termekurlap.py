@@ -7,7 +7,6 @@ from urlap import Valaszto
 from kontakt import Kontakt
 from jelleg import Jelleg
 from termek import Termek
-from konstans import TERMEK_TIPUS
 
 
 class TermekUrlap(Frame):
