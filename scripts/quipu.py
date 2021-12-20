@@ -247,11 +247,15 @@ class Quipu(Frame):
         """Raktárkészlet-adatbázis inicializálása."""
         raktar_kon = tamer.Tamer("raktar.db")
 
-        raktar_kon.create("termek",
+        raktar_kon.create("anyag",
             azonosito="INTEGER PRIMARY KEY",
             gyarto="INTEGER",
             nev="TEXT",
+            tipus="TEXT",
             cikkszam="TEXT",
+            leiras="TEXT",
+            szin="TEXT",
+            szinkod = "TEXT",
             egyseg="TEXT",
             kiszereles_nev="TEXT",
             kiszereles="REAL",
@@ -262,7 +266,7 @@ class Quipu(Frame):
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
 
-        raktar_kon.create("aru",
+        raktar_kon.create("termek",
             azonosito="INTEGER PRIMARY KEY",
             termek="INTEGER",
             projekt="INTEGER DEFAULT 0",
@@ -273,7 +277,7 @@ class Quipu(Frame):
 
         raktar_kon.create("keszlet",
             azonosito="INTEGER PRIMARY KEY",
-            aru="INTEGER",
+            termek="INTEGER",
             mennyiseg="REAL",
             erkezett="DATE",
             eltarthato="DATE",

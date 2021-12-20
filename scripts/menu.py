@@ -4,7 +4,7 @@ import szervezeturlap
 import projekturlap
 import ajanlatkeresurlap
 import ajanlaturlap
-import termekurlap
+import anyagurlap
 import raktarurlap
 
 
@@ -90,8 +90,8 @@ class RaktarMenu(Menu):
         kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
         super().__init__(mb, tearoff=0)
         mb["menu"] = self
+        self.add("cascade", label="anyag", menu=AnyagAlmenu(mb, kon))
         self.add("cascade", label="termék", menu=TermekAlmenu(mb, kon))
-        self.add("cascade", label="áru", menu=AruAlmenu(mb, kon))
         self.add("cascade", label="szállítólevél", menu=SzallitolevelAlmenu(mb, kon))
 
 
@@ -437,8 +437,29 @@ class AjanlatAlmenu(Alapmenu):
         ajanlaturlap.AjanlatModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
+class AnyagAlmenu(Alapmenu):
+    """Anyagokat kezelő almenü."""
+    def __init__(self, mb, kon) -> Menu:
+        """Termékkezelő menüpontok élesítése.
+        mb:     tkinter.Menubutton példánya (amolyan szülő-widget)
+        kon:    konnektor.Konnektor adatbázis gyűjtőkapcsolat"""
+        super().__init__(mb, kon)
+
+    def uj(self) -> None:
+        """Űrlap megjelenítése új anyag létrehozására."""
+        anyagurlap.UjAnyagUrlap(self._mb.winfo_toplevel(), self._kon)
+
+    def torol(self) -> None:
+        """Űrlap megjelenítése meglévő anyag törlésére."""
+        anyagurlap.AnyagTorloUrlap(self._mb.winfo_toplevel(), self._kon)
+
+    def modosit(self) -> None:
+        """Űrlap megjelenítése meglévő anyag módosítására."""
+        anyagurlap.AnyagModositoUrlap(self._mb.winfo_toplevel(), self._kon)
+
+
 class TermekAlmenu(Alapmenu):
-    """Termékeket kezelő almenü."""
+    """Termékeket (árazott anyagokat) kezelő almenü."""
     def __init__(self, mb, kon) -> Menu:
         """Termékkezelő menüpontok élesítése.
         mb:     tkinter.Menubutton példánya (amolyan szülő-widget)
@@ -447,36 +468,15 @@ class TermekAlmenu(Alapmenu):
 
     def uj(self) -> None:
         """Űrlap megjelenítése új termék létrehozására."""
-        termekurlap.UjTermekUrlap(self._mb.winfo_toplevel(), self._kon)
+        anyagurlap.UjTermekUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def torol(self) -> None:
         """Űrlap megjelenítése meglévő termék törlésére."""
-        termekurlap.TermekTorloUrlap(self._mb.winfo_toplevel(), self._kon)
+        anyagurlap.TermekTorloUrlap(self._mb.winfo_toplevel(), self._kon)
 
     def modosit(self) -> None:
         """Űrlap megjelenítése meglévő termék módosítására."""
-        termekurlap.TermekModositoUrlap(self._mb.winfo_toplevel(), self._kon)
-
-
-class AruAlmenu(Alapmenu):
-    """Árukat (árazott termékeket) kezelő almenü."""
-    def __init__(self, mb, kon) -> Menu:
-        """Árukezelő menüpontok élesítése.
-        mb:     tkinter.Menubutton példánya (amolyan szülő-widget)
-        kon:    konnektor.Konnektor adatbázis gyűjtőkapcsolat"""
-        super().__init__(mb, kon)
-
-    def uj(self) -> None:
-        """Űrlap megjelenítése új áru létrehozására."""
-        termekurlap.UjAruUrlap(self._mb.winfo_toplevel(), self._kon)
-
-    def torol(self) -> None:
-        """Űrlap megjelenítése meglévő áru törlésére."""
-        termekurlap.AruTorloUrlap(self._mb.winfo_toplevel(), self._kon)
-
-    def modosit(self) -> None:
-        """Űrlap megjelenítése meglévő áru módosítására."""
-        termekurlap.AruModositoUrlap(self._mb.winfo_toplevel(), self._kon)
+        anyagurlap.TermekModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 class SzallitolevelAlmenu(Menu):

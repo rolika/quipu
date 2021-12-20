@@ -6,11 +6,12 @@ from datetime import date
 from urlap import Valaszto
 from kontakt import Kontakt
 from jelleg import Jelleg
-from termek import Termek
+from anyag import Anyag
+from konstans import AnyagTipus
 
 
-class TermekUrlap(Frame):
-    """A termék egy gyártó előállított anyag."""
+class AnyagUrlap(Frame):
+    """Az anyag egy gyártó előállított anyag."""
     def __init__(self, kon=None, master=None, **kw):
         """Az űrlap egy saját Frame()-ben jelenik meg.
         kon:    konnektor.Konnektor adatbázis gyűjtőkapcsolat
@@ -39,8 +40,9 @@ class TermekUrlap(Frame):
         self._fokusz.grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
         Label(self, text="típus").grid(row=2, column=0, sticky=W, padx=2, pady=2)
-        OptionMenu(self, self._tipus, *TERMEK_TIPUS).grid(row=2, column=1, sticky=W, padx=2, pady=2)
-        self._tipus.set(TERMEK_TIPUS[0])
+        anyagtipusok = [anyag.value() for anyag in AnyagTipus]
+        OptionMenu(self, self._tipus, anyagtipusok).grid(row=2, column=1, sticky=W, padx=2, pady=2)
+        self._tipus.set(AnyagTipus.SZIG.value())
 
         Label(self, text="cikkszám").grid(row=3, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._cikkszam, width=16).grid(row=3, column=1, sticky=W, padx=2, pady=2)
@@ -118,7 +120,7 @@ class AruUrlap(Frame):
     def _termekek(self):
         """Termékek felsorolása."""
         assert self._kon
-        return sorted(map(lambda termek: Termek(**termek), self._kon.raktar.select("termek")),
+        return sorted(map(lambda anyag: Anyag(**anyag), self._kon.raktar.select("anyag")),
                       key=lambda elem: (elem.gyakorisag, repr(elem)))
 
     def _projektek(self):

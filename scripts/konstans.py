@@ -55,8 +55,8 @@ class Esely(enum.IntEnum):
         return self.value
 
 
-class TermekTipus(enum.Enum):
-    """Terméktípusok felsorolása."""
+class AnyagTipus(enum.Enum):
+    """Anyagtípusok felsorolása."""
     SZIG = "szigetelőanyag"  # alapértelmezés
     REZSI = "rezsianyag"
     FOLIA = "szigetelőfólia"
