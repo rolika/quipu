@@ -447,7 +447,9 @@ class AnyagAlmenu(Alapmenu):
 
     def uj(self) -> None:
         """Űrlap megjelenítése új anyag létrehozására."""
+        self._kon.szervezet.attach(kontakt="kontakt.db")
         anyagurlap.UjAnyagUrlap(self._mb.winfo_toplevel(), self._kon)
+        self._kon.szervezet.detach("kontakt")
 
     def torol(self) -> None:
         """Űrlap megjelenítése meglévő anyag törlésére."""

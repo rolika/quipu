@@ -1,4 +1,5 @@
 from csomo import Csomo
+from gyarto import Gyarto
 from szervezet import Szervezet
 from konstans import AnyagTipus
 
@@ -26,7 +27,7 @@ class Anyag(Csomo):
                 "szallitasi_ido": 0,
                 "megjegyzes": ""
             }
-        self._tabla = "termek"
+        self._tabla = "anyag"
 
     def __str__(self) -> str:
         return self.listanezet()
@@ -121,7 +122,13 @@ class Anyag(Csomo):
 
     def _gyarto(self) -> Szervezet:
         assert self._kon
-        gyarto = self._kon.szervezet.select("szervezet", azonosito=self.gyarto).fetchone()
+        gyarto = self._kon.szervezet.execute("""
+            SELECT szervezet.*
+            FROM szervezet, gyarto, kontakt
+            ON  gyarto.azonosito = ?
+                AND kontakt.azonosito = gyarto.kontakt
+                AND szervezet.azonosito = kontakt.szervezet;
+        """, (self.gyarto, )).fetchone()
         return Szervezet(kon=self._kon, **gyarto)
 
     def listanezet(self):

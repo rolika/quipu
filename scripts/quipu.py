@@ -297,6 +297,8 @@ class Quipu(Frame):
             aru="INTEGER",
             mennyiseg="REAL",
             megjegyzes="TEXT")
+        
+        return raktar_kon
 
 
 if __name__ == "__main__":
