@@ -186,7 +186,13 @@ class UjAnyagUrlap(simpledialog.Dialog):
     def validate(self) -> bool:
         """Override Dialog.validate - érvényes anyag biztosítása"""
         anyag = self._anyagurlap.export()
-        return bool(anyag)
+        if not anyag:
+            messagebox.showwarning("Hiányos adat!", "Legalább a nevet és az egységet add meg!", parent=self)
+            return False
+        if anyag.meglevo(self._kon.raktar):
+            messagebox.showwarning("Az anyag már létezik!", "Különböztesd meg a megjegyzésben!", parent=self)
+            return False
+        return True
 
     def apply(self) -> None:
         """Override Dialog.apply - anyag mentése"""
