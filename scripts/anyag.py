@@ -44,21 +44,22 @@ class Anyag(Csomo):
         return self._adatok
 
     @adatok.setter
-    def adatok(self, termek) -> None:
-        self._adatok["cikkszam"] = termek.cikkszam
-        self._adatok["nev"] = termek.nev
-        self._adatok["tipus"] = termek.tipus
-        self._adatok["leiras"] = termek.leiras
-        self._adatok["szin"] = termek.szin
-        self._adatok["szinkod"] = termek.szinkod
-        self._adatok["egyseg"] = termek.egyseg
-        self._adatok["kiszereles_nev"] = termek.kiszereles_nev
-        self._adatok["kiszereles"] = termek.kiszereles
-        self._adatok["csomagolas_nev"] =termek.csomagolas_nev
-        self._adatok["csomagolas"] = termek.csomagolas
-        self._adatok["kritikus"] = termek.kritikus
-        self._adatok["szallitasi_ido"] = termek.szallitasi_ido
-        self._adatok["megjegyzes"] = termek.megjegyzes
+    def adatok(self, anyag) -> None:
+        self._adatok["gyarto"] = anyag.gyarto
+        self._adatok["cikkszam"] = anyag.cikkszam
+        self._adatok["nev"] = anyag.nev
+        self._adatok["tipus"] = anyag.tipus
+        self._adatok["leiras"] = anyag.leiras
+        self._adatok["szin"] = anyag.szin
+        self._adatok["szinkod"] = anyag.szinkod
+        self._adatok["egyseg"] = anyag.egyseg
+        self._adatok["kiszereles_nev"] = anyag.kiszereles_nev
+        self._adatok["kiszereles"] = anyag.kiszereles
+        self._adatok["csomagolas_nev"] =anyag.csomagolas_nev
+        self._adatok["csomagolas"] = anyag.csomagolas
+        self._adatok["kritikus"] = anyag.kritikus
+        self._adatok["szallitasi_ido"] = anyag.szallitasi_ido
+        self._adatok["megjegyzes"] = anyag.megjegyzes
 
     @property
     def gyarto(self):

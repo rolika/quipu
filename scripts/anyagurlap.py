@@ -87,16 +87,25 @@ class AnyagUrlap(Frame):
     def fokusz(self):
         return self._gyarto_valaszto
 
-    def _gyartok(self):
-        """Gyártócégek felsorolása."""
-        assert self._kon
-        return sorted(map(lambda gyarto: Gyarto(kon=self._kon, **gyarto), self._kon.kontakt.select("gyarto")),
-                      key=repr)
     
-    def beallit(self, anyag) -> None:
+    def beallit(self, anyag:Anyag) -> None:
         """Adatokkal tölti fel az űrlapot.
         anyag:  anyag.Anyag csomó"""
-        pass
+        self._gyarto_valaszto.valaszto.set(self._gyarto(anyag).listanezet())
+        self._nev.set(anyag.nev)
+        self._tipus.set(anyag.tipus)
+        self._cikkszam.set(anyag.cikkszam)
+        self._leiras.set(anyag.leiras)
+        self._szin.set(anyag.szin)
+        self._szinkod.set(anyag.szinkod)
+        self._egyseg.set(anyag.egyseg)
+        self._kiszereles_nev.set(anyag.kiszereles_nev)
+        self._kiszereles.set(anyag.kiszereles)
+        self._csomagolas_nev.set(anyag.csomagolas_nev)
+        self._csomagolas.set(anyag.csomagolas)
+        self._kritikus.set(anyag.kritikus)
+        self._szallitasi_ido.set(anyag.szallitasi_ido)
+        self._megjegyzes.set(anyag.megjegyzes)
 
     def export(self) -> Anyag:
         """Beolvassa az űrlap kitöltött mezőit és Anyag csomót ad vissza belőlük."""
@@ -117,6 +126,17 @@ class AnyagUrlap(Frame):
             szallitasi_ido = self._szallitasi_ido.get(),
             megjegyzes = self._megjegyzes.get()
         )
+
+    def _gyartok(self) -> list:
+        """Gyártócégek felsorolása."""
+        assert self._kon
+        return sorted(map(lambda gyarto: Gyarto(kon=self._kon, **gyarto), self._kon.kontakt.select("gyarto")),
+                      key=repr)
+    
+    def _gyarto(self, anyag:Anyag) -> Gyarto:
+        """Ismert azonosítójú gyártó."""
+        gyarto = self._kon.kontakt.select("gyarto", azonosito=anyag.gyarto).fetchone()
+        return Gyarto(kon=self._kon, **gyarto)
 
 
 class AruUrlap(Frame):
@@ -236,16 +256,39 @@ class AnyagModositoUrlap(simpledialog.Dialog):
         """Override Dialog.body - gui megjelenítése"""
         self._anyagvalaszto = Valaszto("anyag", self._anyagok(), self)
         self._anyagvalaszto.pack(ipadx=2, ipady=2)
+        self._anyagvalaszto.set_callback(self._megjelenit)
+
+        self._anyagurlap = AnyagUrlap(self._kon, self)
+        self._anyagurlap.pack(ipadx=2, ipady=2)
+
+        self._megjelenit(1)
+
         return self._anyagvalaszto.valaszto
 
     def validate(self) -> bool:
-        """Override Dialog.validate - módosítás előtti utolsó megerősítés"""
+        """Override Dialog.validate - érvényes anyag biztosítása"""
+        anyag = self._anyagurlap.export()
+        if not anyag:
+            messagebox.showwarning("Hiányos adat!", "Legalább a nevet és az egységet add meg!", parent=self)
+            return False
+        if anyag.meglevo(self._kon.raktar):
+            messagebox.showwarning("Az anyag már létezik!", "Különböztesd meg a megjegyzésben!", parent=self)
+            return False
         return True
     
     def apply(self) -> None:
         """Override Dialog.apply - módosítás végrehajtása"""
-        pass
-
+        anyag = self._anyagvalaszto.elem
+        anyag.adatok = self._anyagurlap.export()
+        print("{}: Bejegyzés módosítva.".format(anyag) if anyag.ment(self._kon.raktar) else "Nem sikerült módosítani.")
+    
+    def _anyagok(self) -> list:
+        """Az anyagok custom repr alapján abc-sorrendbe rakott listát készít."""
+        return sorted(map(lambda anyag: Anyag(kon=self._kon, **anyag), self._kon.raktar.select("anyag")), key=repr)
+    
+    def _megjelenit(self, event):
+        """Az anyag adatainak eseményvezérelt kijelzése az űrlap mezőibe."""
+        self._anyagurlap.beallit(self._anyagvalaszto.elem or Anyag())
 
 
 if __name__ == "__main__":

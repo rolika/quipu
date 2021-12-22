@@ -459,7 +459,9 @@ class AnyagAlmenu(Alapmenu):
 
     def modosit(self) -> None:
         """Űrlap megjelenítése meglévő anyag módosítására."""
+        self._kon.szervezet.attach(kontakt="kontakt.db")
         anyagurlap.AnyagModositoUrlap(self._mb.winfo_toplevel(), self._kon)
+        self._kon.szervezet.detach("kontakt")
 
 
 class TermekAlmenu(Alapmenu):
