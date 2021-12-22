@@ -453,7 +453,9 @@ class AnyagAlmenu(Alapmenu):
 
     def torol(self) -> None:
         """Űrlap megjelenítése meglévő anyag törlésére."""
+        self._kon.szervezet.attach(kontakt="kontakt.db")
         anyagurlap.AnyagTorloUrlap(self._mb.winfo_toplevel(), self._kon)
+        self._kon.szervezet.detach("kontakt")
 
     def modosit(self) -> None:
         """Űrlap megjelenítése meglévő anyag módosítására."""

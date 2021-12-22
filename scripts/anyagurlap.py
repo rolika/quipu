@@ -200,6 +200,30 @@ class UjAnyagUrlap(simpledialog.Dialog):
         print("Bejegyzés mentve." if anyag.ment(self._kon.raktar) else "Nem sikerült menteni.")
 
 
+class AnyagTorloUrlap(simpledialog.Dialog):
+    """Űrlap meglévő anyag törlésére."""
+    def __init__(self, szulo, kon=None) -> None:
+        self._kon = kon  # super() előtt kell legyen
+        super().__init__(szulo, title="Anyag törlése")
+    
+    def body(self, szulo) -> Combobox:
+        """Override Dialog.body - gui megjelenítése"""
+        self._anyagvalaszto = Valaszto("anyag", self._anyagok(), self)
+        self._anyagvalaszto.pack(ipadx=2, ipady=2)
+        return self._anyagvalaszto.valaszto
+
+    def validate(self) -> bool:
+        """Override Dialog.validate - törlés előtti utolsó megerősítés"""
+        return messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!")
+    
+    def apply(self) -> None:
+        """Override Dialog.apply - törlés végrehajtása"""
+        pass
+    
+    def _anyagok(self) -> list:
+        """Az anyagok custom repr alapján abc-sorrendbe rakott listát készít."""
+        return sorted(map(lambda anyag: Anyag(kon=self._kon, **anyag), self._kon.raktar.select("anyag")), key=repr)
+
 
 
 if __name__ == "__main__":
