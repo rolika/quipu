@@ -197,7 +197,7 @@ class UjAnyagUrlap(simpledialog.Dialog):
     def apply(self) -> None:
         """Override Dialog.apply - anyag mentése"""
         anyag = self._anyagurlap.export()
-        print("Bejegyzés mentve." if anyag.ment(self._kon.raktar) else "Nem sikerült menteni.")
+        print("{}: Bejegyzés mentve.".format(anyag) if anyag.ment(self._kon.raktar) else "Nem sikerült menteni.")
 
 
 class AnyagTorloUrlap(simpledialog.Dialog):
@@ -218,11 +218,33 @@ class AnyagTorloUrlap(simpledialog.Dialog):
     
     def apply(self) -> None:
         """Override Dialog.apply - törlés végrehajtása"""
-        pass
+        anyag = self._anyagvalaszto.elem
+        print("{}: Bejegyzés törölve.".format(anyag) if anyag.torol(self._kon.raktar) else "Nem sikerült törölni.")
     
     def _anyagok(self) -> list:
         """Az anyagok custom repr alapján abc-sorrendbe rakott listát készít."""
         return sorted(map(lambda anyag: Anyag(kon=self._kon, **anyag), self._kon.raktar.select("anyag")), key=repr)
+
+
+class AnyagModositoUrlap(simpledialog.Dialog):
+    """Űrlap meglévő anyag módosítására."""
+    def __init__(self, szulo, kon=None) -> None:
+        self._kon = kon  # super() előtt kell legyen
+        super().__init__(szulo, title="Anyag módosítása")
+    
+    def body(self, szulo) -> Combobox:
+        """Override Dialog.body - gui megjelenítése"""
+        self._anyagvalaszto = Valaszto("anyag", self._anyagok(), self)
+        self._anyagvalaszto.pack(ipadx=2, ipady=2)
+        return self._anyagvalaszto.valaszto
+
+    def validate(self) -> bool:
+        """Override Dialog.validate - módosítás előtti utolsó megerősítés"""
+        return True
+    
+    def apply(self) -> None:
+        """Override Dialog.apply - módosítás végrehajtása"""
+        pass
 
 
 
