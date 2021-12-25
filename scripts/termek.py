@@ -12,9 +12,9 @@ class Termek(Csomo):
         else:
             self._adatok = {  # űrlap alaphelyzetbe állítására
                 "egysegar": 0,
-                "ervenyes": "",
                 "megjegyzes": ""
             }
+        self._tabla = "termek"
     
     def __str__(self) -> str:
         return self.listanezet()
@@ -31,36 +31,43 @@ class Termek(Csomo):
         return self._adatok
 
     @adatok.setter
-    def adatok(self, aru) -> None:
-        self._adatok["egysegar"] = aru.egysegar
-        self._adatok["ervenyes"] = aru.ervenyes
-        self._adatok["megjegyzes"] = aru.megjegyzes
+    def adatok(self, termek) -> None:
+        self._adatok["anyag"] = termek.anyag
+        self._adatok["szallito"] = termek.szallito
+        self._adatok["egysegar"] = termek.egysegar
+        self._adatok["megjegyzes"] = termek.megjegyzes
     
     @property
     def anyag(self):
         return self._adatok["anyag"]
     
-    @anyag.setter
-    def anyag(self, anyag):
-        self._adatok["anyag"] = anyag
+    # @anyag.setter
+    # def anyag(self, anyag):
+    #     self._adatok["anyag"] = anyag
     
     @property
     def szallito(self):
         return self._adatok["szallito"]
     
-    @szallito.setter
-    def szallito(self, szallito):
-        self._adatok["szallito"] = szallito
+    # @szallito.setter
+    # def szallito(self, szallito):
+    #     self._adatok["szallito"] = szallito
     
-    def _anyag(self) -> Anyag:
+    @property
+    def egysegar(self):
+        return self._adatok["egysegar"]
+    
+    @property
+    def anyag_teljes(self) -> Anyag:
         assert self._kon
         anyag = self._kon.raktar.select("anyag", azonosito=self.anyag).fetchone()
         return Anyag(kon=self._kon, **anyag)
 
-    def _szallito(self) -> Szallito:
+    @property
+    def szallito_teljes(self) -> Szallito:
         assert self._kon
         szallito = self._kon.kontakt.select("szallito", azonosito=self.szallito).fetchone()
         return Szallito(kon=self._kon, **szallito)
     
     def listanezet(self) -> str:
-        return "{termek}: {ar}".format(termek=self._termek().listanezet(), ar=self.egysegar)
+        return "{anyag}: {ar}".format(anyag=self.anyag_teljes.listanezet(), ar=self.egysegar)

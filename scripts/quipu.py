@@ -268,10 +268,9 @@ class Quipu(Frame):
 
         raktar_kon.create("termek",
             azonosito="INTEGER PRIMARY KEY",
-            termek="INTEGER",
-            projekt="INTEGER DEFAULT 0",
+            anyag="INTEGER",
+            szallito="INTEGER",
             egysegar="INTEGER",
-            ervenyes="DATE",
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
 

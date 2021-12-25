@@ -5,6 +5,7 @@ import projekturlap
 import ajanlatkeresurlap
 import ajanlaturlap
 import anyagurlap
+import termekurlap
 import raktarurlap
 
 
@@ -474,15 +475,21 @@ class TermekAlmenu(Alapmenu):
 
     def uj(self) -> None:
         """Űrlap megjelenítése új termék létrehozására."""
-        anyagurlap.UjTermekUrlap(self._mb.winfo_toplevel(), self._kon)
+        self._kon.szervezet.attach(kontakt="kontakt.db")
+        termekurlap.UjTermekUrlap(self._mb.winfo_toplevel(), self._kon)
+        self._kon.szervezet.detach("kontakt")
 
     def torol(self) -> None:
         """Űrlap megjelenítése meglévő termék törlésére."""
-        anyagurlap.TermekTorloUrlap(self._mb.winfo_toplevel(), self._kon)
+        self._kon.szervezet.attach(kontakt="kontakt.db")
+        termekurlap.TermekTorloUrlap(self._mb.winfo_toplevel(), self._kon)
+        self._kon.szervezet.detach("kontakt")
 
     def modosit(self) -> None:
         """Űrlap megjelenítése meglévő termék módosítására."""
-        anyagurlap.TermekModositoUrlap(self._mb.winfo_toplevel(), self._kon)
+        self._kon.szervezet.attach(kontakt="kontakt.db")
+        termekurlap.TermekModositoUrlap(self._mb.winfo_toplevel(), self._kon)
+        self._kon.szervezet.detach("kontakt")
 
 
 class SzallitolevelAlmenu(Menu):

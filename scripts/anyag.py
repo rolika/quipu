@@ -1,5 +1,4 @@
 from csomo import Csomo
-from gyarto import Gyarto
 from szervezet import Szervezet
 from konstans import AnyagTipus
 
