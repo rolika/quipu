@@ -5,6 +5,8 @@ from anyag import Anyag
 
 class Termek(Csomo):
     """Termék, azaz árral rendelkező anyag megvalósítása."""
+    tabla = "termek"
+
     def __init__(self, **kwargs) -> object:
         super().__init__(kwargs.pop("kon", None))
         if kwargs:
@@ -14,7 +16,7 @@ class Termek(Csomo):
                 "egysegar": 0,
                 "megjegyzes": ""
             }
-        self._tabla = "termek"
+        self._tabla = Termek.tabla
     
     def __str__(self) -> str:
         return self.listanezet()
@@ -41,26 +43,13 @@ class Termek(Csomo):
     def anyag(self):
         return self._adatok["anyag"]
     
-    # @anyag.setter
-    # def anyag(self, anyag):
-    #     self._adatok["anyag"] = anyag
-    
     @property
     def szallito(self):
         return self._adatok["szallito"]
     
-    # @szallito.setter
-    # def szallito(self, szallito):
-    #     self._adatok["szallito"] = szallito
-    
     @property
     def egysegar(self):
         return self._adatok["egysegar"]
-    
-    # @property
-    # def anyag_teljes(self) -> Anyag:
-    #     assert self._kon
-    #     return 
 
     @property
     def szallito_teljes(self) -> Szallito:

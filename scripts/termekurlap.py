@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
+from tkinter.ttk import Combobox
 from urlap import Valaszto
 from szallito import Szallito
 from termek import Termek
@@ -46,7 +47,7 @@ class TermekUrlap(Frame):
         )
 
     def beallit(self, termek:Termek) -> None:
-        self._anyagvalaszto.valaszto.set(termek.anyag_teljes.listanezet())
+        self._anyagvalaszto.valaszto.set(Anyag.anyag(self._kon, termek.anyag).listanezet())
         self._szallito_valaszto.valaszto.set(termek.szallito_teljes.listanezet())
         self._egysegar.set(termek.egysegar)
         self._megjegyzes.set(termek.megjegyzes)
@@ -85,8 +86,10 @@ class UjTermekUrlap(simpledialog.Dialog):
         if not termek:
             messagebox.showwarning("Hiányos adat!", "Legalább az egységárat add meg!", parent=self)
             return False
-        else:
-            return True
+        if termek.meglevo(self._kon.raktar):
+            messagebox.showwarning("Ez a termék már létezik!", "Használd azt!", parent=self)
+            return False
+        return True
     
     def apply(self) -> None:
         """Override Dialog.apply - termék mentése"""
@@ -105,9 +108,9 @@ class TermekTorloUrlap(simpledialog.Dialog):
     
     def body(self, szulo):
         """Override Dialog.body - gui megjelenítése"""
-        self._termek_valaszto = Valaszto("termék", self._termekek(), self)
-        self._termek_valaszto.pack(ipadx=2, ipady=2)
-        return self._termek_valaszto.valaszto
+        self._termekvalaszto = Valaszto("termék", self._termekek(), self)
+        self._termekvalaszto.pack(ipadx=2, ipady=2)
+        return self._termekvalaszto.valaszto
 
     def validate(self) -> bool:
         """Override Dialog.validate - törlés előtti utolsó megerősítés"""
@@ -115,9 +118,53 @@ class TermekTorloUrlap(simpledialog.Dialog):
     
     def apply(self) -> None:
         """Override Dialog.apply - törlés végrehajtása"""
-        termek = self._termek_valaszto.elem
+        termek = self._termekvalaszto.elem
         print("{}: Bejegyzés törölve.".format(termek) if termek.torol(self._kon.raktar) else "Nem sikerült törölni.")
 
     def _termekek(self) -> list:
         """A termékekből custom repr alapján abc-sorrendbe rakott listát készít."""
         return sorted(map(lambda termek: Termek(kon=self._kon, **termek), self._kon.raktar.select("termek")), key=repr)
+
+class TermekModositoUrlap(simpledialog.Dialog):
+    """Űrlap meglévő termék módosítására."""
+    def __init__(self, szulo, kon=None) -> None:
+        self._kon = kon  # super() előtt kell legyen
+        super().__init__(szulo, title="Termék módosítása")
+    
+    def body(self, szulo) -> Combobox:
+        """Override Dialog.body - gui megjelenítése"""
+        self._termekvalaszto = Valaszto("termék", self._termekek(), self)
+        self._termekvalaszto.pack(ipadx=2, ipady=2)
+        self._termekvalaszto.set_callback(self._megjelenit)
+
+        self._termekurlap = TermekUrlap(self._kon, self)
+        self._termekurlap.pack(ipadx=2, ipady=2)
+
+        self._megjelenit(1)
+
+        return self._termekvalaszto.valaszto
+    
+    def validate(self) -> bool:
+        """Override Dialog.validate - érvényes termék biztosítása"""
+        termek = self._termekurlap.export()
+        if not termek:
+            messagebox.showwarning("Hiányos adat!", "Legalább az egységárat add meg!", parent=self)
+            return False
+        if termek.meglevo(self._kon.raktar):
+            messagebox.showwarning("Ez a termék már létezik!", "Használd azt!", parent=self)
+            return False
+        return True
+    
+    def apply(self) -> None:
+        """Override Dialog.apply - módosítás végrehajtása"""
+        termek = self._termekvalaszto.elem
+        termek.adatok = self._termekurlap.export()
+        print("{}: Bejegyzés módosítva.".format(termek) if termek.ment(self._kon.raktar) else "Nem sikerült módosítani.")
+
+    def _termekek(self) -> list:
+        """A termékekből custom repr alapján abc-sorrendbe rakott listát készít."""
+        return sorted(map(lambda termek: Termek(kon=self._kon, **termek), self._kon.raktar.select("termek")), key=repr)
+    
+    def _megjelenit(self, event):
+        """A termék adatainak eseményvezérelt kijelzése az űrlap mezőibe."""
+        self._termekurlap.beallit(self._termekvalaszto.elem or Termek())
