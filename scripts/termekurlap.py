@@ -94,5 +94,30 @@ class UjTermekUrlap(simpledialog.Dialog):
         print("{}: Bejegyzés mentve.".format(termek) if termek.ment(self._kon.raktar) else "Nem sikerült menteni.")
             
     
+class TermekTorloUrlap(simpledialog.Dialog):
+    """Űrlap meglévő termék törlésére."""
+    def __init__(self, szulo, kon=None) -> None:
+        """Az űrlap egy simpledialog.Dialog példány.
+        szulo:  szülő widget
+        kon:    konnektor.Konnektor adatbázis-gyűjtőkapcsolat"""
+        self._kon = kon  # super() előtt kell legyen
+        super().__init__(szulo, title="Termék törlése")
+    
+    def body(self, szulo):
+        """Override Dialog.body - gui megjelenítése"""
+        self._termek_valaszto = Valaszto("termék", self._termekek(), self)
+        self._termek_valaszto.pack(ipadx=2, ipady=2)
+        return self._termek_valaszto.valaszto
 
+    def validate(self) -> bool:
+        """Override Dialog.validate - törlés előtti utolsó megerősítés"""
+        return messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN és MINDEN adata törlődik!")
+    
+    def apply(self) -> None:
+        """Override Dialog.apply - törlés végrehajtása"""
+        termek = self._termek_valaszto.elem
+        print("{}: Bejegyzés törölve.".format(termek) if termek.torol(self._kon.raktar) else "Nem sikerült törölni.")
 
+    def _termekek(self) -> list:
+        """A termékekből custom repr alapján abc-sorrendbe rakott listát készít."""
+        return sorted(map(lambda termek: Termek(kon=self._kon, **termek), self._kon.raktar.select("termek")), key=repr)

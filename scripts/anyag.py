@@ -5,6 +5,8 @@ from konstans import AnyagTipus
 
 class Anyag(Csomo):
     """Anyag megvalósítása."""
+    tabla = "anyag"
+
     def __init__(self, **kwargs) -> object:
         super().__init__(kwargs.pop("kon", None))
         if kwargs:
@@ -26,7 +28,7 @@ class Anyag(Csomo):
                 "szallitasi_ido": 0,
                 "megjegyzes": ""
             }
-        self._tabla = "anyag"
+        self._tabla = Anyag.tabla
 
     def __str__(self) -> str:
         return self.listanezet()
@@ -37,6 +39,11 @@ class Anyag(Csomo):
     def __bool__(self) -> bool:
         """Az anyag meghatározott, ha van neve és egysége."""
         return bool(self.nev) and bool(self.egyseg)
+    
+    @classmethod
+    def anyag(cls, kon, azonosito):
+        anyag = kon.raktar.select(cls.tabla, azonosito=azonosito).fetchone()
+        return cls(kon=kon, **anyag)
 
     @property
     def adatok(self) -> dict:

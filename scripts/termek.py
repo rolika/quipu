@@ -57,11 +57,10 @@ class Termek(Csomo):
     def egysegar(self):
         return self._adatok["egysegar"]
     
-    @property
-    def anyag_teljes(self) -> Anyag:
-        assert self._kon
-        anyag = self._kon.raktar.select("anyag", azonosito=self.anyag).fetchone()
-        return Anyag(kon=self._kon, **anyag)
+    # @property
+    # def anyag_teljes(self) -> Anyag:
+    #     assert self._kon
+    #     return 
 
     @property
     def szallito_teljes(self) -> Szallito:
@@ -70,4 +69,5 @@ class Termek(Csomo):
         return Szallito(kon=self._kon, **szallito)
     
     def listanezet(self) -> str:
-        return "{anyag}: {ar}".format(anyag=self.anyag_teljes.listanezet(), ar=self.egysegar)
+        assert self._kon
+        return "{anyag}: {ar}".format(anyag=Anyag.anyag(self._kon, self.anyag).listanezet(), ar=self.egysegar)
