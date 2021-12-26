@@ -31,6 +31,7 @@ class AnyagUrlap(Frame):
         self._csomagolas = StringVar()
         self._kritikus = StringVar()
         self._szallitasi_ido = StringVar()
+        self._eltarthato = StringVar()
         self._megjegyzes = StringVar()
 
         self._gyarto_valaszto = Valaszto("gyártó", self._gyartok(), self)
@@ -59,6 +60,7 @@ class AnyagUrlap(Frame):
 
         Label(self, text="egység").grid(row=7, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._egyseg, width=8).grid(row=7, column=1, sticky=W, padx=2, pady=2)
+        self._egyseg.set("m2")
 
         Label(self, text="kiszerelés neve").grid(row=8, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._kiszereles_nev, width=8).grid(row=8, column=1, sticky=W, padx=2, pady=2)
@@ -75,11 +77,15 @@ class AnyagUrlap(Frame):
         Label(self, text="kritikus szint").grid(row=12, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._kritikus, width=8).grid(row=12, column=1, sticky=W, padx=2, pady=2)
 
-        Label(self, text="szállítási idő").grid(row=13, column=0, sticky=W, padx=2, pady=2)
+        Label(self, text="szállítási idő (nap)").grid(row=13, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._szallitasi_ido, width=8).grid(row=13, column=1, sticky=W, padx=2, pady=2)
 
-        Label(self, text="megjegyzés").grid(row=14, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=14, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="eltartható (nap)").grid(row=14, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._eltarthato, width=8).grid(row=14, column=1, sticky=W, padx=2, pady=2)
+        self._eltarthato.set("1825")
+
+        Label(self, text="megjegyzés").grid(row=15, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=15, column=1, sticky=W, padx=2, pady=2)
 
     @property
     def fokusz(self):
@@ -102,26 +108,28 @@ class AnyagUrlap(Frame):
         self._csomagolas.set(anyag.csomagolas)
         self._kritikus.set(anyag.kritikus)
         self._szallitasi_ido.set(anyag.szallitasi_ido)
+        self._eltarthato.set(anyag.eltarthato)
         self._megjegyzes.set(anyag.megjegyzes)
 
     def export(self) -> Anyag:
         """Beolvassa az űrlap kitöltött mezőit és Anyag csomót ad vissza belőlük."""
         return Anyag(kon=self._kon,
-            gyarto = self._gyarto_valaszto.elem.azonosito,
-            nev = self._nev.get(),
-            tipus = self._tipus.get(),
-            cikkszam = self._cikkszam.get(),
-            leiras = self._leiras.get(),
-            szin = self._szin.get(),
-            szinkod = self._szinkod.get(),
-            egyseg = self._egyseg.get(),
-            kiszereles_nev = self._kiszereles_nev.get(),
-            kiszereles = self._kiszereles.get(),
-            csomagolas_nev = self._csomagolas_nev.get(),
-            csomagolas = self._csomagolas.get(),
-            kritikus = self._kritikus.get(),
-            szallitasi_ido = self._szallitasi_ido.get(),
-            megjegyzes = self._megjegyzes.get()
+            gyarto=self._gyarto_valaszto.elem.azonosito,
+            nev=self._nev.get(),
+            tipus=self._tipus.get(),
+            cikkszam=self._cikkszam.get(),
+            leiras=self._leiras.get(),
+            szin=self._szin.get(),
+            szinkod=self._szinkod.get(),
+            egyseg=self._egyseg.get(),
+            kiszereles_nev=self._kiszereles_nev.get(),
+            kiszereles=self._kiszereles.get(),
+            csomagolas_nev=self._csomagolas_nev.get(),
+            csomagolas=self._csomagolas.get(),
+            kritikus=self._kritikus.get(),
+            szallitasi_ido=self._szallitasi_ido.get(),
+            eltarthato=self._eltarthato.get(), 
+            megjegyzes=self._megjegyzes.get()
         )
 
     def _gyartok(self) -> list:

@@ -26,6 +26,7 @@ class Anyag(Csomo):
                 "csomagolas": 0,
                 "kritikus": 0,
                 "szallitasi_ido": 0,
+                "eltarthato": 0,
                 "megjegyzes": ""
             }
         self._tabla = Anyag.tabla
@@ -65,6 +66,7 @@ class Anyag(Csomo):
         self._adatok["csomagolas"] = anyag.csomagolas
         self._adatok["kritikus"] = anyag.kritikus
         self._adatok["szallitasi_ido"] = anyag.szallitasi_ido
+        self._adatok["eltarthato"] = anyag.eltarthato
         self._adatok["megjegyzes"] = anyag.megjegyzes
 
     @property
@@ -126,6 +128,10 @@ class Anyag(Csomo):
     @property
     def szallitasi_ido(self):
         return self._adatok["szallitasi_ido"]
+
+    @property
+    def eltarthato(self):
+        return self._adatok["eltarthato"]
 
     def _gyarto(self) -> Szervezet:
         assert self._kon

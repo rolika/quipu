@@ -263,6 +263,7 @@ class Quipu(Frame):
             csomagolas="REAL",
             kritikus="REAL",
             szallitasi_ido="INTEGER",
+            eltarthato="INTEGER DEFAULT 0",
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
 
@@ -279,8 +280,6 @@ class Quipu(Frame):
             termek="INTEGER",
             mennyiseg="REAL",
             erkezett="DATE",
-            eltarthato="DATE",
-            modositva="DATETIME",
             megjegyzes="TEXT")
         
         raktar_kon.create("szallitolevel",
