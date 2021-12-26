@@ -14,4 +14,4 @@ class Gyarto(Vevo):
         return Szervezet(**szervezet)
     
     def listanezet(self) -> str:
-        return self._szervezet().rovidnev
+        return self._szervezet().listanezet()
