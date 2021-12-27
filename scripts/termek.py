@@ -27,6 +27,11 @@ class Termek(Csomo):
     def __bool__(self) -> bool:
         """A termék akkor meghatározott, ha van egységára."""
         return bool(self.egysegar)
+    
+    @classmethod
+    def adatbazisbol(cls, kon, azonosito):
+        termek = kon.raktar.select(cls.tabla, azonosito=azonosito).fetchone()
+        return cls(kon=kon, **termek)
 
     @property
     def adatok(self) -> dict:

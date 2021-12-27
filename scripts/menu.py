@@ -6,6 +6,7 @@ import ajanlatkeresurlap
 import ajanlaturlap
 import anyagurlap
 import termekurlap
+import keszleturlap
 import raktarurlap
 
 
@@ -93,6 +94,7 @@ class RaktarMenu(Menu):
         mb["menu"] = self
         self.add("cascade", label="anyag", menu=AnyagAlmenu(mb, kon))
         self.add("cascade", label="termék", menu=TermekAlmenu(mb, kon))
+        self.add("cascade", label="termék", menu=KeszletAlmenu(mb, kon))
         self.add("cascade", label="szállítólevél", menu=SzallitolevelAlmenu(mb, kon))
 
 
@@ -490,6 +492,27 @@ class TermekAlmenu(Alapmenu):
         self._kon.szervezet.attach(kontakt="kontakt.db")
         termekurlap.TermekModositoUrlap(self._mb.winfo_toplevel(), self._kon)
         self._kon.szervezet.detach("kontakt")
+
+
+class KeszletAlmenu(Alapmenu):
+    """Készletet (raktározott termékeket) közvetlenül kezelő almenü."""
+    def __init__(self, mb, kon) -> Menu:
+        """Készletkezelő menüpontok élesítése.
+        mb:     tkinter.Menubutton példánya (amolyan szülő-widget)
+        kon:    konnektor.Konnektor adatbázis gyűjtőkapcsolat"""
+        super().__init__(mb, kon)
+
+    def uj(self) -> None:
+        """Űrlap megjelenítése új keszlet létrehozására."""
+        keszleturlap.UjKeszletUrlap(self._mb.winfo_toplevel(), self._kon)
+
+    def torol(self) -> None:
+        """Űrlap megjelenítése meglévő keszlet törlésére."""
+        keszleturlap.KeszletTorloUrlap(self._mb.winfo_toplevel(), self._kon)
+
+    def modosit(self) -> None:
+        """Űrlap megjelenítése meglévő keszlet módosítására."""
+        keszleturlap.KeszletModositoUrlap(self._mb.winfo_toplevel(), self._kon)
 
 
 class SzallitolevelAlmenu(Menu):
