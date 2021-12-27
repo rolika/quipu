@@ -23,7 +23,7 @@ class Szemely(Csomo):
             }
         csomo = self.__class__
         self._db = csomo.db
-        self._tabla = csomo.db
+        self._tabla = csomo.tabla
 
     def __str__(self):
         """Személyi adatok megjelenítése terminál-nézethez."""
@@ -41,14 +41,6 @@ class Szemely(Csomo):
     def __bool__(self):
         """Egy személy akkor meghatározott, ha legalább az egyik név adott"""
         return bool(self.vezeteknev) or bool(self.keresztnev)
-
-    @classmethod
-    def adatbazisbol(cls, kon, azonosito):
-        """Meglévő, adott azonosítójú csomó előkeresése az adatbázisból.
-        kon:        Konnektor adatbázis-kapcsolat
-        azonosito:  SQL PRIMARY KEY"""
-        csomo = kon[cls.db].select(cls.tabla, azonosito=azonosito).fetchone()
-        return cls(kon=kon, **csomo)
 
     @property
     def adatok(self):

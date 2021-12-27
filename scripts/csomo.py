@@ -31,9 +31,17 @@ class Csomo:
         """A csomó bázispéldánya. Önmagában nem jó semmire, le kell származtatni.
         kon:    Konnektor() adabázis-gyűjtőkapcsolat"""
         self._adatok = dict()
-        self._tabla = None
-        self._db = None
         self._kon = kon
+        self._db = None
+        self._tabla = None
+
+    @classmethod
+    def adatbazisbol(cls, kon, azonosito):
+        """Meglévő, adott azonosítójú csomó előkeresése az adatbázisból. Factory metódus.
+        kon:        Konnektor adatbázis-kapcsolat
+        azonosito:  SQL PRIMARY KEY"""
+        csomo = kon[cls.db].select(cls.tabla, azonosito=azonosito).fetchone()
+        return cls(kon=kon, **csomo)
 
     def __str__(self) -> str:
         """Csomó miden adatának szöveges megjelenítése, terminál-nézethez."""
@@ -51,12 +59,6 @@ class Csomo:
         """A csomó azonos egy másikkal, ha azonos az SQL PRIMARY KEY-ük.
         Kell a None-check, mert None == None True-t ad."""
         return False if self.azonosito is None else self.azonosito == masik.azonosito
-
-    @classmethod
-    def adatbazisbol(cls, azonosito):
-        """Meglévő, adott azonosítójú csomó előkeresése az adatbázisból.
-        azonosito:  SQL PRIMARY KEY"""
-        raise NotImplementedError
 
     @property
     def azonosito(self) -> int:
