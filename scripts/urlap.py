@@ -1,9 +1,12 @@
+"""A Quipu általános, többször használt űrlapjai."""
+
 from tkinter import *
 from tkinter.ttk import Combobox
 from telefon import Telefon
 from e_mail import Email
 from cim import Cim
 from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS, ORSZAG, MEGYE
+from szemely import Szemely
 
 
 class TelefonszamUrlap(Frame):
@@ -164,3 +167,65 @@ class Valaszto(LabelFrame):
         """Callback-függvény beállítása kívülről.
         fv_ref: függvény referenciája () nélkül"""
         self._valaszto.bind("<<ComboboxSelected>>", fv_ref)
+
+
+class SzemelyUrlap(Frame):
+    """Űrlap személyi adatokhoz."""
+    def __init__(self, kon=None, master=None, **kwargs) -> Frame:
+        """Az űrlap egy tkinter.Frame-ben helyezkedik el, mert a Frame-en belül lehet .grid-elni a widget-eket,
+        viszont a simpledialog.Dialog-on belül csak .pack-olni lehet.
+        kon:    konnektor.Konnektor adatbázis gyűjtőkapcsolat
+        master: szülő widget
+        kwargs: tkinter.Frame tulajdonságait szabályozó értékek"""
+        super().__init__(master=master, **kwargs)
+        self._kon = kon
+
+        self._elotag = StringVar()
+        self._vezeteknev = StringVar()
+        self._keresztnev = StringVar()
+        self._nem = StringVar()
+        self._megjegyzes = StringVar()
+
+        Label(self, text="előtag").grid(row=0, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._elotag, width=8).grid(row=0, column=1, sticky=W, padx=2, pady=2)
+
+        Label(self, text="vezetéknév").grid(row=1, column=0, sticky=W, padx=2, pady=2)
+        self._fokusz = Entry(self, textvariable=self._vezeteknev, width=32)
+        self._fokusz.grid(row=1, column=1, columnspan=2, sticky=W, padx=2, pady=2)
+
+        Label(self, text="keresztnév").grid(row=2, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._keresztnev, width=32)\
+            .grid(row=2, column=1, columnspan=2, sticky=W, padx=2, pady=2)
+
+        Label(self, text="nem").grid(row=3, column=0, sticky=W, padx=2, pady=2)
+        Radiobutton(self, text="nő", value="nő", variable=self._nem).grid(row=3, column=1, sticky=W, padx=2, pady=2)
+        Radiobutton(self, text="férfi", value="férfi", variable=self._nem).grid(row=3, column=2, sticky=W, padx=2, pady=2)
+        self._nem.set("férfi")
+
+        Label(self, text="megjegyzés").grid(row=4, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._megjegyzes, width=32)\
+            .grid(row=4, column=1, columnspan=2, sticky=W, padx=2, pady=2)
+
+    @property
+    def fokusz(self) -> Entry:
+        """Az űrlap alapértelmezett widget-je."""
+        return self._fokusz
+
+    def beallit(self, szemely) -> None:
+        """Adatokkal tölti fel az űrlapot.
+        szemely:    szemely.Szemely csomó"""
+        self._elotag.set(szemely.elotag)
+        self._vezeteknev.set(szemely.vezeteknev)
+        self._keresztnev.set(szemely.keresztnev)
+        self._nem.set(szemely.nem)
+        self._megjegyzes.set(szemely.megjegyzes)
+
+    def export(self) -> Szemely:
+        """Beolvassa az űrlap kitöltött mezőit és Személy csomót ad vissza belőlük."""
+        return Szemely(kon=self._kon,
+            elotag=self._elotag.get(),
+            vezeteknev=self._vezeteknev.get(),
+            keresztnev=self._keresztnev.get(),
+            nem=self._nem.get(),
+            megjegyzes=self._megjegyzes.get()
+        )

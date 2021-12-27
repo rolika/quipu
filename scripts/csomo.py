@@ -3,11 +3,36 @@ import re
 
 class Csomo:
     """A kipu egy csomóírás. Ez az alkalmazás is alapvető csomókból áll."""
+
+    def ascii_rep(szoveg) -> str:
+        """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
+        szoveg:     string"""
+        return "".join(re.findall("[a-z]", szoveg.lower().translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))))
+
+    def formazo(attr, zarojel="()", elvalasztojel=" ", hatul=False) -> str:
+        """Segít a formázásban, ill. ha hiányzik az adat, nem írjuk ki egyáltalán.
+        attr:           attribútum, vagy annak hiánya, ha üres
+        zarojel:        () vagy [] vagy {} esetleg // vagy "" legyen az adat körül (két karakter legyen, vagy üres)
+        elvalasztojel:  az adatot a többitől elválasztó jel
+        hatul:          az elválasztójel hátul legyen"""
+        if attr == "None":
+            return ""
+        if hatul:
+            hatul = elvalasztojel
+            elvalasztojel = ""
+        else:
+            hatul = ""
+        nyito = zarojel[0] if zarojel else ""
+        zaro = zarojel[1] if zarojel else ""
+        return "{elvalaszto}{nyit}{adat}{zar}{hatul}"\
+            .format(elvalaszto=elvalasztojel, nyit=nyito, adat=attr, zar=zaro, hatul=hatul) if attr else ""
+
     def __init__(self, kon=None) -> object:
         """A csomó bázispéldánya. Önmagában nem jó semmire, le kell származtatni.
         kon:    Konnektor() adabázis-gyűjtőkapcsolat"""
         self._adatok = dict()
         self._tabla = None
+        self._db = None
         self._kon = kon
 
     def __str__(self) -> str:
@@ -27,6 +52,12 @@ class Csomo:
         Kell a None-check, mert None == None True-t ad."""
         return False if self.azonosito is None else self.azonosito == masik.azonosito
 
+    @classmethod
+    def adatbazisbol(cls, azonosito):
+        """Meglévő, adott azonosítójú csomó előkeresése az adatbázisból.
+        azonosito:  SQL PRIMARY KEY"""
+        raise NotImplementedError
+
     @property
     def azonosito(self) -> int:
         """A csomó azonosítója (SQL PRIMARY KEY)."""
@@ -38,6 +69,11 @@ class Csomo:
         self._adatok["azonosito"] = azonosito
 
     @property
+    def gyakorisag(self) -> int:
+        """A csomó használatának gyakorisága."""
+        return self._adatok.get("gyakorisag", 0)
+
+    @property
     def megjegyzes(self) -> str:
         """Minden csomóhoz fűzhető valamilyen megjegyzés."""
         return self._adatok.get("megjegyzes")
@@ -46,46 +82,35 @@ class Csomo:
         """Csomó szöveges megjelenítése kiválasztáshoz (pl. Combobox)."""
         raise NotImplementedError
 
-    def meglevo(self, kon) -> bool:
-        """Ellenőrzi, hogy a csomó szerepel-e az adatbázisban.
-        kon:    tamer modul adatbázis konnektora"""
+    def meglevo(self) -> bool:
+        """Ellenőrzi, hogy a csomó szerepel-e az adatbázisban."""
+        assert self._kon
+        assert self._db
         assert self._tabla
-        return True if self.azonosito else kon.select(self._tabla, logic="AND", **self._adatok).fetchone()
+        csomo = self._kon[self._db].select(self._tabla, logic="AND", **self._adatok)
+        return True if self.azonosito else csomo.fetchone()
 
-    def ment(self, kon) -> bool:
-        """Menti vagy módosítja a csomó adatait.
-        kon:    tamer modul adatbázis konnektora"""
+    def ment(self) -> bool:
+        """Menti vagy módosítja a csomó adatait, attól függően, van-e azonosítója, jelezve, sikerült-e a művelet:
+        return:
+            True:       sikerült a módosítás
+            False:      nem sikerült a módosítás (alapvetően adatbázis-hiba)
+            lastrowid:  sikerült az új csomó adatainak mentése (utolsó insert sql primary key)
+            None:       nem sikerült az új csomó adatainak mentése (alapvetően adatbázis-hiba)"""
+        assert self._kon
+        assert self._db
         assert self._tabla
         if self.azonosito:
-            return kon.update(self._tabla, self._adatok, azonosito=self.azonosito)  # True vagy False
+            muvelet = self._kon[self._db].update(self._tabla, self._adatok, azonosito=self.azonosito)
         else:
-            return kon.insert(self._tabla, **self._adatok)  # lastrowid vagy None
+            muvelet = self._kon[self._db].insert(self._tabla, **self._adatok)
+        if muvelet:
+            self._adatok["gyakorisag"] = self.gyakorisag - 1
+        return muvelet
 
-    def torol(self, kon) -> bool:
-        """Törli az adatbázisból a csomót.
-        kon:    tamer modul adatbázis konnektora"""
+    def torol(self) -> bool:
+        """Törli az adatbázisból a csomó adatait, jelezve, hogy sikerült-e a törlés."""
+        assert self._kon
+        assert self._db
         assert self._tabla
-        return kon.delete(self._tabla, azonosito=self.azonosito)
-
-    def _ascii_rep(self, szoveg) -> str:
-        """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
-        szoveg:     string"""
-        return "".join(re.findall("[a-z]", szoveg.lower().translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))))
-
-    def _nullazo(self, attr, zarojel="()", elvalasztojel=" ", hatul=False) -> str:
-        """Ha hiányzik az adat, nem írjuk ki egyáltalán.
-        attr:           attribútum, vagy annak hiánya, ha üres
-        zarojel:        () vagy [] vagy {} esetleg // vagy "" legyen az adat körül (két karakter legyen, vagy üres)
-        elvalasztojel:  az adatot a többitől elválasztó jel
-        hatul:          az elválasztójel hátul legyen"""
-        if attr == "None":
-            return ""
-        if hatul:
-            hatul = elvalasztojel
-            elvalasztojel = ""
-        else:
-            hatul = ""
-        nyito = zarojel[0] if zarojel else ""
-        zaro = zarojel[1] if zarojel else ""
-        return "{elvalaszto}{nyit}{adat}{zar}{hatul}"\
-            .format(elvalaszto=elvalasztojel, nyit=nyito, adat=attr, zar=zaro, hatul=hatul) if attr else ""
+        return self._kon[self._db].delete(self._tabla, azonosito=self.azonosito)

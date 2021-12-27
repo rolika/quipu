@@ -7,7 +7,7 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox
-from urlap import TelefonszamUrlap, EmailcimUrlap, CimUrlap, Valaszto
+from urlap import TelefonszamUrlap, EmailcimUrlap, CimUrlap, Valaszto, SzemelyUrlap
 from szemely import Szemely
 from telefon import Telefon
 from e_mail import Email
@@ -18,64 +18,6 @@ from vevo import Vevo
 from szallito import Szallito
 from gyarto import Gyarto
 from konstans import VITYA, ROLI
-
-
-class SzemelyUrlap(Frame):
-    """Űrlap személyi adatokhoz."""
-    def __init__(self, master=None, **kw) -> Frame:
-        """Az űrlap egy tkinter.Frame-ben helyezkedik el, mert a Frame-en belül lehet .grid-elni a widget-eket,
-        viszont a simpledialog.Dialog-on belül csak .pack-olni lehet.
-        master: szülő widget
-        kwargs: tkinter.Frame tulajdonságait szabályozó értékek"""
-        super().__init__(master=master, **kw)
-
-        self._elotag = StringVar()
-        self._vezeteknev = StringVar()
-        self._keresztnev = StringVar()
-        self._nem = StringVar()
-        self._megjegyzes = StringVar()
-
-        Label(self, text="előtag").grid(row=0, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._elotag, width=8).grid(row=0, column=1, sticky=W, padx=2, pady=2)
-
-        Label(self, text="vezetéknév").grid(row=1, column=0, sticky=W, padx=2, pady=2)
-        self._fokusz = Entry(self, textvariable=self._vezeteknev, width=32)
-        self._fokusz.grid(row=1, column=1, columnspan=2, sticky=W, padx=2, pady=2)
-
-        Label(self, text="keresztnév").grid(row=2, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._keresztnev, width=32)\
-            .grid(row=2, column=1, columnspan=2, sticky=W, padx=2, pady=2)
-
-        Label(self, text="nem").grid(row=3, column=0, sticky=W, padx=2, pady=2)
-        Radiobutton(self, text="nő", value="nő", variable=self._nem).grid(row=3, column=1, sticky=W, padx=2, pady=2)
-        Radiobutton(self, text="férfi", value="férfi", variable=self._nem).grid(row=3, column=2, sticky=W, padx=2, pady=2)
-        self._nem.set("férfi")
-
-        Label(self, text="megjegyzés").grid(row=4, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._megjegyzes, width=32)\
-            .grid(row=4, column=1, columnspan=2, sticky=W, padx=2, pady=2)
-
-    @property
-    def fokusz(self) -> Entry:
-        """Az űrlap alapértelmezett widget-je."""
-        return self._fokusz
-
-    def beallit(self, szemely) -> None:
-        """Adatokkal tölti fel az űrlapot.
-        szemely:    szemely.Szemely csomó"""
-        self._elotag.set(szemely.elotag)
-        self._vezeteknev.set(szemely.vezeteknev)
-        self._keresztnev.set(szemely.keresztnev)
-        self._nem.set(szemely.nem)
-        self._megjegyzes.set(szemely.megjegyzes)
-
-    def export(self) -> Szemely:
-        """Beolvassa az űrlap kitöltött mezőit és Szemely csomót ad vissza belőlük."""
-        return Szemely(elotag=self._elotag.get(),
-                      vezeteknev=self._vezeteknev.get(),
-                      keresztnev=self._keresztnev.get(),
-                      nem=self._nem.get(),
-                      megjegyzes=self._megjegyzes.get())
 
 
 class UjSzemelyUrlap(simpledialog.Dialog):
@@ -89,7 +31,7 @@ class UjSzemelyUrlap(simpledialog.Dialog):
 
     def body(self, szulo) -> Entry:
         """Override Dialog.body - gui megjelenítése"""
-        self._szemelyurlap = SzemelyUrlap(self)
+        self._szemelyurlap = SzemelyUrlap(self._kon, self)
         self._szemelyurlap.pack(ipadx=2, ipady=2)
         return self._szemelyurlap.fokusz
 
@@ -99,7 +41,7 @@ class UjSzemelyUrlap(simpledialog.Dialog):
         if not szemely:
             messagebox.showwarning("Hiányos adat!", "Legalább az egyik nevet add meg!", parent=self)
             return False
-        if szemely.meglevo(self._kon.szemely):
+        if szemely.meglevo():
             messagebox.showwarning("A név már létezik!", "Különböztesd meg a megjegyzésben!", parent=self)
             return False
         return True
@@ -107,7 +49,7 @@ class UjSzemelyUrlap(simpledialog.Dialog):
     def apply(self) -> None:
         """Override Dialog.apply - személy mentése"""
         szemely = self._szemelyurlap.export()
-        if szemely.ment(self._kon.szemely):
+        if szemely.ment():
             print("{}: Bejegyzés mentve.".format(szemely))
         else:  # adatbázis-hiba visszajelzése
             print("Nem sikerült elmenteni.")

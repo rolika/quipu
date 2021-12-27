@@ -1,4 +1,4 @@
-class Konnektor:
+class Konnektor(dict):
     """Adatbázis kapcsolat gyűjtőosztálya.
     A vég nélküli paraméterlistákat hivatott kiváltani, egy név alá gyűjtve az összes adatbázis-kapcsolatot.
     Kezeli az összetett lekérdezéseket, melyeket a tamer.Tamer() nem tud."""
@@ -10,6 +10,7 @@ class Konnektor:
         
         A külső használat úgy fog kinézni, hogy pl. kon.projekt.select(...)
         """
+        super().__init__(**kwargs)
         for nev, kon in kwargs.items():
             setattr(self, nev, kon)
     
@@ -33,3 +34,7 @@ if __name__ == "__main__":
     print(kon.szemely)
     print(kon.szervezet)
     print(kon.projekt)
+    print("###############################")
+    print(kon["szemely"])
+    print(kon["szervezet"])
+    print(kon["projekt"])

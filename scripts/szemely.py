@@ -2,11 +2,15 @@ from csomo import Csomo
 
 
 class Szemely(Csomo):
-    """Személy megvalósítása. Alapvető csomó, nem támaszkodik külső kulcsra."""
+    """Személy megvalósítása."""
+
+    db = "szemely"
+    tabla = "szemely"
+
     def __init__(self, **kwargs) -> Csomo:
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
-        super().__init__(kwargs.pop("kon", None))
+        super().__init__(kwargs.pop("kon", None))  # a Csomónak kell a kon
         if kwargs:
             self._adatok = dict(kwargs)
         else:  # űrlap mezőinek törléséhez
@@ -17,24 +21,34 @@ class Szemely(Csomo):
                 "nem": "férfi",
                 "megjegyzes": ""
             }
-        self._tabla = "szemely"
+        csomo = self.__class__
+        self._db = csomo.db
+        self._tabla = csomo.db
 
     def __str__(self):
         """Személyi adatok megjelenítése terminál-nézethez."""
         return "{vezeteknev} {keresztnev}{elotag} ({nem}{megjegyzes})".format(\
             vezeteknev=self.vezeteknev,
             keresztnev=self.keresztnev,
-            elotag=self._nullazo(self.elotag, zarojel="", elvalasztojel=", "),
+            elotag=Csomo.formazo(self.elotag, zarojel="", elvalasztojel=", "),
             nem=self.nem,
-            megjegyzes=self._nullazo(self.megjegyzes, zarojel="", elvalasztojel=", "))
+            megjegyzes=Csomo.formazo(self.megjegyzes, zarojel="", elvalasztojel=", "))
 
     def __repr__(self):
         """Név megjelenítése sorbarendezéshez"""
-        return self._ascii_rep("{vezetek} {kereszt}".format(vezetek=self.vezeteknev, kereszt=self.keresztnev))
+        return Csomo.ascii_rep("{vezetek} {kereszt}".format(vezetek=self.vezeteknev, kereszt=self.keresztnev))
 
     def __bool__(self):
         """Egy személy akkor meghatározott, ha legalább az egyik név adott"""
         return bool(self.vezeteknev) or bool(self.keresztnev)
+
+    @classmethod
+    def adatbazisbol(cls, kon, azonosito):
+        """Meglévő, adott azonosítójú csomó előkeresése az adatbázisból.
+        kon:        Konnektor adatbázis-kapcsolat
+        azonosito:  SQL PRIMARY KEY"""
+        csomo = kon[cls.db].select(cls.tabla, azonosito=azonosito).fetchone()
+        return cls(kon=kon, **csomo)
 
     @property
     def adatok(self):
@@ -68,7 +82,7 @@ class Szemely(Csomo):
 
     def listanezet(self) -> str:
         """Személy megjelenítése kiválasztáshoz (Combobox)"""
-        return "{elotag}{vezeteknev} {keresztnev}".format(elotag=self._nullazo(self.elotag, zarojel="", hatul=True),
+        return "{elotag}{vezeteknev} {keresztnev}".format(elotag=Csomo.formazo(self.elotag, zarojel="", hatul=True),
                                                           vezeteknev=self.vezeteknev,
                                                           keresztnev=self.keresztnev)
 
