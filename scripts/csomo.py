@@ -27,13 +27,15 @@ class Csomo:
         return "{elvalaszto}{nyit}{adat}{zar}{hatul}"\
             .format(elvalaszto=elvalasztojel, nyit=nyito, adat=attr, zar=zaro, hatul=hatul) if attr else ""
 
-    def __init__(self, kon=None) -> object:
+    def __init__(self, kon=None, db=None, tabla=None) -> object:
         """A csomó bázispéldánya. Önmagában nem jó semmire, le kell származtatni.
-        kon:    Konnektor() adabázis-gyűjtőkapcsolat"""
+        kon:    Konnektor() adabázis-gyűjtőkapcsolat
+        db:     a csomóhoz tartozó adatbázis-file
+        tabla:  a csomóhoz tartozó tábla"""
         self._adatok = dict()
         self._kon = kon
-        self._db = None
-        self._tabla = None
+        self._db = db
+        self._tabla = tabla
 
     @classmethod
     def adatbazisbol(cls, kon, azonosito):
@@ -42,6 +44,12 @@ class Csomo:
         azonosito:  SQL PRIMARY KEY"""
         csomo = kon[cls.db].select(cls.tabla, azonosito=azonosito).fetchone()
         return cls(kon=kon, **csomo)
+
+    @classmethod
+    def osszes(cls, kon) -> list:
+        """Az összes adott típusú csomó előkeresése az adatbázisból.
+        kon:        Konnektor adatbázis-kapcsolat"""
+        return sorted(map(lambda csomo: cls(kon=kon, **csomo), kon[cls.db].select(cls.tabla)), key=repr)
 
     def __str__(self) -> str:
         """Csomó miden adatának szöveges megjelenítése, terminál-nézethez."""

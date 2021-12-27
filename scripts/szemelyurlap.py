@@ -1,6 +1,4 @@
-"""
-A Quipu személyekkel kapcsolatos űrlapjait tartalmazza.
-"""
+"""A Quipu személyekkel kapcsolatos űrlapjait tartalmazza."""
 
 
 from tkinter import *
@@ -49,9 +47,8 @@ class UjSzemelyUrlap(simpledialog.Dialog):
     def apply(self) -> None:
         """Override Dialog.apply - személy mentése"""
         szemely = self._szemelyurlap.export()
-        if azonosito := szemely.ment():
+        if szemely.ment():
             print("{}: Bejegyzés mentve.".format(szemely))
-            print(Szemely.adatbazisbol(self._kon, azonosito))
         else:  # adatbázis-hiba visszajelzése
             print("Nem sikerült elmenteni.")
 
@@ -67,7 +64,7 @@ class SzemelyTorloUrlap(simpledialog.Dialog):
 
     def body(self, szulo) -> Combobox:
         """Override Dialog.body - gui megjelenítése"""
-        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto = Valaszto("név", Szemely.osszes(self._kon), self)
         self._nev_valaszto.pack(ipadx=2, ipady=2)
         return self._nev_valaszto.valaszto
 
@@ -85,16 +82,11 @@ class SzemelyTorloUrlap(simpledialog.Dialog):
         self._kon.szemely.delete("telefon", szemely=szemely.azonosito)  # GDPR!
         self._kon.szemely.delete("email", szemely=szemely.azonosito)
         self._kon.szemely.delete("cim", szemely=szemely.azonosito)
-        self._kon.szemely.delete("kontakt", szemely=szemely.azonosito)
-        if szemely.torol(self._kon.szemely):
+        if szemely.torol():
             print("{}: Bejegyzés törölve.".format(szemely))
-            self._nev_valaszto.beallit(self._nevsor())
+            self._nev_valaszto.beallit(Szemely.osszes(self._kon))
         else:
             print("Nem sikerült törölni.")
-
-    def _nevsor(self) -> list:
-        """Belső függvény, abc-rendbe rakott szemely. Szemely csomókból álló listát készít, a __repr__ alapján."""
-        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
 
 
 class SzemelyModositoUrlap(simpledialog.Dialog):
@@ -103,11 +95,11 @@ class SzemelyModositoUrlap(simpledialog.Dialog):
         super().__init__(szulo, title="Személy módosítása")
 
     def body(self, szulo):
-        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto = Valaszto("név", Szemely.osszes(self._kon), self)
         self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenit)
         self._nev_valaszto.pack(ipadx=2, ipady=2)
 
-        self._szemelyurlap = SzemelyUrlap(self)
+        self._szemelyurlap = SzemelyUrlap(self._kon, self)
         self._szemelyurlap.pack(ipadx=2, ipady=2)
         self._megjelenit(1)
 
@@ -120,7 +112,7 @@ class SzemelyModositoUrlap(simpledialog.Dialog):
         if not szemely:
             messagebox.showwarning("Hiányos adat!", "Legalább az egyik nevet add meg!", parent=self)
             return False
-        if szemely.meglevo(self._kon.szemely):
+        if szemely.meglevo():
             messagebox.showwarning("A név már létezik!", "Különböztesd meg a megjegyzésben!", parent=self)
             return False
         return True
@@ -128,16 +120,13 @@ class SzemelyModositoUrlap(simpledialog.Dialog):
     def apply(self):
         szemely = self._nev_valaszto.elem
         szemely.adatok = self._szemelyurlap.export()
-        if szemely.ment(self._kon.szemely):
+        if szemely.ment():
             print("{}: Bejegyzés módosítva.".format(szemely))
         else:
             print("Nem sikerült módosítani.")
 
-    def _nevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
-
     def _megjelenit(self, event):
-        self._szemelyurlap.beallit(self._nev_valaszto.elem or Szemely())
+        self._szemelyurlap.beallit(self._nev_valaszto.elem or Szemely(kon=self._kon))
 
 
 class UjTelefonUrlap(simpledialog.Dialog):

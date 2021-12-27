@@ -10,7 +10,8 @@ class Szemely(Csomo):
     def __init__(self, **kwargs) -> Csomo:
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
-        super().__init__(kwargs.pop("kon", None))  # a Csomónak kell a kon
+        csomo = self.__class__
+        super().__init__(kwargs.pop("kon", None), csomo.db, csomo.tabla)  # a Csomónak kell a kon
         if kwargs:
             self._adatok = dict(kwargs)
         else:  # űrlap mezőinek törléséhez
@@ -21,9 +22,6 @@ class Szemely(Csomo):
                 "nem": "férfi",
                 "megjegyzes": ""
             }
-        csomo = self.__class__
-        self._db = csomo.db
-        self._tabla = csomo.tabla
 
     def __str__(self):
         """Személyi adatok megjelenítése terminál-nézethez."""

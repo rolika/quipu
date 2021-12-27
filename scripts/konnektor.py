@@ -7,13 +7,13 @@ class Konnektor(dict):
         kwargs: név=konnektor párosok
             A név egy valid Python változó legyen, ami célszerűen azonos az adatbázis filenevekkel.
             A konnektor pedig az adatbázis-file csatlakozásánák hivatkozása.
-        
+
         A külső használat úgy fog kinézni, hogy pl. kon.projekt.select(...)
         """
         super().__init__(**kwargs)
         for nev, kon in kwargs.items():
             setattr(self, nev, kon)
-    
+
     def szemelyhez_rendelt_szervezetek(self, szemelyazonosito):
         self._kon.szemely.execute("""
             SELECT *

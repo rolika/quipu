@@ -28,8 +28,8 @@ from tkinter import *
 import tamer
 import menu
 from konstans import MAGANSZEMELY, WEVIK, VITYA, ROLI
-from kontakt import Kontakt
 from konnektor import Konnektor
+from kontakt import Kontakt
 
 
 class Quipu(Frame):
@@ -48,12 +48,14 @@ class Quipu(Frame):
         super().__init__(master=master, **kwargs)
 
         # adatbázis konnektorok
-        kon = Konnektor(szemely=self._init_szemely_db(),
-                        szervezet=self._init_szervezet_db(),
-                        kontakt=self._init_kontakt_db(),
-                        projekt=self._init_projekt_db(),
-                        ajanlat=self._init_ajanlat_db(),
-                        raktar=self._init_raktar_db())
+        kon = Konnektor(
+            szemely=self._init_szemely_db(),
+            szervezet=self._init_szervezet_db(),
+            kontakt=self._init_kontakt_db(),
+            projekt=self._init_projekt_db(),
+            ajanlat=self._init_ajanlat_db(),
+            raktar=self._init_raktar_db()
+        )
 
         # alapadatok beírása
         # if not WEVIK.meglevo(kon.szervezet):  # feltételezem, hogy a céggel együtt a többet se írta még be
@@ -86,18 +88,21 @@ class Quipu(Frame):
             keresztnev="TEXT",
             becenev="TEXT",
             nem="TEXT",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
         szemely_kon.create("telefon",
             azonosito="INTEGER PRIMARY KEY",
             szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
             telefonszam="TEXT NOT NULL",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
         szemely_kon.create("email",
             azonosito="INTEGER PRIMARY KEY",
             szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
             emailcim="TEXT NOT NULL",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
         szemely_kon.create("cim",
@@ -111,6 +116,7 @@ class Quipu(Frame):
             hrsz="TEXT DEFAULT ''",
             postafiok="TEXT DEFAULT ''",
             honlap="TEXT DEFAULT ''",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
         return szemely_kon
@@ -130,12 +136,14 @@ class Quipu(Frame):
             azonosito="INTEGER PRIMARY KEY",
             szervezet="INTEGER NOT NULL REFERENCES szervezet",
             telefonszam="TEXT NOT NULL",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
         szervezet_kon.create("email",
             azonosito="INTEGER PRIMARY KEY",
             szervezet="INTEGER NOT NULL REFERENCES szervezet",
             emailcim="TEXT NOT NULL",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
         szervezet_kon.create("cim",
@@ -149,6 +157,7 @@ class Quipu(Frame):
             hrsz="TEXT DEFAULT ''",
             postafiok="TEXT DEFAULT ''",
             honlap="TEXT DEFAULT ''",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
         return szervezet_kon
@@ -166,15 +175,21 @@ class Quipu(Frame):
 
         kontakt_kon.create("vevo",
             azonosito="INTEGER PRIMARY KEY",
-            kontakt="INTEGER UNIQUE REFERENCES kontakt")
+            kontakt="INTEGER UNIQUE REFERENCES kontakt",
+            gyakorisag="INTEGER DEFAULT 0",
+            megjegyzes="TEXT DEFAULT ''")
 
         kontakt_kon.create("szallito",
             azonosito="INTEGER PRIMARY KEY",
-            kontakt="INTEGER UNIQUE REFERENCES kontakt")
+            kontakt="INTEGER UNIQUE REFERENCES kontakt",
+            gyakorisag="INTEGER DEFAULT 0",
+            megjegyzes="TEXT DEFAULT ''")
 
         kontakt_kon.create("gyarto",
             azonosito="INTEGER PRIMARY KEY",
-            kontakt="INTEGER UNIQUE REFERENCES kontakt")
+            kontakt="INTEGER UNIQUE REFERENCES kontakt",
+            gyakorisag="INTEGER DEFAULT 0",
+            megjegyzes="TEXT DEFAULT ''")
 
         return kontakt_kon
 
@@ -196,6 +211,7 @@ class Quipu(Frame):
             projekt="INTEGER NOT NULL REFERENCES projekt",
             megnevezes="TEXT NOT NULL",
             enaplo="INTEGER",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
         projekt_kon.create("cim",
@@ -209,12 +225,14 @@ class Quipu(Frame):
             hrsz="TEXT DEFAULT ''",
             postafiok="TEXT DEFAULT ''",
             honlap="TEXT DEFAULT ''",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
         projekt_kon.create("jelleg",
             azonosito="INTEGER PRIMARY KEY",
             munkaresz="INTEGER NOT NULL REFERENCES munkaresz",
             megnevezes="TEXT NOT NULL",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
         return projekt_kon
@@ -230,6 +248,7 @@ class Quipu(Frame):
             temafelelos="INTEGER NOT NULL",
             erkezett="TEXT DEFAULT CURRENT_DATE",
             hatarido="TEXT DEFAULT ''",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
         ajanlat_kon.create("ajanlat",
@@ -239,11 +258,12 @@ class Quipu(Frame):
             leadva="TEXT DEFAULT CURRENT_DATE",
             ervenyes="TEXT DEFAULT ''",
             esely="INTEGER DEFAULT 5",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
         return ajanlat_kon
 
-    def _init_raktar_db(self):
+    def _init_raktar_db(self) -> tamer.Tamer:
         """Raktárkészlet-adatbázis inicializálása."""
         raktar_kon = tamer.Tamer("raktar.db")
 
@@ -280,6 +300,7 @@ class Quipu(Frame):
             termek="INTEGER",
             mennyiseg="REAL",
             erkezett="DATE",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
         
         raktar_kon.create("szallitolevel",
@@ -287,6 +308,7 @@ class Quipu(Frame):
             jelleg="INTEGER",
             szam="TEXT",
             datum="DATETIME",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
 
         raktar_kon.create("tetel",
@@ -294,6 +316,7 @@ class Quipu(Frame):
             szallitolevel="INTEGER",
             aru="INTEGER",
             mennyiseg="REAL",
+            gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT")
         
         return raktar_kon
