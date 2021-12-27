@@ -38,8 +38,8 @@ class Csomo:
         self._tabla = tabla
 
     @classmethod
-    def adatbazisbol(cls, kon, azonosito):
-        """Meglévő, adott azonosítójú csomó előkeresése az adatbázisból. Factory metódus.
+    def egy(cls, kon, azonosito):
+        """Egy meglévő, adott azonosítójú csomó előkeresése az adatbázisból. Factory metódus.
         kon:        Konnektor adatbázis-kapcsolat
         azonosito:  SQL PRIMARY KEY"""
         csomo = kon[cls.db].select(cls.tabla, azonosito=azonosito).fetchone()

@@ -2,11 +2,15 @@ from csomo import Csomo
 
 
 class Telefon(Csomo):
-    """Telefonos elérhetőség megvalósítása. Egyszerű csomó, egy külső kulcsra támaszkodik."""
+    """Telefonos elérhetőség megvalósítása."""
+
+    tabla = "telefon"
+
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
-        super().__init__(kwargs.pop("kon", None))
+        csomo = self.__class__
+        super().__init__(kwargs.pop("kon", None), csomo.db, csomo.tabla)
         if kwargs:
             self._adatok = dict(kwargs)
         else:
@@ -14,7 +18,12 @@ class Telefon(Csomo):
                 "telefonszam": "",
                 "megjegyzes": ""
             }
-        self._tabla = "telefon"
+
+    def __str__(self) -> str:
+        return self.listanezet()
+
+    def __repr__(self) -> str:
+        return Csomo.ascii_rep(self.listanezet())
 
     def __bool__(self):
         """Telefonszámot kötelező megadni."""
@@ -52,4 +61,4 @@ class Telefon(Csomo):
 
     def listanezet(self):
         """Elérhetőseg megjelenítése kiválasztáshoz (Combobox)"""
-        return "{}{}".format(self.telefonszam, self._nullazo(self.megjegyzes))
+        return "{}{}".format(self.telefonszam, Csomo.formazo(self.megjegyzes))

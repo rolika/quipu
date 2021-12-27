@@ -10,8 +10,9 @@ from szemely import Szemely
 
 
 class TelefonszamUrlap(Frame):
-    def __init__(self, master=None, **kw):
+    def __init__(self, master=None, kon=None, **kw):
         super().__init__(master=master, **kw)
+        self._kon = kon
 
         self._telefonszam = StringVar()
         self._megjegyzes = StringVar()
@@ -27,12 +28,16 @@ class TelefonszamUrlap(Frame):
         self._megjegyzes.set(telefon.megjegyzes)
 
     def export(self):
-        return Telefon(telefonszam=self._telefonszam.get(), megjegyzes=self._megjegyzes.get())
+        return Telefon(kon=self._kon,
+            telefonszam=self._telefonszam.get(),
+            megjegyzes=self._megjegyzes.get()
+        )
 
 
 class EmailcimUrlap(Frame):
-    def __init__(self, master=None, **kw):
+    def __init__(self, master=None, kon=None, **kw):
         super().__init__(master=master, **kw)
+        self._kon = kon
 
         self._emailcim = StringVar()
         self._megjegyzes = StringVar()
@@ -52,8 +57,9 @@ class EmailcimUrlap(Frame):
 
 
 class CimUrlap(Frame):
-    def __init__(self, master=None, **kw):
+    def __init__(self, master=None, kon=None, **kw):
         super().__init__(master=master, **kw)
+        self._kon = kon
 
         self._orszag = StringVar()
         self._megye = StringVar()
@@ -171,11 +177,11 @@ class Valaszto(LabelFrame):
 
 class SzemelyUrlap(Frame):
     """Űrlap személyi adatokhoz."""
-    def __init__(self, kon=None, master=None, **kwargs) -> Frame:
+    def __init__(self, master=None, kon=None, **kwargs) -> Frame:
         """Az űrlap egy tkinter.Frame-ben helyezkedik el, mert a Frame-en belül lehet .grid-elni a widget-eket,
         viszont a simpledialog.Dialog-on belül csak .pack-olni lehet.
-        kon:    konnektor.Konnektor adatbázis gyűjtőkapcsolat
         master: szülő widget
+        kon:    konnektor.Konnektor adatbázis gyűjtőkapcsolat
         kwargs: tkinter.Frame tulajdonságait szabályozó értékek"""
         super().__init__(master=master, **kwargs)
         self._kon = kon

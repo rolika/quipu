@@ -29,7 +29,7 @@ class UjSzemelyUrlap(simpledialog.Dialog):
 
     def body(self, szulo) -> Entry:
         """Override Dialog.body - gui megjelenítése"""
-        self._szemelyurlap = SzemelyUrlap(self._kon, self)
+        self._szemelyurlap = SzemelyUrlap(self, self._kon)
         self._szemelyurlap.pack(ipadx=2, ipady=2)
         return self._szemelyurlap.fokusz
 
@@ -99,7 +99,7 @@ class SzemelyModositoUrlap(simpledialog.Dialog):
         self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenit)
         self._nev_valaszto.pack(ipadx=2, ipady=2)
 
-        self._szemelyurlap = SzemelyUrlap(self._kon, self)
+        self._szemelyurlap = SzemelyUrlap(self, self._kon)
         self._szemelyurlap.pack(ipadx=2, ipady=2)
         self._megjelenit(1)
 
@@ -132,45 +132,43 @@ class SzemelyModositoUrlap(simpledialog.Dialog):
 class UjTelefonUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon
-        self._telefonszam = None
+        Telefon.db = "szemely"
         super().__init__(szulo, title="Új telefonszám hozzáadása")
 
     def body(self, szulo):
-        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto = Valaszto("név", Szemely.osszes(self._kon), self)
         self._nev_valaszto.pack(ipadx=2, ipady=2)
 
-        self._telefonszam_urlap = TelefonszamUrlap(self)
+        self._telefonszam_urlap = TelefonszamUrlap(self, self._kon)
         self._telefonszam_urlap.pack(ipadx=2, ipady=2)
 
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        self._telefonszam = self._telefonszam_urlap.export()
-        if not self._telefonszam:
+        telefonszam = self._telefonszam_urlap.export()
+        if not telefonszam:
             messagebox.showwarning("Hiányos adat!", "Add meg a telefonszámot!", parent=self)
             return False
         return True
 
     def apply(self):
-        self._telefonszam.szemely = self._nev_valaszto.elem.azonosito
-        if self._telefonszam.ment(self._kon.szemely):
+        telefonszam = self._telefonszam_urlap.export()
+        telefonszam.szemely = self._nev_valaszto.elem.azonosito
+        if telefonszam.ment():
             print("Bejegyzés mentve.")
         else:
             print("Nem sikerült elmenteni.")
-
-    def _nevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
 
 
 class TelefonTorloUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon
-        self._telefonszam = None
+        Telefon.db = "szemely"
         super().__init__(szulo, title="Telefonszám törlése")
 
     def body(self, szulo):
-        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
-        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
+        self._nev_valaszto = Valaszto("név", Szemely.osszes(self._kon), self)
+        self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenites)
         self._nev_valaszto.pack(ipadx=2, ipady=2)
 
         self._telefon_valaszto = Valaszto("törlendő telefonszám", self._telefonszamok(), self)
@@ -179,47 +177,45 @@ class TelefonTorloUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        self._telefonszam = self._telefon_valaszto.elem
-        if self._telefonszam:
+        telefonszam = self._telefon_valaszto.elem
+        if telefonszam:
             biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
-        return self._telefonszam and biztos  # rövidzárlat miatt a biztos nem értékelődik ki, ha a telefonszám nem igaz
+        return telefonszam and biztos  # rövidzárlat miatt a biztos nem értékelődik ki, ha a telefonszám nem igaz
 
     def apply(self):
-        if self._telefonszam.torol(self._kon.szemely):
+        telefonszam = self._telefon_valaszto.elem
+        if telefonszam.torol():
             print("Bejegyzés törölve.")
         else:
             print("Nem sikerült törölni.")
-        self._elerhetosegek(1)
-
-    def _nevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
+        self._megjelenites(1)
 
     def _telefonszamok(self):
-        szemely = self._nev_valaszto.elem
-        return [Telefon(**telefon) for telefon in self._kon.szemely.select("telefon", szemely=szemely.azonosito)]
+        szemely = self._nev_valaszto.elem.azonosito
+        return [Telefon(kon=self._kon, **telefon) for telefon in self._kon.szemely.select("telefon", szemely=szemely)]
 
-    def _elerhetosegek(self, event):
+    def _megjelenites(self, event):
         self._telefon_valaszto.beallit(self._telefonszamok())
 
 
 class TelefonModositoUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon
-        self._telefonszam = None
+        Telefon.db = "szemely"
         super().__init__(szulo, title="Telefonszám módosítása")
 
     def body(self, szulo):
-        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto = Valaszto("név", Szemely.osszes(self._kon), self)
         self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
         self._nev_valaszto.pack(ipadx=2, ipady=2)
 
         self._telefon_valaszto = Valaszto("módosítandó telefonszam", self._telefonszamok(), self)
-        self._telefon_valaszto.valaszto.bind("<<ComboboxSelected>>", self._kiir_elerhetoseg)
+        self._telefon_valaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenites)
         self._telefon_valaszto.pack(ipadx=2, ipady=2)
 
-        self._telefonszam_urlap = TelefonszamUrlap(self)
+        self._telefonszam_urlap = TelefonszamUrlap(self, self._kon)
         self._telefonszam_urlap.pack(ipadx=2, ipady=2)
-        self._kiir_elerhetoseg(1)
+        self._megjelenites(1)
 
         return self._nev_valaszto.valaszto
 
@@ -235,25 +231,22 @@ class TelefonModositoUrlap(simpledialog.Dialog):
                 return True
 
     def apply(self):
-        if self._telefonszam.ment(self._kon.szemely):
+        if self._telefonszam.ment():
             print("Bejegyzés módosítva.")
         else:
             print("Nem sikerült módosítani.")
         self._elerhetosegek(1)
 
-    def _nevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
-
     def _telefonszamok(self):
-        szemely = self._nev_valaszto.elem
-        return [Telefon(**telefon) for telefon in self._kon.szemely.select("telefon", szemely=szemely.azonosito)]
+        szemely = self._nev_valaszto.elem.azonosito
+        return [Telefon(kon=self._kon, **telefon) for telefon in self._kon.szemely.select("telefon", szemely=szemely)]
 
     def _elerhetosegek(self, event):
         self._telefon_valaszto.beallit(self._telefonszamok())
-        self._kiir_elerhetoseg(1)
+        self._megjelenites(1)
 
-    def _kiir_elerhetoseg(self, event):
-        self._telefonszam_urlap.beallit(self._telefon_valaszto.elem or Telefon())
+    def _megjelenites(self, event):
+        self._telefonszam_urlap.beallit(self._telefon_valaszto.elem or Telefon(kon=self._kon))
 
     def _uj_telefonszam(self):
         telefon = self._telefon_valaszto.elem
@@ -347,12 +340,12 @@ class EmailModositoUrlap(simpledialog.Dialog):
         self._nev_valaszto.pack(ipadx=2, ipady=2)
 
         self._email_valaszto = Valaszto("módosítandó email-cím", self._emailcimek(), self)
-        self._email_valaszto.valaszto.bind("<<ComboboxSelected>>", self._kiir_elerhetoseg)
+        self._email_valaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenites)
         self._email_valaszto.pack(ipadx=2, ipady=2)
 
         self._emailcim_urlap = EmailcimUrlap(self)
         self._emailcim_urlap.pack(ipadx=2, ipady=2)
-        self._kiir_elerhetoseg(1)
+        self._megjelenites(1)
 
         return self._nev_valaszto.valaszto
 
@@ -383,9 +376,9 @@ class EmailModositoUrlap(simpledialog.Dialog):
 
     def _elerhetosegek(self, event):
         self._email_valaszto.beallit(self._emailcimek())
-        self._kiir_elerhetoseg(1)
+        self._megjelenites(1)
 
-    def _kiir_elerhetoseg(self, event):
+    def _megjelenites(self, event):
         self._emailcim_urlap.beallit(self._email_valaszto.elem or Email())
 
     def _uj_emailcim(self):
@@ -480,12 +473,12 @@ class CimModositoUrlap(simpledialog.Dialog):
         self._nev_valaszto.pack(ipadx=2, ipady=2)
 
         self._cim_valaszto = Valaszto("módosítandó cím", self._cimek(), self)
-        self._cim_valaszto.valaszto.bind("<<ComboboxSelected>>", self._kiir_elerhetoseg)
+        self._cim_valaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenites)
         self._cim_valaszto.pack(ipadx=2, ipady=2)
 
         self._cim_urlap = CimUrlap(self)
         self._cim_urlap.pack(ipadx=2, ipady=2)
-        self._kiir_elerhetoseg(1)
+        self._megjelenites(1)
 
         return self._nev_valaszto.valaszto
 
@@ -516,9 +509,9 @@ class CimModositoUrlap(simpledialog.Dialog):
 
     def _elerhetosegek(self, event):
         self._cim_valaszto.beallit(self._cimek())
-        self._kiir_elerhetoseg(1)
+        self._megjelenites(1)
 
-    def _kiir_elerhetoseg(self, event):
+    def _megjelenites(self, event):
         self._cim_urlap.beallit(self._cim_valaszto.elem or Cim())
 
     def _uj_cim(self):
