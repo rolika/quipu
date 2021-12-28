@@ -2,12 +2,15 @@ from csomo import Csomo
 
 
 class Email(Csomo):
-    """Email-elérhetőség megvalósítása.
-    Egyszerű csomó, egy külső kulcsra támaszkodik, ami azonos adatbázis file-ban van."""
+    """Email-elérhetőség megvalósítása."""
+
+    tabla = "email"
+
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
-        super().__init__(kwargs.pop("kon", None))
+        csomo = self.__class__
+        super().__init__(kwargs.pop("kon", None), csomo.db, csomo.tabla)
         if kwargs:
             self._adatok = dict(kwargs)
         else:
@@ -15,7 +18,12 @@ class Email(Csomo):
                 "emailcim": "",
                 "megjegyzes": ""
             }
-        self._tabla = "email"
+
+    def __str__(self) -> str:
+        return self.listanezet()
+
+    def __repr__(self) -> str:
+        return Csomo.ascii_rep(self.listanezet())
 
     def __bool__(self):
         return bool(self.emailcim)
@@ -52,4 +60,4 @@ class Email(Csomo):
 
     def listanezet(self):
         """Elérhetőseg megjelenítése kiválasztáshoz (Combobox)"""
-        return "{} ({})".format(self.emailcim, self.megjegyzes)
+        return "{}{}".format(self.emailcim, Csomo.formazo(self.megjegyzes))

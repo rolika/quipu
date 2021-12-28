@@ -53,7 +53,10 @@ class EmailcimUrlap(Frame):
         self._megjegyzes.set(email.megjegyzes)
 
     def export(self):
-        return Email(emailcim=self._emailcim.get(), megjegyzes=self._megjegyzes.get())
+        return Email(kon=self._kon,
+            emailcim=self._emailcim.get(),
+            megjegyzes=self._megjegyzes.get()
+        )
 
 
 class CimUrlap(Frame):
