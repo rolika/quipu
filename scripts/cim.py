@@ -2,11 +2,15 @@ from csomo import Csomo
 
 
 class Cim(Csomo):
-    """Cím megvalósítása. Egyszerű csomó, egy külső kulcsra támaszkodik."""
+    """Cím megvalósítása."""
+
+    tabla = "cim"
+
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
-        super().__init__(kwargs.pop("kon", None))
+        csomo = self.__class__
+        super().__init__(kwargs.pop("kon", None), csomo.db, csomo.tabla)
         if kwargs:
             self._adatok = dict(kwargs)
         else:  # űrlap mezőinek törléséhez
@@ -21,10 +25,12 @@ class Cim(Csomo):
                 "honlap": "",
                 "megjegyzes": ""
             }
-        self._tabla = "cim"
 
     def __str__(self):
         return "{}-{} {}, {}".format(self.orszag, self.megye, self.iranyitoszam, self.helyseg, self.utca)
+
+    def __repr__(self) -> str:
+        return Csomo.ascii_rep(self.listanezet())
 
     def __bool__(self):
         """Egy cím akkor meghatározott, ha legalább a helység adott"""
@@ -66,7 +72,7 @@ class Cim(Csomo):
     @property
     def munkaresz(self):
         return self._adatok.get("munkaresz")
-    
+
     @munkaresz.setter
     def munkaresz(self, munkaresz):
         self._adatok["munkaresz"] = munkaresz
@@ -74,7 +80,7 @@ class Cim(Csomo):
     @property
     def orszag(self):
         return self._adatok.get("orszag", "")
-    
+
     @property
     def megye(self):
         return self._adatok.get("megye", "")

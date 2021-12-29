@@ -116,7 +116,7 @@ class CimUrlap(Frame):
         self._megjegyzes.set(cim.megjegyzes)
 
     def export(self):
-        return Cim(
+        return Cim(kon=self._kon,
             orszag=ORSZAG[self._orszag.get()],
             megye=self._megye.get(),
             iranyitoszam=self._iranyitoszam.get(),

@@ -364,44 +364,38 @@ class EmailModositoUrlap(simpledialog.Dialog):
 class UjCimUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon
-        self._cim = None
+        Cim.db = "szemely"
         super().__init__(szulo, title="Új cím hozzáadása")
 
     def body(self, szulo):
-        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto = Valaszto("név", Szemely.osszes(self._kon), self)
         self._nev_valaszto.pack(ipadx=2, ipady=2)
 
-        self._cim_urlap = CimUrlap(self)
+        self._cim_urlap = CimUrlap(self, self._kon)
         self._cim_urlap.pack(ipadx=2, ipady=2)
 
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        self._cim = self._cim_urlap.export()
-        if not self._cim:
+        if not self._cim_urlap.export():
             messagebox.showwarning("Hiányos adat!", "Legalább a helységet add meg!", parent=self)
             return False
         return True
 
     def apply(self):
-        self._cim.szemely = self._nev_valaszto.elem.azonosito
-        if self._cim.ment(self._kon.szemely):
-            print("Bejegyzés mentve.")
-        else:
-            print("Nem sikerült elmenteni.")
-
-    def _nevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
+        cim = self._cim_urlap.export()
+        cim.szemely = self._nev_valaszto.elem.azonosito
+        print("Bejegyzés mentve." if cim.ment() else "Nem sikerült elmenteni.")
 
 
 class CimTorloUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon
-        self._cim = None
+        Cim.db = "szemely"
         super().__init__(szulo, title="Cím törlése")
 
     def body(self, szulo):
-        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto = Valaszto("név", Szemely.osszes(self._kon), self)
         self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
         self._nev_valaszto.pack(ipadx=2, ipady=2)
 
@@ -411,24 +405,18 @@ class CimTorloUrlap(simpledialog.Dialog):
         return self._nev_valaszto.valaszto
 
     def validate(self):
-        self._cim = self._cim_valaszto.elem
-        if self._cim:
+        cim = self._cim_valaszto.elem
+        if cim:
             biztos = messagebox.askokcancel("Biztos vagy benne?", "VÉGLEGESEN törlődik!", parent=self)
-        return self._cim and biztos  # rövidzárlat miatt a biztos nem értékelődik ki, ha a cím nem igaz
+        return cim and biztos  # rövidzárlat miatt a biztos nem értékelődik ki, ha a cím nem igaz
 
     def apply(self):
-        if self._cim.torol(self._kon.szemely):
-            print("Bejegyzés törölve.")
-        else:
-            print("Nem sikerült törölni.")
+        print("Bejegyzés törölve." if self._cim_valaszto.elem.torol() else "Nem sikerült törölni.")
         self._elerhetosegek(1)
-
-    def _nevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
 
     def _cimek(self):
         szemely = self._nev_valaszto.elem
-        return [Cim(**cim) for cim in self._kon.szemely.select("cim", szemely=szemely.azonosito)]
+        return [Cim(kon=self._kon, **cim) for cim in self._kon.szemely.select("cim", szemely=szemely.azonosito)]
 
     def _elerhetosegek(self, event):
         self._cim_valaszto.beallit(self._cimek())
@@ -437,11 +425,11 @@ class CimTorloUrlap(simpledialog.Dialog):
 class CimModositoUrlap(simpledialog.Dialog):
     def __init__(self, szulo, kon=None):
         self._kon = kon
-        self._cim = None
+        Cim.db = "szemely"
         super().__init__(szulo, title="Cím módosítása")
 
     def body(self, szulo):
-        self._nev_valaszto = Valaszto("név", self._nevsor(), self)
+        self._nev_valaszto = Valaszto("név", Szemely.osszes(self._kon), self)
         self._nev_valaszto.valaszto.bind("<<ComboboxSelected>>", self._elerhetosegek)
         self._nev_valaszto.pack(ipadx=2, ipady=2)
 
@@ -449,7 +437,7 @@ class CimModositoUrlap(simpledialog.Dialog):
         self._cim_valaszto.valaszto.bind("<<ComboboxSelected>>", self._megjelenites)
         self._cim_valaszto.pack(ipadx=2, ipady=2)
 
-        self._cim_urlap = CimUrlap(self)
+        self._cim_urlap = CimUrlap(self, self._kon)
         self._cim_urlap.pack(ipadx=2, ipady=2)
         self._megjelenites(1)
 
@@ -459,26 +447,19 @@ class CimModositoUrlap(simpledialog.Dialog):
         if not self._cim_valaszto.elem:
             return False
         else:
-            self._cim = self._uj_cim()
-            if not self._cim:
+            if not self._uj_cim():
                 messagebox.showwarning("Hiányos adat!", "Legalább a helységet add meg!", parent=self)
                 return False
             else:
                 return True
 
     def apply(self):
-        if self._cim.ment(self._kon.szemely):
-            print("Bejegyzés módosítva.")
-        else:
-            print("Nem sikerült módosítani.")
+        print("Bejegyzés módosítva." if self._uj_cim().ment() else "Nem sikerült módosítani.")
         self._elerhetosegek(1)
-
-    def _nevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
 
     def _cimek(self):
         szemely = self._nev_valaszto.elem
-        return [Cim(**cim) for cim in self._kon.szemely.select("cim", szemely=szemely.azonosito)]
+        return [Cim(kon=self._kon, **cim) for cim in self._kon.szemely.select("cim", szemely=szemely.azonosito)]
 
     def _elerhetosegek(self, event):
         self._cim_valaszto.beallit(self._cimek())
