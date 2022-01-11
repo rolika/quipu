@@ -7,7 +7,7 @@ class Csomo:
     def ascii_rep(szoveg) -> str:
         """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
         szoveg:     string"""
-        return "".join(re.findall("[a-z]", szoveg.lower().translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))))
+        return "".join(re.findall("[a-z1-9]", szoveg.lower().translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))))
 
     def formazo(attr, zarojel="()", elvalasztojel=" ", hatul=False) -> str:
         """Segít a formázásban, ill. ha hiányzik az adat, nem írjuk ki egyáltalán.
