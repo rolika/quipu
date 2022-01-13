@@ -1,0 +1,50 @@
+body {
+    font-family: Jura, sans-serif;
+}
+
+h2 {
+    font-family: Audiowide, cursive;
+    color: white;
+
+    background:  linear-gradient(to right, #006394, #17325d);
+
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    padding-left: 0.4em;
+
+    border-radius: 0.3em;
+
+    transform: skewX(335deg);
+}
+
+h3 {
+    color: grey;
+}
+
+nav li {
+    font-family: Audiowide, cursive;
+
+    width: 10em;
+
+    background:  linear-gradient(to right, #006394, #17325d);
+
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    padding-left: 0.4em;
+
+    border-radius: 0.3em;
+
+    list-style-type: none;
+}
+
+nav li:hover {
+    transform: skewX(335deg)
+}
+
+nav a:link {
+    color: white;
+}
+
+nav a:visited {
+    color: lightgrey;
+}
