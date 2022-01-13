@@ -31,4 +31,9 @@ def insider():
     return bottle.static_file("insider.html", root=html_path)
 
 
+@btl.route("/insider/<csomo>")
+def csomo(csomo):
+    return bottle.static_file(csomo + "form.html", root=html_path)
+
+
 btl.run(reloader=True, debug=True)
