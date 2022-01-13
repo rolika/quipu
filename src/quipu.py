@@ -24,15 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from tkinter import *
+
 import tamer
-import menu
-from konstans import MAGANSZEMELY, WEVIK, VITYA, ROLI
 from konnektor import Konnektor
-from kontakt import Kontakt
 
 
-class Quipu(Frame):
+class Quipu:
     """ Fő alkalmazás
     A kipu, más néven csomóírás vagy zsinórírás egy különleges, tízes számrendszerbeli információtárolási rendszer,
     melynek segítségével helyettesítették az írást az Inka Birodalomban. A kipu a kecsuák nyelvén csomót jelent,
@@ -40,46 +37,21 @@ class Quipu(Frame):
     A kipukon rögzített értékeket meglepő módon egy kettes számrendszeren alapuló, kövek helyzetével operáló, számoló
     eszközzel, egy ősi számítógéppel dolgozták fel. [Wikipedia nyomán]
     """
-    def __init__(self, master=None, **kwargs) -> Frame:
-        """A fő alkalmazás egy tkinter.Frame-ben indul. Ha a szülője None, mint az alapértelmezés, akkor saját
-        ablakot nyit magának.
-        master: szülő widget
-        kwargs: tkinter.Frame tulajdonságait szabályozó értékek"""
-        super().__init__(master=master, **kwargs)
+    def __init__(self) -> None:
 
         # adatbázis konnektorok
         kon = Konnektor(
-            szemely=self._init_szemely_db(),
-            szervezet=self._init_szervezet_db(),
-            kontakt=self._init_kontakt_db(),
-            projekt=self._init_projekt_db(),
-            ajanlat=self._init_ajanlat_db(),
-            raktar=self._init_raktar_db()
-        )
+            szemely=self._init_szemely_db("szemely"),
+            szervezet=self._init_szervezet_db("szervezet"),
+            kontakt=self._init_kontakt_db("kontakt"),
+            projekt=self._init_projekt_db("projekt"),
+            ajanlat=self._init_ajanlat_db("ajanlat"),
+            raktar=self._init_raktar_db("raktar")
+            )
 
-        # alapadatok beírása
-        # if not WEVIK.meglevo(kon.szervezet):  # feltételezem, hogy a céggel együtt a többet se írta még be
-        #     MAGANSZEMELY.ment(kon.szervezet)  # SQL PRIMARY KEY 1
-        #     wevik_id = WEVIK.ment(kon.szervezet)  # SQL PRIMARY KEY 2
-        #     vitya_id = VITYA.ment(kon.szemely)  # SQL PRIMARY KEY 1
-        #     roli_id = ROLI.ment(kon.szemely)  # SQL PRIMARY KEY 2
-        #     Kontakt(szemely=vitya_id, szervezet=wevik_id).ment(kon.kontakt)  # SQL PRIMARY KEY 1
-        #     Kontakt(szemely=roli_id, szervezet=wevik_id).ment(kon.kontakt)  # SQL PRIMARY KEY 2
-        MAGANSZEMELY.azonosito = 1
-        WEVIK.azonosito = 2
-        VITYA.azonosito = 1  # a fenti mentési sorrend miatt kontaktszemély-azonosítóként is használandó
-        ROLI.azonosito = 2  # ez is
-
-        # főmenü megjelenítése
-        menu.Fomenu(self, kon)
-        self.grid()
-
-        # és pörgés :-)
-        self.mainloop()
-
-    def _init_szemely_db(self) -> tamer.Tamer:
-        """ Személy adatbázis inicializálása  """
-        szemely_kon = tamer.Tamer("szemely.db")
+    def _init_szemely_db(self, db_file:str) -> tamer.Tamer:
+        """Személy adatbázis inicializálása"""
+        szemely_kon = tamer.Tamer("db/" + db_file + ".db")
 
         szemely_kon.create("szemely",
             azonosito="INTEGER PRIMARY KEY",
@@ -91,39 +63,11 @@ class Quipu(Frame):
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
-        szemely_kon.create("telefon",
-            azonosito="INTEGER PRIMARY KEY",
-            szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            telefonszam="TEXT NOT NULL",
-            gyakorisag="INTEGER DEFAULT 0",
-            megjegyzes="TEXT DEFAULT ''")
-
-        szemely_kon.create("email",
-            azonosito="INTEGER PRIMARY KEY",
-            szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            emailcim="TEXT NOT NULL",
-            gyakorisag="INTEGER DEFAULT 0",
-            megjegyzes="TEXT DEFAULT ''")
-
-        szemely_kon.create("cim",
-            azonosito="INTEGER PRIMARY KEY",
-            szemely="INTEGER NOT NULL REFERENCES szemely ON DELETE CASCADE",
-            orszag="TEXT DEFAULT 'H'",
-            megye="TEXT DEFAULT ''",
-            iranyitoszam="TEXT DEFAULT ''",
-            helyseg="TEXT NOT NULL",
-            utca="TEXT DEFAULT ''",
-            hrsz="TEXT DEFAULT ''",
-            postafiok="TEXT DEFAULT ''",
-            honlap="TEXT DEFAULT ''",
-            gyakorisag="INTEGER DEFAULT 0",
-            megjegyzes="TEXT DEFAULT ''")
-
         return szemely_kon
 
-    def _init_szervezet_db(self) -> tamer.Tamer:
+    def _init_szervezet_db(self, db_file:str) -> tamer.Tamer:
         """Szervezet adatbázis inicializálása"""
-        szervezet_kon = tamer.Tamer("szervezet.db")
+        szervezet_kon = tamer.Tamer("db/" + db_file + ".db")
 
         szervezet_kon.create("szervezet",
             azonosito="INTEGER PRIMARY KEY",
@@ -132,23 +76,36 @@ class Quipu(Frame):
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
-        szervezet_kon.create("telefon",
+        return szervezet_kon
+
+    def _init_kontakt_db(self, db_file:str) -> tamer.Tamer:
+        """Kontaktszemélyek adatbázisának inicializálása"""
+        kontakt_kon = tamer.Tamer("db/" + db_file + ".db")
+
+        kontakt_kon.create("kontakt",
             azonosito="INTEGER PRIMARY KEY",
-            szervezet="INTEGER NOT NULL REFERENCES szervezet",
+            szemely="INTEGER",
+            szervezet="INTEGER",
+            gyakorisag="INTEGER DEFAULT 0",
+            megjegyzes="TEXT DEFAULT ''")
+
+        kontakt_kon.create("telefon",
+            azonosito="INTEGER PRIMARY KEY",
+            szervezet="INTEGER NOT NULL REFERENCES kontakt",
             telefonszam="TEXT NOT NULL",
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
-        szervezet_kon.create("email",
+        kontakt_kon.create("email",
             azonosito="INTEGER PRIMARY KEY",
-            szervezet="INTEGER NOT NULL REFERENCES szervezet",
+            szervezet="INTEGER NOT NULL REFERENCES kontakt",
             emailcim="TEXT NOT NULL",
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
-        szervezet_kon.create("cim",
+        kontakt_kon.create("cim",
             azonosito="INTEGER PRIMARY KEY",
-            szervezet="INTEGER NOT NULL REFERENCES szervezet",
+            szervezet="INTEGER NOT NULL REFERENCES kontakt",
             orszag="TEXT DEFAULT 'H'",
             megye="TEXT DEFAULT ''",
             iranyitoszam="TEXT DEFAULT ''",
@@ -157,19 +114,6 @@ class Quipu(Frame):
             hrsz="TEXT DEFAULT ''",
             postafiok="TEXT DEFAULT ''",
             honlap="TEXT DEFAULT ''",
-            gyakorisag="INTEGER DEFAULT 0",
-            megjegyzes="TEXT DEFAULT ''")
-
-        return szervezet_kon
-
-    def _init_kontakt_db(self) -> tamer.Tamer:
-        """Kontaktszemélyek adatbázisának inicializálása"""
-        kontakt_kon = tamer.Tamer("kontakt.db")
-
-        kontakt_kon.create("kontakt",
-            azonosito="INTEGER PRIMARY KEY",
-            szemely="INTEGER",
-            szervezet="INTEGER",
             gyakorisag="INTEGER DEFAULT 0",
             megjegyzes="TEXT DEFAULT ''")
 
@@ -193,9 +137,9 @@ class Quipu(Frame):
 
         return kontakt_kon
 
-    def _init_projekt_db(self) -> tamer.Tamer:
+    def _init_projekt_db(self, db_file:str) -> tamer.Tamer:
         """Projekt adatbázis inicializálása"""
-        projekt_kon = tamer.Tamer("projekt.db")
+        projekt_kon = tamer.Tamer("db/" + db_file + ".db")
 
         projekt_kon.create("projekt",
             azonosito="INTEGER PRIMARY KEY",
@@ -237,9 +181,9 @@ class Quipu(Frame):
 
         return projekt_kon
 
-    def _init_ajanlat_db(self) -> tamer.Tamer:
+    def _init_ajanlat_db(self, db_file:str) -> tamer.Tamer:
         """Ajánlat adatbázis inicializálása."""
-        ajanlat_kon = tamer.Tamer("ajanlat.db")
+        ajanlat_kon = tamer.Tamer("db/" + db_file + ".db")
 
         ajanlat_kon.create("ajanlatkeres",
             azonosito="INTEGER PRIMARY KEY",
@@ -263,9 +207,9 @@ class Quipu(Frame):
 
         return ajanlat_kon
 
-    def _init_raktar_db(self) -> tamer.Tamer:
+    def _init_raktar_db(self, db_file:str) -> tamer.Tamer:
         """Raktárkészlet-adatbázis inicializálása."""
-        raktar_kon = tamer.Tamer("raktar.db")
+        raktar_kon = tamer.Tamer("db/" + db_file + ".db")
 
         raktar_kon.create("anyag",
             azonosito="INTEGER PRIMARY KEY",
