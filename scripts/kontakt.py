@@ -5,11 +5,16 @@ from szervezet import Szervezet
 
 
 class Kontakt(Csomo):
-    """Kontaktszemély megvalósítása. Összetett csomó, több külső kulcsra támaszkodik."""
+    """Kontaktszemély megvalósítása."""
+
+    db = "kontakt"
+    tabla = "kontakt"
+
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
-        super().__init__(kwargs.pop("kon", None))
+        csomo = self.__class__
+        super().__init__(kwargs.pop("kon", None), csomo.db, csomo.tabla)
         if kwargs:
             self._ceg_elol = kwargs.pop("ceg_elol", True)
             self._adatok = dict(kwargs)
@@ -20,9 +25,8 @@ class Kontakt(Csomo):
                 "megjegyzes": ""
             }
             self._ceg_elol = True
-        self._tabla = "kontakt"
 
-    def __str__(self) ->str:
+    def __str__(self) -> str:
         """Szervezeti adatok megjelenítése terminál-nézethez."""
         return "{ceg}{nev}".format(ceg=str(self._szervezet()), nev=self._szemely().listanezet())
 
@@ -39,43 +43,43 @@ class Kontakt(Csomo):
 
     @adatok.setter
     def adatok(self, kontakt):
-        self._adatok["szemely"] = kontakt.szemely
-        self._adatok["szervezet"] = kontakt.szervezet
+        self._adatok["szemely"] = kontakt.szemely.azonosito
+        self._adatok["szervezet"] = kontakt.szervezet.azonosito
         self._adatok["megjegyzes"] = kontakt.megjegyzes
 
     @property
-    def szemely(self):
-        return self._adatok.get("szemely")
+    def szemely(self) -> Szemely:
+        return Szemely.egy(self._adatok["szemely"])
 
     @property
-    def szervezet(self):
-        return self._adatok.get("szervezet")
+    def szervezet(self) -> Szervezet:
+        return Szervezet.egy(self._adatok["szervezet"])
 
-    def _szemely(self) -> Szemely:
-        """A kontakt személyi adatai."""
-        assert self._kon
-        szemely = self._kon.szemely.select("szemely", azonosito=self.szemely).fetchone()
-        return Szemely(**szemely)
+    # def _szemely(self) -> Szemely:
+    #     """A kontakt személyi adatai."""
+    #     assert self._kon
+    #     szemely = self._kon.szemely.select("szemely", azonosito=self.szemely).fetchone()
+    #     return Szemely(**szemely)
 
-    def _szervezet(self) -> Szervezet:
-        """A kontakt szervezeti adatai."""
-        assert self._kon
-        szervezet = self._kon.szervezet.select("szervezet", azonosito=self.szervezet).fetchone()
-        szervezet = Szervezet(kon=self._kon, **szervezet)
-        if szervezet == MAGANSZEMELY:  # __eq__ használata
-            szervezet.rovidnev = ""
-        return szervezet
+    # def _szervezet(self) -> Szervezet:
+    #     """A kontakt szervezeti adatai."""
+    #     assert self._kon
+    #     szervezet = self._kon.szervezet.select("szervezet", azonosito=self.szervezet).fetchone()
+    #     szervezet = Szervezet(kon=self._kon, **szervezet)
+    #     if szervezet == MAGANSZEMELY:  # __eq__ használata
+    #         szervezet.rovidnev = ""
+    #     return szervezet
 
     def listanezet(self) -> str:
         """Kontakt szöveges megjelenítése kiválasztáshoz (pl. Combobox)."""
         if self._ceg_elol:
-            return "{ceg}{nev}".format(ceg=self._nullazo(self._szervezet().listanezet(),
+            return "{ceg}{nev}".format(ceg=Csomo.formazo(self.szervezet.listanezet(),
                                                          zarojel="",
                                                          elvalasztojel=": ",
                                                          hatul=True),
-                                       nev=self._szemely().listanezet())
+                                       nev=self.szemely.listanezet())
         else:
-            return "{nev}{ceg}".format(nev=self._szemely().listanezet(),
-                                       ceg=self._nullazo(self._szervezet().listanezet(),
+            return "{nev}{ceg}".format(nev=self.szemely.listanezet(),
+                                       ceg=Csomo.formazo(self.szervezet.listanezet(),
                                                          zarojel="",
                                                          elvalasztojel=" / "))

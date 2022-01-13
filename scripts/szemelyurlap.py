@@ -506,7 +506,11 @@ class UjKontaktUrlap(simpledialog.Dialog):
         return self._szemelyvalaszto
 
     def validate(self):
-        return self._vevo.get() or self._szallito.get() or self._gyarto.get()
+        if self._vevo.get() or self._szallito.get() or self._gyarto.get():
+            return True
+        else:
+            messagebox.showwarning("Hiányzó adat!", "Legalább az egyik típust add meg!", parent=self)
+            return False
 
     def apply(self):
         kontakt = Kontakt(szemely=self._szemelyvalaszto.elem.azonosito,
@@ -539,14 +543,14 @@ class UjKontaktUrlap(simpledialog.Dialog):
                 print("Nem sikerült elmenteni.")
 
     def _szemelynevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
+        return sorted(map(lambda szemely: Szemely(kon=self._kon, **szemely), self._kon.szemely.select("szemely")), key=repr)
 
     def _szervezetnevsor(self):
         szemelyazonosito = self._szemelyvalaszto.elem.azonosito
         szemelyhez_nem_rendelt_szervezetek = self._kon.szemely.execute("""
             SELECT * FROM szervezet WHERE azonosito NOT IN (SELECT szervezet FROM kontakt WHERE szemely = ?);
         """, (szemelyazonosito, ))
-        return sorted(map(lambda szervezet: Szervezet(**szervezet), szemelyhez_nem_rendelt_szervezetek), key=repr)
+        return sorted(map(lambda szervezet: Szervezet(kon=self._kon, **szervezet), szemelyhez_nem_rendelt_szervezetek), key=repr)
 
     def _megjelenit(self, event):
         self._szervezetvalaszto.beallit(self._szervezetnevsor())
@@ -574,47 +578,47 @@ class KontaktTorloUrlap(simpledialog.Dialog):
             return False
 
     def apply(self):
-        kontakt = Kontakt(**(self._kon.kontakt.select("kontakt", logic="AND",
+        kontakt = Kontakt(kon=self._kon, **(self._kon.kontakt.select("kontakt", logic="AND",
                                                        szemely=self._szemelyvalaszto.elem.azonosito,
                                                        szervezet=self._szervezetvalaszto.elem.azonosito).fetchone()))
-        if kontakt.torol(self._kon.kontakt):
+        if kontakt.torol():
             print("Bejegyzés törölve.")
         else:
             print("Nem sikerült törölni.")
 
         vevo = self._kon.kontakt.select("vevo", kontakt=kontakt.azonosito).fetchone()
         if vevo:
-            vevo = Vevo(**vevo)
-            if vevo.torol(self._kon.kontakt):
+            vevo = Vevo(kon=self._kon, **vevo)
+            if vevo.torol():
                 print("Vevő törölve.")
             else:
                 print("Nem sikerült a vevőt törölni.")
 
         szallito = self._kon.kontakt.select("szallito", kontakt=kontakt.azonosito).fetchone()
         if szallito:
-            szallito = Szallito(**szallito)
-            if szallito.torol(self._kon.kontakt):
+            szallito = Szallito(kon=self._kon, **szallito)
+            if szallito.torol():
                 print("Szállító törölve.")
             else:
                 print("Nem sikerült a szállítót törölni.")
 
         gyarto = self._kon.kontakt.select("gyarto", kontakt=kontakt.azonosito).fetchone()
         if gyarto:
-            gyarto = Gyarto(**gyarto)
-            if gyarto.torol(self._kon.kontakt):
+            gyarto = Gyarto(kon=self._kon, **gyarto)
+            if gyarto.torol():
                 print("Gyártó törölve.")
             else:
                 print("Nem sikerült a gyártót törölni.")
 
     def _szemelynevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
+        return sorted(map(lambda szemely: Szemely(kon=self._kon, **szemely), self._kon.szemely.select("szemely")), key=repr)
 
     def _szervezetnevsor(self):
         szemelyazonosito = self._szemelyvalaszto.elem.azonosito
         szemelyhez_rendelt_szervezetek = self._kon.szemely.execute("""
             SELECT * FROM szervezet WHERE azonosito IN (SELECT szervezet FROM kontakt WHERE szemely = ?);
         """, (szemelyazonosito, ))
-        return sorted(map(lambda szervezet: Szervezet(**szervezet), szemelyhez_rendelt_szervezetek), key=repr)
+        return sorted(map(lambda szervezet: Szervezet(kon=self._kon, **szervezet), szemelyhez_rendelt_szervezetek), key=repr)
 
     def _megjelenit(self, event):
         self._szervezetvalaszto.beallit(self._szervezetnevsor())
@@ -662,7 +666,7 @@ class KontaktModositoUrlap(simpledialog.Dialog):
             print("Nem sikerült módosítani.")
 
     def _szemelynevsor(self):
-        return sorted(map(lambda szemely: Szemely(**szemely), self._kon.szemely.select("szemely")), key=repr)
+        return sorted(map(lambda szemely: Szemely(kon=self._kon, **szemely), self._kon.szemely.select("szemely")), key=repr)
 
     def _szervezetnevsor(self):
         szemelyazonosito = self._szemelyvalaszto.elem.azonosito
@@ -675,7 +679,7 @@ class KontaktModositoUrlap(simpledialog.Dialog):
                 WHERE szemely = ?
             );
         """, (szemelyazonosito, ))
-        return sorted(map(lambda szervezet: Szervezet(**szervezet), szemelyhez_rendelt_szervezetek), key=repr)
+        return sorted(map(lambda szervezet: Szervezet(kon=self._kon, **szervezet), szemelyhez_rendelt_szervezetek), key=repr)
 
     def _modszervezetnevsor(self):
         szemelyazonosito = self._szemelyvalaszto.elem.azonosito
@@ -688,7 +692,7 @@ class KontaktModositoUrlap(simpledialog.Dialog):
                 WHERE szemely = ?
             );
         """, (szemelyazonosito, ))
-        return sorted(map(lambda szervezet: Szervezet(**szervezet), szemelyhez_nem_rendelt_szervezetek), key=repr)
+        return sorted(map(lambda szervezet: Szervezet(kon=self._kon, **szervezet), szemelyhez_nem_rendelt_szervezetek), key=repr)
 
     def _megjelenit(self, event):
         self._szervezetvalaszto.beallit(self._szervezetnevsor())
