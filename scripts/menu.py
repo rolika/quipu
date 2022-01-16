@@ -94,7 +94,7 @@ class RaktarMenu(Menu):
         mb["menu"] = self
         self.add("cascade", label="anyag", menu=AnyagAlmenu(mb, kon))
         self.add("cascade", label="termék", menu=TermekAlmenu(mb, kon))
-        self.add("cascade", label="termék", menu=KeszletAlmenu(mb, kon))
+        self.add("cascade", label="készlet", menu=KeszletAlmenu(mb, kon))
         self.add("cascade", label="szállítólevél", menu=SzallitolevelAlmenu(mb, kon))
 
 

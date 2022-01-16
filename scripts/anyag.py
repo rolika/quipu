@@ -15,7 +15,7 @@ class Anyag(Csomo):
             self._adatok = {  # űrlap alaphelyzetbe állítására
                 "cikkszam": "",
                 "nev": "",
-                "tipus" : AnyagTipus.SZIG.value(),
+                "tipus" : AnyagTipus.SZIG.value,
                 "leiras": "",
                 "szin": "",
                 "szinkod": "",
