@@ -15,7 +15,7 @@ class Anyag(Csomo):
             self._adatok = {  # űrlap alaphelyzetbe állítására
                 "cikkszam": "",
                 "nev": "",
-                "tipus" : AnyagTipus.SZIG.value(),
+                "tipus" : AnyagTipus.SZIG.value,
                 "leiras": "",
                 "szin": "",
                 "szinkod": "",
@@ -145,4 +145,4 @@ class Anyag(Csomo):
         return Szervezet(kon=self._kon, **gyarto)
 
     def listanezet(self):
-        return "{gyarto} {nev}".format(gyarto=self._gyarto().listanezet(), nev=self.nev)
+        return "{cikkszam} {gyarto} {nev}".format(cikkszam=self.cikkszam, gyarto=self._gyarto().listanezet(), nev=self.nev)
