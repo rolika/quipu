@@ -27,6 +27,12 @@ class Csomo:
         Kell a None-check, mert None == None True-t ad."""
         return False if self.azonosito is None else self.azonosito == masik.azonosito
 
+    @classmethod
+    def mind(cls, kon) -> list:
+        """Az összes adott típusú csomó előkeresése az adatbázisból.
+        kon:        Konnektor adatbázis-kapcsolat"""
+        return sorted(map(lambda csomo: cls(kon=kon, **csomo), kon[cls.db].select(cls.tabla)), key=repr)
+
     @property
     def azonosito(self) -> int:
         """A csomó azonosítója (SQL PRIMARY KEY)."""
@@ -70,7 +76,7 @@ class Csomo:
     def _ascii_rep(self, szoveg) -> str:
         """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
         szoveg:     string"""
-        return "".join(re.findall("[a-z]", szoveg.lower().translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))))
+        return "".join(re.findall("[a-z1-9]", szoveg.lower().translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))))
 
     def _nullazo(self, attr, zarojel="()", elvalasztojel=" ", hatul=False) -> str:
         """Ha hiányzik az adat, nem írjuk ki egyáltalán.
