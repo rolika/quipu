@@ -47,7 +47,7 @@ class TermekUrlap(Frame):
         )
 
     def beallit(self, termek:Termek) -> None:
-        self._anyagvalaszto.valaszto.set(Anyag.anyag(self._kon, termek.anyag).listanezet())
+        self._anyagvalaszto.valaszto.set(Anyag.adatbazisbol(self._kon, termek.anyag).listanezet())
         self._szallito_valaszto.valaszto.set(termek.szallito_teljes.listanezet())
         self._egysegar.set(termek.egysegar)
         self._megjegyzes.set(termek.megjegyzes)

@@ -42,7 +42,7 @@ class Anyag(Csomo):
         return bool(self.nev) and bool(self.egyseg)
     
     @classmethod
-    def anyag(cls, kon, azonosito):
+    def adatbazisbol(cls, kon, azonosito):
         anyag = kon.raktar.select(cls.tabla, azonosito=azonosito).fetchone()
         return cls(kon=kon, **anyag)
 
