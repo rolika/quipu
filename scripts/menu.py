@@ -504,7 +504,9 @@ class KeszletAlmenu(Alapmenu):
 
     def uj(self) -> None:
         """Űrlap megjelenítése új keszlet létrehozására."""
+        self._kon.szervezet.attach(kontakt="kontakt.db")
         keszleturlap.UjKeszletUrlap(self._mb.winfo_toplevel(), self._kon)
+        self._kon.szervezet.detach("kontakt")
 
     def torol(self) -> None:
         """Űrlap megjelenítése meglévő keszlet törlésére."""

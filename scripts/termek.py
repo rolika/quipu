@@ -64,4 +64,4 @@ class Termek(Csomo):
     
     def listanezet(self) -> str:
         assert self._kon
-        return "{anyag}: {ar}".format(anyag=Anyag.anyag(self._kon, self.anyag).listanezet(), ar=self.egysegar)
+        return "{anyag}: {ar}".format(anyag=Anyag.adatbazisbol(self._kon, self.anyag).listanezet(), ar=self.egysegar)
