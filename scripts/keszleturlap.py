@@ -104,6 +104,9 @@ class KeszletTorloUrlap(simpledialog.Dialog):
     
     def body(self, szulo):
         """Override Dialog.body - gui megjelenítése"""
+        self._keszletvalaszto = Valaszto("készlet", self._keszletek(), self)
+        self._keszletvalaszto.pack(ipadx=2, ipady=2)
+        return self._keszletvalaszto
     
     def validate(self) -> bool:
         """Override Dialog.validate - törlés előtti utolsó megerősítés"""
@@ -111,6 +114,12 @@ class KeszletTorloUrlap(simpledialog.Dialog):
     
     def apply(self) -> None:
         """Override Dialog.apply - törlés végrehajtása"""
+        keszlet = self._keszletvalaszto.elem
+        print("{}: Bejegyzés törölve.".format(keszlet) if keszlet.torol(self._kon.raktar) else "Nem sikerült törölni.")
+    
+    def _keszletek(self):
+        """A készletekből custom repr alapján abc-sorrendbe rakott listát készít."""
+        return sorted(map(lambda keszlet: Keszlet(kon=self._kon, **keszlet), self._kon.raktar.select("keszlet")), key=repr)
 
 
 class KeszletModositoUrlap(simpledialog.Dialog):

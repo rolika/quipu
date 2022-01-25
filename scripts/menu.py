@@ -510,11 +510,15 @@ class KeszletAlmenu(Alapmenu):
 
     def torol(self) -> None:
         """Űrlap megjelenítése meglévő keszlet törlésére."""
+        self._kon.szervezet.attach(kontakt="kontakt.db")
         keszleturlap.KeszletTorloUrlap(self._mb.winfo_toplevel(), self._kon)
+        self._kon.szervezet.detach("kontakt")
 
     def modosit(self) -> None:
         """Űrlap megjelenítése meglévő keszlet módosítására."""
+        self._kon.szervezet.attach(kontakt="kontakt.db")
         keszleturlap.KeszletModositoUrlap(self._mb.winfo_toplevel(), self._kon)
+        self._kon.szervezet.detach("kontakt")
 
 
 class SzallitolevelAlmenu(Menu):
