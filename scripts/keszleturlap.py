@@ -62,7 +62,7 @@ class KeszletUrlap(Frame):
             return modositando
 
     def beallit(self, keszlet:Keszlet) -> None:
-        self.termekvalaszto.valaszto.set(Termek.adatbazisbol(self._kon, keszlet.termek).listanezet())
+        self.termekvalaszto.valaszto.set(keszlet.listanezet())
         self._mennyiseg.set(keszlet.mennyiseg)
         self._erkezett.set(keszlet.erkezett)
         self._megjegyzes.set(keszlet.megjegyzes)
