@@ -32,26 +32,33 @@ class Keszlet(Csomo):
 
     @adatok.setter
     def adatok(self, keszlet) -> None:
-        self._adatok["termek"] = keszlet.termek.azonosito
+        self._adatok["termek"] = keszlet.termek
         self._adatok["mennyiseg"] = keszlet.mennyiseg
         self._adatok["erkezett"] = keszlet.erkezett
         self._adatok["megjegyzes"] = keszlet.megjegyzes
     
     @property
     def termek(self) -> Termek:
-        assert self._kon
-        return Termek.adatbazisbol(self._kon, self._adatok["termek"])
+        return  self._adatok["termek"]
     
     @property
     def mennyiseg(self) -> float:
         return self._adatok["mennyiseg"]
     
+    @mennyiseg.setter
+    def mennyiseg(self, mennyiseg) -> None:
+        self._adatok["mennyiseg"] = mennyiseg
+    
     @property
     def erkezett(self) -> str:
         return self._adatok["erkezett"]
     
+    @erkezett.setter
+    def erkezett(self, erkezett) -> None:
+        self._adatok["erkezett"] = erkezett
+    
     def listanezet(self) -> str:
         assert self._kon
-        return "{termek}: {mennyiseg}".format(termek=self.termek.listanezet(), mennyiseg=self.mennyiseg)
+        return "{termek}: {mennyiseg}".format(termek=Termek.adatbazisbol(self._kon, self.termek).listanezet(), mennyiseg=self.mennyiseg)
 
     

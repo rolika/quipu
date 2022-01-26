@@ -42,6 +42,11 @@ class Csomo:
         """Minden csomóhoz fűzhető valamilyen megjegyzés."""
         return self._adatok.get("megjegyzes")
 
+    @megjegyzes.setter
+    def megjegyzes(self, megjegyzes) -> None:
+        """A csomóhoz fűzött megjegyzés beállítása kívülről."""
+        self._adatok["megjegyzes"] = megjegyzes
+
     def listanezet(self) -> str:
         """Csomó szöveges megjelenítése kiválasztáshoz (pl. Combobox)."""
         raise NotImplementedError

@@ -9,16 +9,25 @@ from urlap import Valaszto
 
 class KeszletUrlap(Frame):
     """Készlet egy rektáron lévő termék mennyisége."""
-    def __init__(self, kon=None, master=None, **kw):
+    def __init__(self, kon=None, master=None, uj=True, **kw):
         """Az űrlap egy saját Frame()-ben jelenik meg.
         kon:    konnektor.Konnektor adatbázis gyűjtőkapcsolat
         master: szülő-widget (ha nincs megadva, saját új ablakban nyílik meg -> tesztelésre)
+        uj:     új készlet (true) vagy meglévő készlet módosítása (false)
         **kw:   Frame() paraméterek testreszabáshoz"""
         super().__init__(master=master, **kw)
         self._kon = kon
+        self._uj = uj
 
-        self._termekvalaszto = Valaszto("termék", self._termekek(), self)
-        self._termekvalaszto.grid(row=0, column=0, columnspan=2, sticky=W, padx=2, pady=2)
+        if self._uj:
+            cim = "termék"
+            valasztek = self._termekek
+        else:
+            cim = "készlet"
+            valasztek = self._keszletek
+
+        self.termekvalaszto = Valaszto(cim, valasztek(), self)
+        self.termekvalaszto.grid(row=0, column=0, columnspan=2, sticky=W, padx=2, pady=2)
 
         self._mennyiseg = StringVar()
         Label(self, text="mennyiség").grid(row=1, column=0, sticky=W, padx=2, pady=2)
@@ -35,23 +44,25 @@ class KeszletUrlap(Frame):
     @property
     def fokusz(self):
         """Az űrlap fókuszban lévő widget-je."""
-        return self._termekvalaszto.valaszto
+        return self.termekvalaszto.valaszto
 
     def export(self) -> Keszlet:
-        """Űrlap tartalmának exportálása termékként."""
+        """Űrlap tartalmának exportálása készletként."""
         try:
             mennyiseg = float(self._mennyiseg.get())
         except ValueError:
             mennyiseg = 0.0
-        return Keszlet(kon=self._kon,
-            termek=self._termekvalaszto.elem.azonosito,
-            mennyiseg=mennyiseg,
-            erkezett=self._erkezett.get(),
-            megjegyzes=self._megjegyzes.get()
-        )
+        if self._uj:
+            return Keszlet(kon=self._kon, termek=self.termekvalaszto.elem.azonosito, mennyiseg=mennyiseg, erkezett=self._erkezett.get(), megjegyzes=self._megjegyzes.get())
+        else:
+            modositando = self.termekvalaszto.elem
+            modositando.mennyiseg = mennyiseg
+            modositando.erkezett = self._erkezett.get()
+            modositando.megjegyzes = self._megjegyzes.get()
+            return modositando
 
     def beallit(self, keszlet:Keszlet) -> None:
-        self._termekvalaszto.valaszto.set(Termek.adatbazisbol(self._kon, keszlet.termek).listanezet())
+        self.termekvalaszto.valaszto.set(Termek.adatbazisbol(self._kon, keszlet.termek).listanezet())
         self._mennyiseg.set(keszlet.mennyiseg)
         self._erkezett.set(keszlet.erkezett)
         self._megjegyzes.set(keszlet.megjegyzes)
@@ -61,6 +72,16 @@ class KeszletUrlap(Frame):
         assert self._kon
         return sorted(map(lambda termek: Termek(kon=self._kon, **termek), self._kon.raktar.select("termek")),
                       key=repr)
+    
+    def _keszletek(self) -> list:
+        """Meglévő készletek felsorolása kiválasztáshoz."""
+        assert self._kon
+        keszletek = self._kon.raktar.execute("""
+        SELECT keszlet.*
+        FROM keszlet, termek
+        ON keszlet.termek = termek.azonosito;
+        """)
+        return sorted(map(lambda keszlet: Keszlet(kon=self._kon, **keszlet), keszletek), key=repr)
 
 
 class UjKeszletUrlap(simpledialog.Dialog):
@@ -130,9 +151,26 @@ class KeszletModositoUrlap(simpledialog.Dialog):
     
     def body(self, szulo) -> Combobox:
         """Override Dialog.body - gui megjelenítése"""
+        self._keszleturlap = KeszletUrlap(self._kon, self, uj=False)
+        self._keszleturlap.termekvalaszto.set_callback(self._megjelenit)
+        self._keszleturlap.pack(ipadx=2, ipady=2)
+        self._megjelenit(1)
+        return self._keszleturlap.fokusz
     
     def validate(self) -> bool:
-        """Override Dialog.validate - érvényes termék biztosítása"""
+        """Override Dialog.validate - érvényes készlet biztosítása"""
+        keszlet = self._keszleturlap.export()
+        if keszlet.mennyiseg < 0:
+            messagebox.showwarning("Rossz adat!", "A mennyiség legalább 0!", parent=self)
+            return False
+        else:
+            return True
     
     def apply(self) -> None:
         """Override Dialog.apply - módosítás végrehajtása"""
+        keszlet = self._keszleturlap.export()
+        print("{}: Bejegyzés módosítva.".format(keszlet) if keszlet.ment(self._kon.raktar) else "Nem sikerült módosítani.")
+    
+    def _megjelenit(self, event):
+        """A készlet adatainak eseményvezérelt kijelzése az űrlap mezőibe."""
+        self._keszleturlap.beallit(self._keszleturlap.termekvalaszto.elem or Keszlet())
