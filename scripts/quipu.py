@@ -279,21 +279,16 @@ class Quipu(Frame):
             azonosito="INTEGER PRIMARY KEY",
             termek="INTEGER",
             mennyiseg="REAL",
+            hely="TEXT",
             erkezett="DATE",
             megjegyzes="TEXT")
         
-        raktar_kon.create("szallitolevel",
+        raktar_kon.create("raktar",
             azonosito="INTEGER PRIMARY KEY",
             jelleg="INTEGER",
-            szam="TEXT",
-            datum="DATETIME",
-            megjegyzes="TEXT")
-
-        raktar_kon.create("tetel",
-            azonosito="INTEGER PRIMARY KEY",
-            szallitolevel="INTEGER",
-            aru="INTEGER",
+            termek="INTEGER",
             mennyiseg="REAL",
+            idobelyeg="TEXT",
             megjegyzes="TEXT")
         
         return raktar_kon
