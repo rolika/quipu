@@ -1,0 +1,47 @@
+{
+    "kontakt": {
+        "szemely": {
+            "elotag": "TEXT DEFAULT ''",
+            "vezeteknev": "TEXT NOT NULL",
+            "keresztnev": "TEXT DEFAULT ''",
+            "becenev": "TEXT DEFAULT ''",
+            "nem": "TEXT DEFAULT ''"
+        },
+        "szervezet": {
+            "rovidnev": "TEXT NOT NULL",
+            "teljesnev": "TEXT DEFAULT ''"
+        },
+        "kontakt": {
+            "szemelyazonosito": "INTEGER NOT NULL REFERENCES szemely",
+            "szervezetazonosito": "INTEGER NOT NULL REFERENCES szervezet"
+        },
+        "cim": {
+            "kontaktazonosito": "INTEGER NOT NULL REFERENCES kontakt",
+            "orszag": "TEXT DEFAULT 'H'",
+            "megye": "TEXT DEFAULT ''",
+            "iranyitoszam": "TEXT DEFAULT ''",
+            "helyseg": "TEXT NOT NULL",
+            "utca": "TEXT DEFAULT ''",
+            "hrsz": "TEXT DEFAULT ''",
+            "postafiok": "TEXT DEFAULT ''",
+            "honlap": "TEXT DEFAULT ''"
+        },
+        "telefon": {
+            "kontaktazonosito": "INTEGER NOT NULL REFERENCES kontakt",
+            "telefonszam": "TEXT NOT NULL"
+        },
+        "email": {
+            "kontaktazonosito": "INTEGER NOT NULL REFERENCES kontakt",
+            "emailcim": "TEXT NOT NULL"
+        },
+        "vevo": {
+            "kontaktazonosito": "INTEGER NOT NULL REFERENCES kontakt"
+        },
+        "szallito": {
+            "kontaktazonosito": "INTEGER NOT NULL REFERENCES kontakt"
+        },
+        "gyarto": {
+            "kontaktazonosito": "INTEGER NOT NULL REFERENCES kontakt"
+        }
+    }
+}
