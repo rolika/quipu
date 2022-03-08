@@ -33,13 +33,17 @@ class KeszletUrlap(Frame):
         Label(self, text="mennyiség").grid(row=1, column=0, sticky=W, padx=2, pady=2)
         Entry(self, textvariable=self._mennyiseg, width=8).grid(row=1, column=1, sticky=W, padx=2, pady=2)
 
+        self._hely = StringVar()
+        Label(self, text="hely").grid(row=2, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._hely, width=8).grid(row=2, column=1, sticky=W, padx=2, pady=2)
+
         self._erkezett = StringVar()
-        Label(self, text="érkezett").grid(row=2, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._erkezett, width=8).grid(row=2, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="érkezett").grid(row=3, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._erkezett, width=8).grid(row=3, column=1, sticky=W, padx=2, pady=2)
 
         self._megjegyzes = StringVar()
-        Label(self, text="megjegyzés").grid(row=3, column=0, sticky=W, padx=2, pady=2)
-        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=3, column=1, sticky=W, padx=2, pady=2)
+        Label(self, text="megjegyzés").grid(row=4, column=0, sticky=W, padx=2, pady=2)
+        Entry(self, textvariable=self._megjegyzes, width=32).grid(row=4, column=1, sticky=W, padx=2, pady=2)
     
     @property
     def fokusz(self):
@@ -53,10 +57,15 @@ class KeszletUrlap(Frame):
         except ValueError:
             mennyiseg = 0.0
         if self._uj:
-            return Keszlet(kon=self._kon, termek=self.termekvalaszto.elem.azonosito, mennyiseg=mennyiseg, erkezett=self._erkezett.get(), megjegyzes=self._megjegyzes.get())
+            return Keszlet(kon=self._kon,
+                           termek=self.termekvalaszto.elem.azonosito, mennyiseg=mennyiseg,
+                           hely=self._hely.get(),
+                           erkezett=self._erkezett.get(),
+                           megjegyzes=self._megjegyzes.get())
         else:
             modositando = self.termekvalaszto.elem
             modositando.mennyiseg = mennyiseg
+            modositando.hely = self._hely.get()
             modositando.erkezett = self._erkezett.get()
             modositando.megjegyzes = self._megjegyzes.get()
             return modositando
@@ -64,6 +73,7 @@ class KeszletUrlap(Frame):
     def beallit(self, keszlet:Keszlet) -> None:
         self.termekvalaszto.valaszto.set(keszlet.listanezet())
         self._mennyiseg.set(keszlet.mennyiseg)
+        self._hely.set(keszlet.hely)
         self._erkezett.set(keszlet.erkezett)
         self._megjegyzes.set(keszlet.megjegyzes)
     

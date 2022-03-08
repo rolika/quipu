@@ -11,6 +11,7 @@ class Keszlet(Csomo):
         else:
             self._adatok = {  # űrlap alaphelyzetbe állítására
                 "mennyiseg": 0.0,
+                "hely": "",
                 "erkezett": "",
                 "megjegyzes": ""
             }
@@ -34,6 +35,7 @@ class Keszlet(Csomo):
     def adatok(self, keszlet) -> None:
         self._adatok["termek"] = keszlet.termek
         self._adatok["mennyiseg"] = keszlet.mennyiseg
+        self._adatok["hely"] = keszlet.hely,
         self._adatok["erkezett"] = keszlet.erkezett
         self._adatok["megjegyzes"] = keszlet.megjegyzes
     
@@ -48,6 +50,14 @@ class Keszlet(Csomo):
     @mennyiseg.setter
     def mennyiseg(self, mennyiseg) -> None:
         self._adatok["mennyiseg"] = mennyiseg
+    
+    @property
+    def hely(self) -> str:
+        return self._adatok["hely"]
+
+    @hely.setter
+    def hely(self, hely) -> None:
+        self._adatok["hely"] = hely
     
     @property
     def erkezett(self) -> str:
