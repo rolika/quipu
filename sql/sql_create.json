@@ -79,8 +79,8 @@
         },
         "megkereses": {
             "jelleg":"INTEGER NOT NULL REFERENCES jelleg",
-            "ajanlatkero":"INTEGER NOT NULL REFERENCES kontakt.vevo",
-            "temafelelos":"INTEGER NOT NULL REFERENCES kontakt.ajanlatkeszito",
+            "ajanlatkero":"INTEGER NOT NULL REFERENCES vevo",
+            "temafelelos":"INTEGER NOT NULL REFERENCES ajanlatkeszito",
             "hatarido":"TEXT DEFAULT ''"
         },
         "ajanlat": {
@@ -94,7 +94,7 @@
 
     "raktar": {
         "anyag": {
-            "gyartoazonosito":"INTEGER NOT NULL REFERENCES kontakt.gyarto",
+            "gyartoazonosito":"INTEGER NOT NULL REFERENCES gyarto",
             "nev":"TEXT NOT NULL",
             "tipus":"TEXT DEFAULT ''",
             "cikkszam":"TEXT DEFAULT ''",
@@ -112,7 +112,7 @@
         },
         "termek": {
             "anyagazonosito":"INTEGER NOT NULL REFERENCES anyag",
-            "szallitoazosito":"INTEGER NOT NULL REFERENCES kontakt.szallito",
+            "szallitoazosito":"INTEGER NOT NULL REFERENCES szallito",
             "egysegar":"REAL NOT NULL",
             "kedvezmeny": "REAL DEFAULT 0"
         },
