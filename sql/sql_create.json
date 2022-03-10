@@ -62,7 +62,7 @@
             "projektazonosito": "INTEGER NOT NULL REFERENCES projekt",
             "megnevezes": "TEXT NOT NULL"
         },
-        "cim": {
+        "hely": {
             "munkareszazonosito": "INTEGER NOT NULL REFERENCES munkaresz",
             "orszag": "TEXT DEFAULT 'H'",
             "megye": "TEXT DEFAULT ''",
