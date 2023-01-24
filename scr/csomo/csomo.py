@@ -1,14 +1,48 @@
 import re
 
+from scr.konnektor import Konnektor
+
 
 class Csomo:
-    """A kipu egy csomóírás. Ez az alkalmazás is alapvető csomókból áll."""
-    def __init__(self, kon=None) -> object:
-        """A csomó bázispéldánya. Önmagában nem jó semmire, le kell származtatni.
+    """A kipu egy csomóírás, ezért az alkalmazás is alapvető csomókból áll."""
+
+    # osztálymetódusok
+
+    def ascii_rep(szoveg) -> str:
+        """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
+        szoveg:     string"""
+        return "".join(re.findall("[a-z1-9]", szoveg.lower().translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))))
+
+    def formazo(attr, zarojel="()", elvalasztojel=" ", hatul=False) -> str:
+        """Segít a formázásban, ill. ha hiányzik az adat, nem írjuk ki egyáltalán.
+        attr:           attribútum, vagy annak hiánya, ha üres
+        zarojel:        () vagy [] vagy {} esetleg // vagy "" legyen az adat körül (két karakter legyen, vagy üres)
+        elvalasztojel:  az adatot a többitől elválasztó jel
+        hatul:          az elválasztójel hátul legyen"""
+        if attr == "None":
+            return ""
+        if hatul:
+            hatul = elvalasztojel
+            elvalasztojel = ""
+        else:
+            hatul = ""
+        nyito = zarojel[0] if zarojel else ""
+        zaro = zarojel[1] if zarojel else ""
+        return "{elvalaszto}{nyit}{adat}{zar}{hatul}"\
+            .format(elvalaszto=elvalasztojel, nyit=nyito, adat=attr, zar=zaro, hatul=hatul) if attr else ""
+    
+    # osztályváltozók
+
+    kon = Konnektor()
+
+    # példányosítás
+
+    def __init__(self, kon=None) -> None:
+        """A csomó bázispéldánya, le kell származtatni.
         kon:    Konnektor() adabázis-gyűjtőkapcsolat"""
         self._adatok = dict()
+        self._db = None
         self._tabla = None
-        self._kon = kon
 
     def __str__(self) -> str:
         """Csomó miden adatának szöveges megjelenítése, terminál-nézethez."""
@@ -33,7 +67,7 @@ class Csomo:
         return self._adatok.get("azonosito")
 
     @azonosito.setter
-    def azonosito(self, azonosito) -> None:
+    def azonosito(self, azonosito:int) -> None:
         """A csomó azonosítójának (SQL PRIMARY KEY) beállítása kívülről."""
         self._adatok["azonosito"] = azonosito
 
@@ -43,7 +77,7 @@ class Csomo:
         return self._adatok.get("megjegyzes")
 
     @megjegyzes.setter
-    def megjegyzes(self, megjegyzes) -> None:
+    def megjegyzes(self, megjegyzes:str) -> None:
         """A csomóhoz fűzött megjegyzés beállítása kívülről."""
         self._adatok["megjegyzes"] = megjegyzes
 
@@ -51,46 +85,23 @@ class Csomo:
         """Csomó szöveges megjelenítése kiválasztáshoz (pl. Combobox)."""
         raise NotImplementedError
 
-    def meglevo(self, kon) -> bool:
-        """Ellenőrzi, hogy a csomó szerepel-e az adatbázisban.
-        kon:    tamer modul adatbázis konnektora"""
+    def meglevo(self) -> bool:
+        """Ellenőrzi, hogy a csomó szerepel-e az adatbázisban."""
+        assert self._db
         assert self._tabla
-        return True if self.azonosito else kon.select(self._tabla, logic="AND", **self._adatok).fetchone()
+        return True if self.azonosito else Csomo.kon[self._db].select(self._tabla, logic="AND", **self._adatok).fetchone()
 
-    def ment(self, kon) -> bool:
-        """Menti vagy módosítja a csomó adatait.
-        kon:    tamer modul adatbázis konnektora"""
+    def ment(self) -> bool:
+        """Menti vagy módosítja a csomó adatait."""
+        assert self._db
         assert self._tabla
         if self.azonosito:
-            return kon.update(self._tabla, self._adatok, azonosito=self.azonosito)  # True vagy False
+            return Csomo.kon[self._db].update(self._tabla, self._adatok, azonosito=self.azonosito)  # True vagy False
         else:
-            return kon.insert(self._tabla, **self._adatok)  # lastrowid vagy None
+            return Csomo.kon[self._db].insert(self._tabla, **self._adatok)  # lastrowid vagy None
 
-    def torol(self, kon) -> bool:
-        """Törli az adatbázisból a csomót.
-        kon:    tamer modul adatbázis konnektora"""
+    def torol(self) -> bool:
+        """Törli az adatbázisból a csomót."""
+        assert self._db
         assert self._tabla
-        return kon.delete(self._tabla, azonosito=self.azonosito)
-
-    def _ascii_rep(self, szoveg) -> str:
-        """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
-        szoveg:     string"""
-        return "".join(re.findall("[a-z1-9]", szoveg.lower().translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))))
-
-    def _nullazo(self, attr, zarojel="()", elvalasztojel=" ", hatul=False) -> str:
-        """Ha hiányzik az adat, nem írjuk ki egyáltalán.
-        attr:           attribútum, vagy annak hiánya, ha üres
-        zarojel:        () vagy [] vagy {} esetleg // vagy "" legyen az adat körül (két karakter legyen, vagy üres)
-        elvalasztojel:  az adatot a többitől elválasztó jel
-        hatul:          az elválasztójel hátul legyen"""
-        if attr == "None":
-            return ""
-        if hatul:
-            hatul = elvalasztojel
-            elvalasztojel = ""
-        else:
-            hatul = ""
-        nyito = zarojel[0] if zarojel else ""
-        zaro = zarojel[1] if zarojel else ""
-        return "{elvalaszto}{nyit}{adat}{zar}{hatul}"\
-            .format(elvalaszto=elvalasztojel, nyit=nyito, adat=attr, zar=zaro, hatul=hatul) if attr else ""
+        return Csomo.kon[self._db].delete(self._tabla, azonosito=self.azonosito)

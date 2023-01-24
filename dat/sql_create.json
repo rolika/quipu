@@ -1,5 +1,6 @@
 {
     "kontakt": {
+        "_attach_": [],
         "szemely": {
             "elotag": "TEXT DEFAULT ''",
             "vezeteknev": "TEXT NOT NULL",
@@ -52,6 +53,7 @@
     },
 
     "projekt": {
+        "_attach_": ["kontakt"],
         "projekt": {
             "nev": "TEXT NOT NULL",
             "kod": "TEXT DEFAULT ''",
@@ -93,6 +95,7 @@
     },
 
     "raktar": {
+        "_attach_": ["kontakt"],
         "anyag": {
             "gyartoazonosito":"INTEGER NOT NULL REFERENCES gyarto",
             "nev":"TEXT NOT NULL",
