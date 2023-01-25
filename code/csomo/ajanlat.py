@@ -1,6 +1,6 @@
-from ajanlatkeres import Ajanlatkeres
-from jelleg import Jelleg
-from csomo import Csomo
+from csomo.ajanlatkeres import Ajanlatkeres
+from csomo.jelleg import Jelleg
+from csomo.csomo import Csomo
 
 
 class Ajanlat(Csomo):

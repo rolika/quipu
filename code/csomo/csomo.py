@@ -1,6 +1,6 @@
 import re
 
-from scr.konnektor import Konnektor
+from konnektor import Konnektor
 
 
 class Csomo:

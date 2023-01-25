@@ -7,16 +7,16 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox
-from urlap import TelefonszamUrlap, EmailcimUrlap, CimUrlap, Valaszto
-from szemely import Szemely
-from telefon import Telefon
-from e_mail import Email
-from cim import Cim
-from szervezet import Szervezet
-from kontakt import Kontakt
-from vevo import Vevo
-from szallito import Szallito
-from gyarto import Gyarto
+from form.urlap import TelefonszamUrlap, EmailcimUrlap, CimUrlap, Valaszto
+from csomo.szemely import Szemely
+from csomo.telefon import Telefon
+from csomo.e_mail import Email
+from csomo.cim import Cim
+from csomo.szervezet import Szervezet
+from csomo.kontakt import Kontakt
+from csomo.vevo import Vevo
+from csomo.szallito import Szallito
+from csomo.gyarto import Gyarto
 from konstans import VITYA, ROLI
 
 

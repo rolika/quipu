@@ -1,13 +1,13 @@
 from tkinter import *
-import szemelyurlap
-import szervezeturlap
-import projekturlap
-import ajanlatkeresurlap
-import ajanlaturlap
-import anyagurlap
-import termekurlap
-import keszleturlap
-import raktarurlap
+from form import szemelyurlap
+from form import szervezeturlap
+from form import projekturlap
+from form import ajanlatkeresurlap
+from form import ajanlaturlap
+from form import anyagurlap
+from form import termekurlap
+from form import keszleturlap
+from form import raktarurlap
 
 
 class Fomenu(Frame):
