@@ -1,5 +1,5 @@
-from csomo import Csomo
-from szervezet import Szervezet
+from .csomo import Csomo
+from .szervezet import Szervezet
 from konstans import AnyagTipus
 
 

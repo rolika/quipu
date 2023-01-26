@@ -3,9 +3,9 @@ from tkinter import simpledialog
 from tkinter import messagebox
 from datetime import date, timedelta
 from tkinter.ttk import LabelFrame
-from urlap import Valaszto
-from ajanlatkeres import Ajanlatkeres
-from ajanlat import Ajanlat
+from form.urlap import Valaszto
+from csomo.ajanlatkeres import Ajanlatkeres
+from csomo.ajanlat import Ajanlat
 from konstans import Esely
 
 

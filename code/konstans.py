@@ -1,8 +1,8 @@
 """ Különböző konstansok, hogy minden egy helyen és egyszer legyen definiálva"""
 
 
-from szemely import Szemely
-from szervezet import Szervezet
+from csomo.szemely import Szemely
+from csomo.szervezet import Szervezet
 import enum
 
 

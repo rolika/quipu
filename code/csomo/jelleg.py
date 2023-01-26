@@ -1,5 +1,5 @@
-from csomo import Csomo
-from munkaresz import Munkaresz
+from .csomo import Csomo
+from .munkaresz import Munkaresz
 
 
 class Jelleg(Csomo):

@@ -1,6 +1,6 @@
-from csomo import Csomo
-from szallito import Szallito
-from anyag import Anyag
+from .csomo import Csomo
+from .szallito import Szallito
+from .anyag import Anyag
 
 
 class Termek(Csomo):

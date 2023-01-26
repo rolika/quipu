@@ -1,6 +1,6 @@
-from csomo import Csomo
-from jelleg import Jelleg
-from kontakt import Kontakt
+from .csomo import Csomo
+from .jelleg import Jelleg
+from .kontakt import Kontakt
 import copy
 
 

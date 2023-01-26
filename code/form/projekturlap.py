@@ -3,11 +3,11 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox, LabelFrame
 from datetime import date
-from urlap import CimUrlap, Valaszto
-from projekt import Projekt
-from munkaresz import Munkaresz
-from cim import Cim
-from jelleg import Jelleg
+from form.urlap import CimUrlap, Valaszto
+from csomo.projekt import Projekt
+from csomo.munkaresz import Munkaresz
+from csomo.cim import Cim
+from csomo.jelleg import Jelleg
 from konstans import JELLEG, MUNKARESZ
 
 

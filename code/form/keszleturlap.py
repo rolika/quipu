@@ -2,9 +2,9 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox
-from keszlet import Keszlet
-from termek import Termek
-from urlap import Valaszto
+from csomo.keszlet import Keszlet
+from csomo.termek import Termek
+from form.urlap import Valaszto
 
 
 class KeszletUrlap(Frame):

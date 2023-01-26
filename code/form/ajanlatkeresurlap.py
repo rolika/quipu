@@ -3,10 +3,10 @@ from tkinter import simpledialog
 from tkinter import messagebox
 from datetime import date, timedelta
 from tkinter.ttk import LabelFrame
-from jelleg import Jelleg
-from urlap import Valaszto
-from kontakt import Kontakt
-from ajanlatkeres import Ajanlatkeres
+from csomo.jelleg import Jelleg
+from form.urlap import Valaszto
+from csomo.kontakt import Kontakt
+from csomo.ajanlatkeres import Ajanlatkeres
 
 
 class AjanlatkeresUrlap(Frame):

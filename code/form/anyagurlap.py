@@ -2,9 +2,9 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox
-from urlap import Valaszto
-from gyarto import Gyarto
-from anyag import Anyag
+from form.urlap import Valaszto
+from csomo.gyarto import Gyarto
+from csomo.anyag import Anyag
 from konstans import AnyagTipus
 
 

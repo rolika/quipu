@@ -1,5 +1,5 @@
-from csomo import Csomo
-from kontakt import Kontakt
+from .csomo import Csomo
+from .kontakt import Kontakt
 
 
 class Vevo(Csomo):

@@ -1,5 +1,5 @@
-from csomo import Csomo
-from termek import Termek
+from .csomo import Csomo
+from .termek import Termek
 
 
 class Keszlet(Csomo):

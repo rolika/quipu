@@ -1,5 +1,5 @@
-from szervezet import Szervezet
-from vevo import Vevo
+from .szervezet import Szervezet
+from .vevo import Vevo
 
 
 class Gyarto(Vevo):

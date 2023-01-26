@@ -1,4 +1,4 @@
-from csomo import Csomo
+from .csomo import Csomo
 
 
 class Email(Csomo):

@@ -2,10 +2,10 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox
-from urlap import Valaszto
-from szallito import Szallito
-from termek import Termek
-from anyag import Anyag
+from form.urlap import Valaszto
+from csomo.szallito import Szallito
+from csomo.termek import Termek
+from csomo.anyag import Anyag
 
 
 class TermekUrlap(Frame):

@@ -1,6 +1,6 @@
-from csomo import Csomo
-from projekt import Projekt
-from cim import Cim
+from .csomo import Csomo
+from .projekt import Projekt
+from .cim import Cim
 
 
 class Munkaresz(Csomo):

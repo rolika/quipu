@@ -28,7 +28,7 @@ from tkinter import *
 import tamer
 import menu
 from konstans import MAGANSZEMELY, WEVIK, VITYA, ROLI
-from kontakt import Kontakt
+from csomo.kontakt import Kontakt
 from konnektor import Konnektor
 
 
