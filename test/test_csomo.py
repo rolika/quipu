@@ -1,11 +1,15 @@
-"""Csomók tesztelése. A cél, hogy önmagukban is működjenek."""
+"""Csomók tesztelése. A cél, hogy önmagukban is működjenek.
+Az adatbázis file-ok is változatlanok maradnak."""
 
 
 import unittest
+from code.csomo.cim import Cim
+from code.csomo.e_mail import Email
 
 from code.csomo.szemely import Szemely
 from code.csomo.szervezet import Szervezet
 from code.csomo.kontakt import Kontakt
+from code.csomo.telefon import Telefon
 
 
 class CsomoTest(unittest.TestCase):
@@ -44,3 +48,35 @@ class CsomoTest(unittest.TestCase):
         self._mintaszemely.torol()
         self._mintaceg.torol()
         self.assertTrue(kontakt.torol())
+    
+    def test_elerhetoseg(self):
+        self._mintaszemely.azonosito = self._mintaszemely.ment()
+        self._mintaceg.azonosito = self._mintaceg.ment()
+
+        kontakt = Kontakt(szemelyazonosito=self._mintaszemely.azonosito,
+                          szervezetazonosito=self._mintaceg.azonosito)
+        kontakt.azonosito = kontakt.ment()
+
+        telefon = Telefon(kontaktazonosito=kontakt.azonosito,
+                          telefonszam="+56-42-565 88 99")
+        email = Email(kontaktazonosito=kontakt.azonosito,
+                      emailcim="drminta@ceg.hu")
+        cim = Cim(kontaktazonosito=kontakt.azonosito,
+                  megye="BAZ",
+                  iranyitoszam="3245",
+                  helyseg="Város",
+                  kozterulet="Fiktiv u. 1.",
+                  hrsz="32/23",
+                  postafiok="10",
+                  honlap="www.ceg.hu",
+                  megjegyzes="nahát")
+        
+        telefon.azonosito = telefon.ment()
+        email.azonosito = email.ment()
+        cim.azonosito = cim.ment()
+
+        self._mintaszemely.torol()
+        self._mintaceg.torol()
+        kontakt.torol()
+
+        self.assertTrue(telefon.torol() and email.torol() and cim.torol())

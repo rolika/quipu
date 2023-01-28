@@ -2,10 +2,14 @@ from .csomo import Csomo
 
 
 class Cim(Csomo):
-    """Cím megvalósítása. Egyszerű csomó, egy külső kulcsra támaszkodik."""
+    """Cím megvalósítása."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
-        kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
+        kwargs:
+            kontaktazonosito:   kontakt sql primary key
+            cim:                kontakt címe
+            megjegyzes:         bármilyen megjegyzés. Használható két, egyébként
+                                azonos bejegyzés megkülönböztetésére"""
         super().__init__(kwargs.pop("kon", None))
         if kwargs:
             self._adatok = dict(kwargs)
@@ -19,12 +23,15 @@ class Cim(Csomo):
                 "hrsz": "",
                 "postafiok": "",
                 "honlap": "",
+                "tipus": "elsődleges",
                 "megjegyzes": ""
             }
+        self._db = "kontakt"
         self._tabla = "cim"
 
     def __str__(self):
-        return "{}-{} {}, {}".format(self.orszag, self.megye, self.iranyitoszam, self.helyseg, self.utca)
+        return "{orszag}-{irszam} {helyseg}, {utca}".\
+            format(self.orszag, self.iranyitoszam, self.helyseg, self.utca)
 
     def __bool__(self):
         """Egy cím akkor meghatározott, ha legalább a helység adott"""
@@ -45,6 +52,7 @@ class Cim(Csomo):
         self._adatok["hrsz"] = cim.hrsz
         self._adatok["postafiok"] = cim.postafiok
         self._adatok["honlap"] = cim.honlap
+        self._adatok["tipus"] = cim.tipus
         self._adatok["megjegyzes"] = cim.megjegyzes
 
     @property
@@ -102,6 +110,10 @@ class Cim(Csomo):
     @property
     def honlap(self):
         return self._adatok.get("honlap", "")
+
+    @property
+    def tipus(self):
+        return self._adatok.get("tipus", "")
 
     def listanezet(self):
         return str(self)

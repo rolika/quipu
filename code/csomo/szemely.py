@@ -13,7 +13,7 @@ class Szemely(Csomo):
             becenev:    becenév vagy rövidítés
             nem:        férfi vagy nő
             megjegyzes: bármilyen megjegyzés. Használható két, egyébként azonos
-                        személy megkülönböztetésére"""
+                        bejegyzés megkülönböztetésére"""
         super().__init__(kwargs.pop("kon", None))
         if kwargs:
             self._adatok = dict(kwargs)

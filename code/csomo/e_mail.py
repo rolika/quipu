@@ -2,19 +2,24 @@ from .csomo import Csomo
 
 
 class Email(Csomo):
-    """Email-elérhetőség megvalósítása.
-    Egyszerű csomó, egy külső kulcsra támaszkodik, ami azonos adatbázis file-ban van."""
+    """Email-elérhetőség megvalósítása."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
-        kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
+        kwargs:
+            kontaktazonosito:   kontakt sql primary key
+            emailcimn:          kontakt email-címe
+            megjegyzes:         bármilyen megjegyzés. Használható két, egyébként
+                                azonos bejegyzés megkülönböztetésére"""
         super().__init__(kwargs.pop("kon", None))
         if kwargs:
             self._adatok = dict(kwargs)
         else:
             self._adatok = {
                 "emailcim": "",
+                "tipus": "elsődleges",
                 "megjegyzes": ""
             }
+        self._db = "kontakt"
         self._tabla = "email"
 
     def __bool__(self):
@@ -50,6 +55,10 @@ class Email(Csomo):
     def emailcim(self):
         return self._adatok.get("emailcim")
 
+    @property
+    def tipus(self):
+        return self._adatok.get("tipus", "")
+
     def listanezet(self):
         """Elérhetőseg megjelenítése kiválasztáshoz (Combobox)"""
-        return "{} ({})".format(self.emailcim, self.megjegyzes)
+        return "{} ({})".format(self.emailcim, Csomo.formazo(self.megjegyzes))
