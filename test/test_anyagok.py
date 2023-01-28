@@ -12,15 +12,16 @@ Feltételezem, hogy a Quipu már legalább egyszer futott és létrehozta az ada
 import unittest
 import csv
 from collections import namedtuple
-from kontakt import Kontakt
-from gyarto import Gyarto
-from anyag import Anyag
-from termek import Termek
-from szallito import Szallito
-from szervezet import Szervezet
-from szemely import Szemely
-from tamer import Tamer
-from konnektor import Konnektor
+
+from code.csomo.kontakt import Kontakt
+from code.csomo.gyarto import Gyarto
+from code.csomo.anyag import Anyag
+from code.csomo.termek import Termek
+from code.csomo.szallito import Szallito
+from code.csomo.szervezet import Szervezet
+from code.csomo.szemely import Szemely
+from code.tamer import Tamer
+from code.konnektor import Konnektor
 
 
 class AnyagTest(unittest.TestCase):

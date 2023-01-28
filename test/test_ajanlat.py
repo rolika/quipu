@@ -13,20 +13,23 @@ Feltételezem, hogy a Quipu már legalább egyszer futott és létrehozta az ada
 import unittest
 import csv
 from collections import namedtuple
-from tamer import Tamer
-from szemely import Szemely
-from telefon import Telefon
-from e_mail import Email
-from szervezet import Szervezet
-from kontakt import Kontakt
-from projekt import Projekt
-from munkaresz import Munkaresz
-from ajanlatkeres import Ajanlatkeres
-from ajanlat import Ajanlat
-from cim import Cim
-from jelleg import Jelleg
-from konnektor import Konnektor
-from konstans import Esely
+
+import code.csomo
+
+from code.tamer import Tamer
+from code.csomo.szemely import Szemely
+from code.csomo.telefon import Telefon
+from code.csomo.e_mail import Email
+from code.csomo.szervezet import Szervezet
+from code.csomo.kontakt import Kontakt
+from code.csomo.projekt import Projekt
+from code.csomo.munkaresz import Munkaresz
+from code.csomo.ajanlatkeres import Ajanlatkeres
+from code.csomo.ajanlat import Ajanlat
+from code.csomo.cim import Cim
+from code.csomo.jelleg import Jelleg
+from code.konnektor import Konnektor
+from code.konstans import Esely
 
 
 class ProjektlistaTest(unittest.TestCase):
