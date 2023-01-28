@@ -2,10 +2,18 @@ from .csomo import Csomo
 
 
 class Szemely(Csomo):
-    """Személy megvalósítása. Alapvető csomó, nem támaszkodik külső kulcsra."""
+    """Személy megvalósítása"""
     def __init__(self, **kwargs) -> Csomo:
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
-        kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
+        sqlite Row-objektum is lehet (hozzáférés oszlopnevekkel)
+        kwargs:
+            elotag:     név előtagja, pl.: dr. mr. id. ifj.
+            vezeteknev: vezetéknév
+            keresztnev: keresztnév
+            becenev:    becenév vagy rövidítés
+            nem:        férfi vagy nő
+            megjegyzes: bármilyen megjegyzés. Használható két, egyébként azonos
+                        személy megkülönböztetésére"""
         super().__init__(kwargs.pop("kon", None))
         if kwargs:
             self._adatok = dict(kwargs)
@@ -14,9 +22,11 @@ class Szemely(Csomo):
                 "elotag": "",
                 "vezeteknev": "",
                 "keresztnev": "",
+                "becenev": "",
                 "nem": "férfi",
                 "megjegyzes": ""
             }
+        self._db = "kontakt"
         self._tabla = "szemely"
 
     def __str__(self):
@@ -47,6 +57,7 @@ class Szemely(Csomo):
         self._adatok["elotag"] = uj.elotag
         self._adatok["vezeteknev"] = uj.vezeteknev
         self._adatok["keresztnev"] = uj.keresztnev
+        self._adatok["becenev"] = uj.becenev
         self._adatok["nem"] = uj.nem
         self._adatok["megjegyzes"] = uj.megjegyzes
 
@@ -61,6 +72,10 @@ class Szemely(Csomo):
     @property
     def keresztnev(self):
         return self._adatok.get("keresztnev", "")
+
+    @property
+    def becenev(self):
+        return self._adatok.get("becenev", "")
 
     @property
     def nem(self):

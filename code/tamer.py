@@ -104,6 +104,7 @@ class Tamer(sqlite3.Connection):
                 .format(table, cols, qmarks), values).lastrowid
         except sqlite3.Error as err:
             print("Couldn't insert item:", err, file=sys.stderr)
+        print(lastrowid)
         return lastrowid
 
 

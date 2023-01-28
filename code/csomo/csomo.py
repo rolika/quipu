@@ -1,6 +1,7 @@
 import re
+from datetime import datetime
 
-from konnektor import Konnektor
+from ..konnektor import Konnektor
 
 
 class Csomo:
@@ -95,9 +96,12 @@ class Csomo:
         """Menti vagy módosítja a csomó adatait."""
         assert self._db
         assert self._tabla
-        if self.azonosito:
+        idobelyeg = datetime.now().strftime("%Y-%m-%d %H:%m:%S")
+        self._adatok["modositva"] = idobelyeg
+        if self.azonosito:  # módosítás
             return Csomo.kon[self._db].update(self._tabla, self._adatok, azonosito=self.azonosito)  # True vagy False
-        else:
+        else:  # új mentés
+            self._adatok["letrehozva"] = idobelyeg
             return Csomo.kon[self._db].insert(self._tabla, **self._adatok)  # lastrowid vagy None
 
     def torol(self) -> bool:

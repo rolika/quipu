@@ -3,13 +3,13 @@
 
 import pathlib
 import json
-import tamer
+from .tamer import Tamer
 
 
 class Konnektor(dict):
     """Adatbázis kapcsolat gyűjtőosztálya.
     Ha még nem léteznek, létrehozza az adatbázis file-okat.
-    A külső használat úgy fog kinézni, hogy kon["projekt"].execute(...)"""
+    A külső használat úgy fog kinézni, hogy kon["db"]["tabla"].execute(...)"""
     def __init__(self) -> None:
         """Konnektor inicializása."""
         super().__init__()
@@ -22,7 +22,7 @@ class Konnektor(dict):
 
         for db_nev in self._db_struktura:
             print("Kapcsolódás adatbázishoz:", db_nev)
-            self[db_nev] = tamer.Tamer(db_path / (db_nev+".db"))
+            self[db_nev] = Tamer(db_path / (db_nev+".db"))
             for tabla, oszlop in self._db_struktura[db_nev].items():
                 if tabla != "_attach_":
                     oszlop.update(alapertelmezett_oszlopok)
