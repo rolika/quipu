@@ -34,13 +34,16 @@ class Szemely(Csomo):
         return "{vezeteknev} {keresztnev}{elotag} ({nem}{megjegyzes})".format(\
             vezeteknev=self.vezeteknev,
             keresztnev=self.keresztnev,
-            elotag=self._nullazo(self.elotag, zarojel="", elvalasztojel=", "),
+            elotag=Csomo.formazo(self.elotag, zarojel="", elvalasztojel=", "),
             nem=self.nem,
-            megjegyzes=self._nullazo(self.megjegyzes, zarojel="", elvalasztojel=", "))
+            megjegyzes=Csomo.formazo(self.megjegyzes,
+                                     zarojel="",
+                                     elvalasztojel=", "))
 
     def __repr__(self):
         """Név megjelenítése sorbarendezéshez"""
-        return self._ascii_rep("{vezetek} {kereszt}".format(vezetek=self.vezeteknev, kereszt=self.keresztnev))
+        return Csomo.ascii_rep("{vezetek} {kereszt}".\
+            format(vezetek=self.vezeteknev, kereszt=self.keresztnev))
 
     def __bool__(self):
         """Egy személy akkor meghatározott, ha legalább az egyik név adott"""
@@ -83,23 +86,12 @@ class Szemely(Csomo):
 
     def listanezet(self) -> str:
         """Személy megjelenítése kiválasztáshoz (Combobox)"""
-        return "{elotag}{vezeteknev} {keresztnev}".format(elotag=self._nullazo(self.elotag, zarojel="", hatul=True),
-                                                          vezeteknev=self.vezeteknev,
-                                                          keresztnev=self.keresztnev)
+        return "{elotag}{vezeteknev} {keresztnev}".\
+            format(elotag=Csomo.formazo(self.elotag,
+                   zarojel="",
+                   hatul=True),
+                   vezeteknev=self.vezeteknev,
+                   keresztnev=self.keresztnev)
 
     def megszolitas(self):
         return "Tisztelt {}!".format("Uram" if self.nem == "férfi" else "Hölgyem")
-
-
-if __name__ == "__main__":
-    """Egyszerű tesztelés"""
-    szemely = Szemely(vezeteknev="Árvíz-tűrő", keresztnev="Tükör+fúrógép", elotag="Mr.", nem="SDS", megjegyzes="Max")
-    print(repr(szemely))  # arvizturotukorfurogep
-    print(szemely)
-    print(szemely.listanezet())
-    szemely = Szemely(elotag="dr")
-    if not szemely:
-        print("Nincs elegendő adat")  # ki kell írnia
-    szemely = Szemely(keresztnev="Roland")
-    if szemely:
-        print("Elegendő adat.")  # ki kell írnia
