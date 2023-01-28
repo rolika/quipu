@@ -2,10 +2,12 @@ from .csomo import Csomo
 
 
 class Szervezet(Csomo):
-    """Szervezet megvalósítása. Alapvető csomó, nem támaszkodik külső kulcsra."""
+    """Szervezet megvalósítása."""
     def __init__(self, **kwargs):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
-        kwargs: adatok kulcs=érték párokként, akár sqlite Row-objektum is (hozzáférés oszlopnevekkel)"""
+        kwargs:
+            rovidnev:   szervezet rövid neve
+            teljesnev:  szervezet hivatalos, teljes neve """
         super().__init__(kwargs.pop("kon", None))
         if kwargs:
             self._adatok = dict(kwargs)
@@ -16,6 +18,7 @@ class Szervezet(Csomo):
                 "gyakorisag": 0,
                 "megjegyzes": ""
             }
+        self._db = "kontakt"
         self._tabla = "szervezet"
 
     def __str__(self) -> str:

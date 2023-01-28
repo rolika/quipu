@@ -4,6 +4,7 @@
 import unittest
 
 from code.csomo.szemely import Szemely
+from code.csomo.szervezet import Szervezet
 
 
 class CsomoTest(unittest.TestCase):
@@ -17,8 +18,17 @@ class CsomoTest(unittest.TestCase):
                                becenev="Alibá",
                                nem="férfi",
                                megjegyzes="bácsi")
-        if not mintaszemely.meglevo():
-            mintaszemely.azonosito = mintaszemely.ment()
-            self.assertTrue(mintaszemely.torol())
+        if not mintaszemely.meglevo():  # működik-e a meglévő, ha igen
+            mintaszemely.azonosito = mintaszemely.ment()  # mentés,
+            self.assertTrue(mintaszemely.torol())  # majd törlés
+        else:
+            self.assertTrue(False)  # amúgy valami nem volt jó
+
+    def test_szervezet(self):
+        mintaceg = Szervezet(rovidnev="Cég Kft.",
+                             teljesnev="Cég Ipari és Szolgáltató Kft.")
+        if not mintaceg.meglevo():
+            mintaceg.azonosito = mintaceg.ment()
+            self.assertTrue(mintaceg.torol())
         else:
             self.assertTrue(False)
