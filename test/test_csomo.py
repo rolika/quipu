@@ -10,12 +10,15 @@ class CsomoTest(unittest.TestCase):
     def setUp(self) -> None:
         pass
 
-    def test_uj_szemely(self):
+    def test_szemely(self):
         mintaszemely = Szemely(elotag="Dr.",
                                vezeteknev="Minta",
                                keresztnev="Aladár",
                                becenev="Alibá",
                                nem="férfi",
                                megjegyzes="bácsi")
-        self.assertTrue(mintaszemely.ment())
-        
+        if not mintaszemely.meglevo():
+            mintaszemely.azonosito = mintaszemely.ment()
+            self.assertTrue(mintaszemely.torol())
+        else:
+            self.assertTrue(False)
