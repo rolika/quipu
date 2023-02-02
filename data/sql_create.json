@@ -115,7 +115,7 @@
         },
         "termek": {
             "anyagazonosito":"INTEGER NOT NULL REFERENCES anyag",
-            "szallitoazosito":"INTEGER NOT NULL REFERENCES szallito",
+            "szallitoazonosito":"INTEGER NOT NULL REFERENCES szallito",
             "egysegar":"REAL NOT NULL",
             "kedvezmeny": "REAL DEFAULT 0"
         },
