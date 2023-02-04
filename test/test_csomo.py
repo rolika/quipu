@@ -5,17 +5,16 @@ Az adatbázis file-ok is változatlanok maradnak."""
 import unittest
 import sys
 
+from code.csomok.szemely import Szemely
+from code.csomok.szervezet import Szervezet
+from code.csomok.kontakt import Kontakt
+from code.csomok.telefon import Telefon
+from code.csomok.e_mail import Email
+from code.csomok.cim import Cim
+
 
 class CsomoTest(unittest.TestCase):
     def setUp(self) -> None:
-        sys.path.insert(0, "../code")
-        from code.csomok.szemely import Szemely
-        from code.csomok.szervezet import Szervezet
-        from code.csomok.kontakt import Kontakt
-        from code.csomok.telefon import Telefon
-        from code.csomok.e_mail import Email
-        from code.csomok.cim import Cim
-
         self._mintaszemely = Szemely(elotag="Dr.",
                                      vezeteknev="Minta",
                                      keresztnev="Aladár",
