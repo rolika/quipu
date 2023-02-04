@@ -3,7 +3,6 @@ Az adatbázis file-ok is változatlanok maradnak."""
 
 
 import unittest
-import sys
 
 from code.csomok.szemely import Szemely
 from code.csomok.szervezet import Szervezet
