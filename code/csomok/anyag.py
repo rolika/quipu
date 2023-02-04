@@ -1,4 +1,4 @@
-from .csomo import Csomo
+from .alapcsomo import Csomo
 from .szervezet import Szervezet
 from konstans import AnyagTipus
 

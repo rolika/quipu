@@ -3,17 +3,19 @@ Az adatbázis file-ok is változatlanok maradnak."""
 
 
 import unittest
-from code.csomo.cim import Cim
-from code.csomo.e_mail import Email
-
-from code.csomo.szemely import Szemely
-from code.csomo.szervezet import Szervezet
-from code.csomo.kontakt import Kontakt
-from code.csomo.telefon import Telefon
+import sys
 
 
 class CsomoTest(unittest.TestCase):
-    def setUp(self) -> None:        
+    def setUp(self) -> None:
+        sys.path.insert(0, "../code")
+        from code.csomok.szemely import Szemely
+        from code.csomok.szervezet import Szervezet
+        from code.csomok.kontakt import Kontakt
+        from code.csomok.telefon import Telefon
+        from code.csomok.e_mail import Email
+        from code.csomok.cim import Cim
+
         self._mintaszemely = Szemely(elotag="Dr.",
                                      vezeteknev="Minta",
                                      keresztnev="Aladár",
@@ -36,7 +38,7 @@ class CsomoTest(unittest.TestCase):
             self.assertTrue(self._mintaceg.torol())
         else:
             self.assertTrue(False)
-    
+
     def test_kontakt(self):
         self._mintaszemely.azonosito = self._mintaszemely.ment()
         self._mintaceg.azonosito = self._mintaceg.ment()
@@ -48,7 +50,7 @@ class CsomoTest(unittest.TestCase):
         self._mintaszemely.torol()
         self._mintaceg.torol()
         self.assertTrue(kontakt.torol())
-    
+
     def test_elerhetoseg(self):
         self._mintaszemely.azonosito = self._mintaszemely.ment()
         self._mintaceg.azonosito = self._mintaceg.ment()
@@ -70,7 +72,7 @@ class CsomoTest(unittest.TestCase):
                   postafiok="10",
                   honlap="www.ceg.hu",
                   megjegyzes="nahát")
-        
+
         telefon.azonosito = telefon.ment()
         email.azonosito = email.ment()
         cim.azonosito = cim.ment()

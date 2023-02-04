@@ -8,15 +8,15 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox
 from form.urlap import TelefonszamUrlap, EmailcimUrlap, CimUrlap, Valaszto
-from csomo.szemely import Szemely
-from csomo.telefon import Telefon
-from csomo.e_mail import Email
-from csomo.cim import Cim
-from csomo.szervezet import Szervezet
-from csomo.kontakt import Kontakt
-from csomo.vevo import Vevo
-from csomo.szallito import Szallito
-from csomo.gyarto import Gyarto
+from csomok.szemely import Szemely
+from csomok.telefon import Telefon
+from csomok.e_mail import Email
+from csomok.cim import Cim
+from csomok.szervezet import Szervezet
+from csomok.kontakt import Kontakt
+from csomok.vevo import Vevo
+from csomok.szallito import Szallito
+from csomok.gyarto import Gyarto
 from konstans import VITYA, ROLI
 
 

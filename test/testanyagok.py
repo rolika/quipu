@@ -13,13 +13,13 @@ import unittest
 import csv
 from collections import namedtuple
 
-from code.csomo.kontakt import Kontakt
-from code.csomo.gyarto import Gyarto
-from code.csomo.anyag import Anyag
-from code.csomo.termek import Termek
-from code.csomo.szallito import Szallito
-from code.csomo.szervezet import Szervezet
-from code.csomo.szemely import Szemely
+from code.csomok.kontakt import Kontakt
+from code.csomok.gyarto import Gyarto
+from code.csomok.anyag import Anyag
+from code.csomok.termek import Termek
+from code.csomok.szallito import Szallito
+from code.csomok.szervezet import Szervezet
+from code.csomok.szemely import Szemely
 from code.tamer import Tamer
 from code.konnektor import Konnektor
 

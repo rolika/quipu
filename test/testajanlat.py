@@ -14,20 +14,20 @@ import unittest
 import csv
 from collections import namedtuple
 
-import code.csomo
+import code.csomok
 
 from code.tamer import Tamer
-from code.csomo.szemely import Szemely
-from code.csomo.telefon import Telefon
-from code.csomo.e_mail import Email
-from code.csomo.szervezet import Szervezet
-from code.csomo.kontakt import Kontakt
-from code.csomo.projekt import Projekt
-from code.csomo.munkaresz import Munkaresz
-from code.csomo.ajanlatkeres import Ajanlatkeres
-from code.csomo.ajanlat import Ajanlat
-from code.csomo.cim import Cim
-from code.csomo.jelleg import Jelleg
+from code.csomok.szemely import Szemely
+from code.csomok.telefon import Telefon
+from code.csomok.e_mail import Email
+from code.csomok.szervezet import Szervezet
+from code.csomok.kontakt import Kontakt
+from code.csomok.projekt import Projekt
+from code.csomok.munkaresz import Munkaresz
+from code.csomok.ajanlatkeres import Ajanlatkeres
+from code.csomok.ajanlat import Ajanlat
+from code.csomok.cim import Cim
+from code.csomok.jelleg import Jelleg
 from code.konnektor import Konnektor
 from code.konstans import Esely
 

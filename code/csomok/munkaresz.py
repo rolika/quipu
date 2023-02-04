@@ -1,4 +1,4 @@
-from .csomo import Csomo
+from .alapcsomo import Csomo
 from .projekt import Projekt
 from .cim import Cim
 

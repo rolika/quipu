@@ -3,7 +3,7 @@
 
 import pathlib
 import json
-from .tamer import Tamer
+from code.tamer import Tamer
 
 
 class Konnektor(dict):

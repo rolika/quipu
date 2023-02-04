@@ -1,4 +1,4 @@
-from .csomo import Csomo
+from .alapcsomo import Csomo
 from .kontakt import Kontakt
 
 

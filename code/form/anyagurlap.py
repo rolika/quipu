@@ -3,8 +3,8 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox
 from form.urlap import Valaszto
-from csomo.gyarto import Gyarto
-from csomo.anyag import Anyag
+from csomok.gyarto import Gyarto
+from csomok.anyag import Anyag
 from konstans import AnyagTipus
 
 

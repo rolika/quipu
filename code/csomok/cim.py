@@ -1,4 +1,4 @@
-from .csomo import Csomo
+from .alapcsomo import Csomo
 
 
 class Cim(Csomo):

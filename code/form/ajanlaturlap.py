@@ -4,8 +4,8 @@ from tkinter import messagebox
 from datetime import date, timedelta
 from tkinter.ttk import LabelFrame
 from form.urlap import Valaszto
-from csomo.ajanlatkeres import Ajanlatkeres
-from csomo.ajanlat import Ajanlat
+from csomok.ajanlatkeres import Ajanlatkeres
+from csomok.ajanlat import Ajanlat
 from konstans import Esely
 
 

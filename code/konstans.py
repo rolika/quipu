@@ -3,8 +3,8 @@
 
 import enum
 
-from .csomo.szemely import Szemely
-from .csomo.szervezet import Szervezet
+from .csomok.szemely import Szemely
+from .csomok.szervezet import Szervezet
 
 
 ELERHETOSEG_TIPUS = ("alapértelmezett", "munkahelyi", "privát")

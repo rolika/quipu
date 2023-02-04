@@ -2,8 +2,8 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox
-from csomo.keszlet import Keszlet
-from csomo.termek import Termek
+from csomok.keszlet import Keszlet
+from csomok.termek import Termek
 from form.urlap import Valaszto
 
 

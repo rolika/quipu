@@ -1,7 +1,8 @@
 import re
 from datetime import datetime
 
-from ..konnektor import Konnektor
+
+from code.konnektor import Konnektor
 
 
 class Csomo:
@@ -10,14 +11,18 @@ class Csomo:
     # osztálymetódusok
 
     def ascii_rep(szoveg) -> str:
-        """Kisbetűs, ékezet nélküli szöveget készít a bemenetről, sorbarendezéshez
+        """Kisbetűs, ékezet nélküli szöveget készít a bemenetről,
+        sorbarendezéshez.
         szoveg:     string"""
-        return "".join(re.findall("[a-z1-9]", szoveg.lower().translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))))
+        return "".join(re.findall("[a-z1-9]", szoveg.lower().\
+            translate(str.maketrans("áéíóöőúüű", "aeiooouuu"))))
 
     def formazo(attr, zarojel="()", elvalasztojel=" ", hatul=False) -> str:
-        """Segít a formázásban, ill. ha hiányzik az adat, nem írjuk ki egyáltalán.
+        """Segít a formázásban, ill. ha hiányzik az adat, nem írjuk ki
+        egyáltalán.
         attr:           attribútum, vagy annak hiánya, ha üres
-        zarojel:        () vagy [] vagy {} esetleg // vagy "" legyen az adat körül (két karakter legyen, vagy üres)
+        zarojel:        () vagy [] vagy {} esetleg // vagy "" legyen az adat
+                        körül (két karakter legyen, vagy üres)
         elvalasztojel:  az adatot a többitől elválasztó jel
         hatul:          az elválasztójel hátul legyen"""
         if attr == "None":
@@ -30,8 +35,12 @@ class Csomo:
         nyito = zarojel[0] if zarojel else ""
         zaro = zarojel[1] if zarojel else ""
         return "{elvalaszto}{nyit}{adat}{zar}{hatul}"\
-            .format(elvalaszto=elvalasztojel, nyit=nyito, adat=attr, zar=zaro, hatul=hatul) if attr else ""
-    
+            .format(elvalaszto=elvalasztojel,
+                    nyit=nyito,
+                    adat=attr,
+                    zar=zaro,
+                    hatul=hatul) if attr else ""
+
     # osztályváltozók
 
     kon = Konnektor()
@@ -50,17 +59,20 @@ class Csomo:
         raise NotImplementedError
 
     def __repr__(self) -> str:
-        """Csomó neve sorbarendezéshez, jellemzően kisbetűs, ékezetek nélkül, ld. self._ascii_rep()."""
+        """Csomó neve sorbarendezéshez, jellemzően kisbetűs, ékezetek nélkül,
+        ld. ascii_rep()."""
         raise NotImplementedError
 
     def __bool__(self) -> bool:
-        """A csomó elegendően meghatározott-e, azaz a felhasználó elég adatot adott meg vagy sem."""
+        """A csomó elegendően meghatározott-e, azaz a felhasználó elég adatot
+        adott meg vagy sem."""
         raise NotImplementedError
 
     def __eq__(self, masik) -> bool:
         """A csomó azonos egy másikkal, ha azonos az SQL PRIMARY KEY-ük.
         Kell a None-check, mert None == None True-t ad."""
-        return False if self.azonosito is None else self.azonosito == masik.azonosito
+        return False if self.azonosito is None\
+            else self.azonosito == masik.azonosito
 
     @property
     def azonosito(self) -> int:
@@ -90,7 +102,8 @@ class Csomo:
         """Ellenőrzi, hogy a csomó szerepel-e az adatbázisban."""
         assert self._db
         assert self._tabla
-        return True if self.azonosito else Csomo.kon[self._db].select(self._tabla, logic="AND", **self._adatok).fetchone()
+        return True if self.azonosito else Csomo.kon[self._db].\
+            select(self._tabla, logic="AND", **self._adatok).fetchone()
 
     def ment(self) -> bool:
         """Menti vagy módosítja a csomó adatait."""
@@ -98,11 +111,12 @@ class Csomo:
         assert self._tabla
         idobelyeg = datetime.now().strftime("%Y-%m-%d %H:%m:%S")
         self._adatok["modositva"] = idobelyeg
-        if self.azonosito:  # módosítás
-            return Csomo.kon[self._db].update(self._tabla, self._adatok, azonosito=self.azonosito)  # True vagy False
-        else:  # új mentés
+        if self.azonosito:  # módosítás: True vagy False
+            return Csomo.kon[self._db].\
+                update(self._tabla, self._adatok, azonosito=self.azonosito)
+        else:  # új rekord: lastrowid vagy None
             self._adatok["letrehozva"] = idobelyeg
-            return Csomo.kon[self._db].insert(self._tabla, **self._adatok)  # lastrowid vagy None
+            return Csomo.kon[self._db].insert(self._tabla, **self._adatok)
 
     def torol(self) -> bool:
         """Törli az adatbázisból a csomót."""

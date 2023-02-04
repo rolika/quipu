@@ -3,9 +3,9 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter.ttk import Combobox
 from form.urlap import Valaszto
-from csomo.szallito import Szallito
-from csomo.termek import Termek
-from csomo.anyag import Anyag
+from csomok.szallito import Szallito
+from csomok.termek import Termek
+from csomok.anyag import Anyag
 
 
 class TermekUrlap(Frame):

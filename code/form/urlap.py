@@ -1,8 +1,8 @@
 from tkinter import *
 from tkinter.ttk import Combobox
-from csomo.telefon import Telefon
-from csomo.e_mail import Email
-from csomo.cim import Cim
+from csomok.telefon import Telefon
+from csomok.e_mail import Email
+from csomok.cim import Cim
 from konstans import ELERHETOSEG_TIPUS, CIM_TIPUS, ORSZAG, MEGYE
 
 

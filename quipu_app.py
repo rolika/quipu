@@ -27,23 +27,24 @@ SOFTWARE.
 from tkinter import *
 from os import getcwd
 
-import menu
-from konstans import MAGANSZEMELY, WEVIK, VITYA, ROLI
-from csomo.kontakt import Kontakt
-from konnektor import Konnektor
+
+from code.csomok.alapcsomo import Csomo
+#import menu
 
 
 class Quipu(Frame):
     """ Fő alkalmazás
-    A kipu, más néven csomóírás vagy zsinórírás egy különleges, tízes számrendszerbeli információtárolási rendszer,
-    melynek segítségével helyettesítették az írást az Inka Birodalomban. A kipu a kecsuák nyelvén csomót jelent,
-    használati gyakorlatáról bebizonyították, hogy afféle textil abakusz, ahol a csomók jelentést hordoznak.
-    A kipukon rögzített értékeket meglepő módon egy kettes számrendszeren alapuló, kövek helyzetével operáló, számoló
-    eszközzel, egy ősi számítógéppel dolgozták fel. [Wikipedia nyomán]
+    A kipu, más néven csomóírás vagy zsinórírás egy különleges, tízes
+    számrendszerbeli információtárolási rendszer, melynek segítségével
+    helyettesítették az írást az Inka Birodalomban. A kipu a kecsuák nyelvén
+    csomót jelent, használati gyakorlatáról bebizonyították, hogy afféle textil
+    abakusz, ahol a csomók jelentést hordoznak. A kipukon rögzített értékeket
+    meglepő módon egy kettes számrendszeren alapuló, kövek helyzetével operáló,
+    számoló eszközzel, egy ősi számítógéppel dolgozták fel. [Wikipedia nyomán]
     """
     def __init__(self, master=None, **kwargs) -> Frame:
-        """A fő alkalmazás egy tkinter.Frame-ben indul. Ha a szülője None, mint az alapértelmezés, akkor saját
-        ablakot nyit magának.
+        """A fő alkalmazás egy tkinter.Frame-ben indul. Ha a szülője None, mint
+        az alapértelmezés, akkor saját ablakot nyit magának.
         master: szülő widget
         kwargs: tkinter.Frame tulajdonságait szabályozó értékek"""
         super().__init__(master=master, **kwargs)
@@ -66,8 +67,10 @@ class Quipu(Frame):
         # ROLI.azonosito = 2  # ez is
 
         # főmenü megjelenítése
-        menu.Fomenu(self, kon)
-        self.grid()
+        # menu.Fomenu(self, kon)
+        # self.grid()
+
+        csomo = Csomo()
 
         # és pörgés :-)
         self.mainloop()

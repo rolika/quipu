@@ -1,4 +1,4 @@
-from .csomo import Csomo
+from .alapcsomo import Csomo
 from .szallito import Szallito
 from .anyag import Anyag
 

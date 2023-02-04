@@ -2,12 +2,12 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import simpledialog
 from form.urlap import TelefonszamUrlap, EmailcimUrlap, CimUrlap, Valaszto
-from csomo.szervezet import Szervezet
-from csomo.telefon import Telefon
-from csomo.e_mail import Email
-from csomo.cim import Cim
-from csomo.szemely import Szemely
-from csomo.kontakt import Kontakt
+from csomok.szervezet import Szervezet
+from csomok.telefon import Telefon
+from csomok.e_mail import Email
+from csomok.cim import Cim
+from csomok.szemely import Szemely
+from csomok.kontakt import Kontakt
 from konstans import MAGANSZEMELY, WEVIK
 
 

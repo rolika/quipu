@@ -4,10 +4,10 @@ from tkinter import simpledialog
 from tkinter.ttk import Combobox, LabelFrame
 from datetime import date
 from form.urlap import CimUrlap, Valaszto
-from csomo.projekt import Projekt
-from csomo.munkaresz import Munkaresz
-from csomo.cim import Cim
-from csomo.jelleg import Jelleg
+from csomok.projekt import Projekt
+from csomok.munkaresz import Munkaresz
+from csomok.cim import Cim
+from csomok.jelleg import Jelleg
 from konstans import JELLEG, MUNKARESZ
 
 
