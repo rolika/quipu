@@ -1,4 +1,4 @@
-from .alapcsomo import Csomo
+from code.csomok.alapcsomo import Csomo
 
 
 class Szervezet(Csomo):

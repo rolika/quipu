@@ -1,7 +1,7 @@
-from .alapcsomo import Csomo
-from ..konstans import MAGANSZEMELY
-from .szemely import Szemely
-from .szervezet import Szervezet
+from code.csomok.alapcsomo import Csomo
+from code.konstans import MAGANSZEMELY
+from code.csomok.szemely import Szemely
+from code.csomok.szervezet import Szervezet
 
 
 class Kontakt(Csomo):
