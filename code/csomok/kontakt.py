@@ -48,42 +48,33 @@ class Kontakt(Csomo):
         self._adatok["megjegyzes"] = kontakt.megjegyzes
 
     @property
-    def szemely(self):
+    def szemely(self) -> int:
         return self._adatok.get("szemely")
 
     @property
-    def szervezet(self):
+    def szervezet(self) -> int:
         return self._adatok.get("szervezet")
 
-    def _szemely(self) -> Szemely:
+    def szemely_(self) -> Szemely:
         """A kontakt személyi adatai."""
-        assert self._kon
-        szemely = self._kon.szemely.select("szemely", azonosito=self.szemely).\
-            fetchone()
-        return Szemely(**szemely)
+        return Szemely.azonositobol(self._db, "szemely", self.szemely)
 
-    def _szervezet(self) -> Szervezet:
+    def szervezet_(self) -> Szervezet:
         """A kontakt szervezeti adatai."""
-        assert self._kon
-        szervezet = self._kon.szervezet.\
-            select("szervezet", azonosito=self.szervezet).fetchone()
-        szervezet = Szervezet(kon=self._kon, **szervezet)
-        if szervezet == MAGANSZEMELY:  # __eq__ használata
-            szervezet.rovidnev = ""
-        return szervezet
+        return Szervezet.azonositobol(self._db, "szervezet", self.szervezet)
 
     def listanezet(self) -> str:
         """Kontakt szöveges megjelenítése kiválasztáshoz (pl. Combobox)."""
         if self._ceg_elol:
             return "{ceg}{nev}".\
-                format(ceg=Csomo.formazo(self._szervezet().listanezet(),
+                format(ceg=Csomo.formazo(self.szervezet_().listanezet(),
                        zarojel="",
                        elvalasztojel=": ",
                        hatul=True),
-                       nev=self._szemely().listanezet())
+                       nev=self.szemely_().listanezet())
         else:
             return "{nev}{ceg}".\
-                format(nev=self._szemely().listanezet(),
-                       ceg=Csomo.formazo(self._szervezet().listanezet(),
+                format(nev=self.szemely_().listanezet(),
+                       ceg=Csomo.formazo(self.szervezet_().listanezet(),
                        zarojel="",
                        elvalasztojel=" / "))

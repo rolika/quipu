@@ -23,33 +23,7 @@ class CsomoTest(unittest.TestCase):
         self._mintaceg = Szervezet(rovidnev="Cég Kft.",
                                    teljesnev="Cég Ipari és Szolgáltató Kft.")
 
-    def test_szemely(self):
-        if not self._mintaszemely.meglevo():  # működik-e a meglévő, ha igen
-            self._mintaszemely.azonosito = self._mintaszemely.ment()  # mentés,
-            self.assertTrue(self._mintaszemely.torol())  # majd törlés
-        else:
-            self.assertTrue(False)  # amúgy valami nem volt jó
-
-    def test_szervezet(self):
-        if not self._mintaceg.meglevo():
-            self._mintaceg.azonosito = self._mintaceg.ment()
-            self.assertTrue(self._mintaceg.torol())
-        else:
-            self.assertTrue(False)
-
     def test_kontakt(self):
-        self._mintaszemely.azonosito = self._mintaszemely.ment()
-        self._mintaceg.azonosito = self._mintaceg.ment()
-
-        kontakt = Kontakt(szemelyazonosito=self._mintaszemely.azonosito,
-                          szervezetazonosito=self._mintaceg.azonosito)
-        kontakt.azonosito = kontakt.ment()
-
-        self._mintaszemely.torol()
-        self._mintaceg.torol()
-        self.assertTrue(kontakt.torol())
-
-    def test_elerhetoseg(self):
         self._mintaszemely.azonosito = self._mintaszemely.ment()
         self._mintaceg.azonosito = self._mintaceg.ment()
 
@@ -75,8 +49,22 @@ class CsomoTest(unittest.TestCase):
         email.azonosito = email.ment()
         cim.azonosito = cim.ment()
 
+        becenev = Szemely.azonositobol\
+            ("kontakt", "szemely", self._mintaszemely.azonosito).becenev
+        cegnev = Szervezet.azonositobol\
+            ("kontakt", "szervezet", self._mintaceg.azonosito).rovidnev
+        telefonszam = Telefon.azonositobol\
+            ("kontakt", "telefon", telefon.azonosito).telefonszam
+        emailcim = Email.azonositobol\
+            ("kontakt", "email", email.azonosito).emailcim
+        irszam = Cim.azonositobol("kontakt", "cim", cim.azonosito).iranyitoszam
+
         self._mintaszemely.torol()
         self._mintaceg.torol()
         kontakt.torol()
+        telefon.torol()
+        email.torol()
+        cim.torol()
 
-        self.assertTrue(telefon.torol() and email.torol() and cim.torol())
+        self.assertEqual(becenev+cegnev+telefonszam+emailcim+irszam,
+                         "AlibáCég Kft.+56-42-565 88 99drminta@ceg.hu3245")

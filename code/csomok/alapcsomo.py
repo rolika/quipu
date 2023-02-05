@@ -1,7 +1,6 @@
 import re
 from datetime import datetime
 
-
 from code.konnektor import Konnektor
 
 
@@ -9,7 +8,6 @@ class Csomo:
     """A kipu egy csomóírás, ezért az alkalmazás is alapvető csomókból áll."""
 
     # osztálymetódusok
-
     def ascii_rep(szoveg) -> str:
         """Kisbetűs, ékezet nélküli szöveget készít a bemenetről,
         sorbarendezéshez.
@@ -42,10 +40,7 @@ class Csomo:
                     hatul=hatul) if attr else ""
 
     # osztályváltozók
-
     kon = Konnektor()
-
-    # példányosítás
 
     def __init__(self, kon=None) -> None:
         """A csomó bázispéldánya, le kell származtatni.
@@ -53,6 +48,12 @@ class Csomo:
         self._adatok = dict()
         self._db = None
         self._tabla = None
+    
+    @classmethod
+    def azonositobol(cls, db, tabla, azonosito):
+        """Azonosoító alapján előkeríti a csomót az adatbázisból."""
+        adatok = Csomo.kon[db].select(tabla, azonosito=azonosito).fetchone()
+        return cls(**adatok)
 
     def __str__(self) -> str:
         """Csomó miden adatának szöveges megjelenítése, terminál-nézethez."""
@@ -100,10 +101,8 @@ class Csomo:
 
     def meglevo(self) -> bool:
         """Ellenőrzi, hogy a csomó szerepel-e az adatbázisban."""
-        assert self._db
-        assert self._tabla
-        return True if self.azonosito else Csomo.kon[self._db].\
-            select(self._tabla, logic="AND", **self._adatok).fetchone()
+        talalat = self.keres(**self._adatok).fetchone()
+        return True if talalat else False
 
     def ment(self) -> bool:
         """Menti vagy módosítja a csomó adatait."""
@@ -123,3 +122,9 @@ class Csomo:
         assert self._db
         assert self._tabla
         return Csomo.kon[self._db].delete(self._tabla, azonosito=self.azonosito)
+
+    def keres(self, **kwargs):
+        """Rákeres a megadott kulcsszavakra az adatbázisban."""
+        assert self._db
+        assert self._tabla
+        return Csomo.kon[self._db].select(self._tabla, logic= "AND", **kwargs)
