@@ -17,8 +17,8 @@ class Kontakt(Csomo):
             self._adatok = dict(kwargs)
         else:
             self._adatok = {
-                "szemely": 0,
-                "szervezet": 0,
+                "szemelyazonosito": 0,
+                "szervezetazonosito": 0,
                 "megjegyzes": ""
             }
             self._ceg_elol = True
@@ -49,14 +49,15 @@ class Kontakt(Csomo):
 
     @property
     def szemely(self) -> int:
-        return self._adatok.get("szemely")
+        return self._adatok.get("szemelyazonosito")
 
     @property
     def szervezet(self) -> int:
-        return self._adatok.get("szervezet")
+        return self._adatok.get("szervezetazonosito")
 
     def szemely_(self) -> Szemely:
         """A kontakt személyi adatai."""
+        print(self._db, self.szemely)
         return Szemely.azonositobol(self._db, "szemely", self.szemely)
 
     def szervezet_(self) -> Szervezet:

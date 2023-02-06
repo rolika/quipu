@@ -26,13 +26,13 @@ class CsomoTest(unittest.TestCase):
         self._mintaceg.azonosito = self._mintaceg.ment()
 
         self._kontakt = Kontakt(szemelyazonosito=self._mintaszemely.azonosito,
-                          szervezetazonosito=self._mintaceg.azonosito)
+                                szervezetazonosito=self._mintaceg.azonosito)
         self._kontakt.azonosito = self._kontakt.ment()
 
         self._telefon = Telefon(kontaktazonosito=self._kontakt.azonosito,
-                          telefonszam="+56-42-565 88 99")
+                                telefonszam="+56-42-565 88 99")
         self._email = Email(kontaktazonosito=self._kontakt.azonosito,
-                      emailcim="drminta@ceg.hu")
+                            emailcim="drminta@ceg.hu")
         self._cim = Cim(kontaktazonosito=self._kontakt.azonosito,
                   megye="BAZ",
                   iranyitoszam="3245",
@@ -48,15 +48,15 @@ class CsomoTest(unittest.TestCase):
         self._cim.azonosito = self._cim.ment()
 
     def test_kontakt(self):
-        becenev = Szemely.azonositobol\
-            ("kontakt", "szemely", self._mintaszemely.azonosito).becenev
-        cegnev = Szervezet.azonositobol\
-            ("kontakt", "szervezet", self._mintaceg.azonosito).rovidnev
+        szemely = self._kontakt.szemely_()
+        becenev = szemely.becenev
+        cegnev = self._kontakt.szervezet_().rovidnev
         telefonszam = Telefon.azonositobol\
             ("kontakt", "telefon", self._telefon.azonosito).telefonszam
         emailcim = Email.azonositobol\
             ("kontakt", "email", self._email.azonosito).emailcim
-        irszam = Cim.azonositobol("kontakt", "cim", self._cim.azonosito).iranyitoszam
+        irszam = Cim.azonositobol\
+            ("kontakt", "cim", self._cim.azonosito).iranyitoszam
 
         self.assertEqual(becenev+cegnev+telefonszam+emailcim+irszam,
                          "AlibáCég Kft.+56-42-565 88 99drminta@ceg.hu3245")

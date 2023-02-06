@@ -51,7 +51,7 @@ class Csomo:
     
     @classmethod
     def azonositobol(cls, db, tabla, azonosito):
-        """Azonosoító alapján előkeríti a csomót az adatbázisból."""
+        """Azonosító alapján előkeríti a csomót az adatbázisból."""
         adatok = Csomo.kon[db].select(tabla, azonosito=azonosito).fetchone()
         return cls(**adatok)
 
