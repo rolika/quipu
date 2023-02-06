@@ -48,9 +48,9 @@ class CsomoTest(unittest.TestCase):
         self._cim.azonosito = self._cim.ment()
 
     def test_kontakt(self):
-        szemely = self._kontakt.szemely_()
+        szemely = self._kontakt.szemely()
         becenev = szemely.becenev
-        cegnev = self._kontakt.szervezet_().rovidnev
+        cegnev = self._kontakt.szervezet().rovidnev
         telefonszam = Telefon.azonositobol\
             ("kontakt", "telefon", self._telefon.azonosito).telefonszam
         emailcim = Email.azonositobol\

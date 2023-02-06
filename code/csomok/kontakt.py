@@ -10,7 +10,9 @@ class Kontakt(Csomo):
         """Konstruktor adatbázisból vagy űrlapból történő példányosításhoz.
         kwargs:
             szemelyazonosito:   személy sql primary key
-            szervezetazonosito: szervezet sql primary key)"""
+            szervezetazonosito: szervezet sql primary key)
+            megjegyzes: bármilyen megjegyzés. Használható két, egyébként azonos
+                        bejegyzés megkülönböztetésére"""
         super().__init__(kwargs.pop("kon", None))
         if kwargs:
             self._ceg_elol = kwargs.pop("ceg_elol", True)
@@ -27,8 +29,8 @@ class Kontakt(Csomo):
 
     def __str__(self) ->str:
         """Szervezeti adatok megjelenítése terminál-nézethez."""
-        return "{ceg}{nev}".format(ceg=str(self._szervezet()),
-                                   nev=self._szemely().listanezet())
+        return "{ceg}{nev}".format(ceg=str(self.szervezet()),
+                                   nev=self.szemely().listanezet())
 
     def __repr__(self) -> str:
         """Név megjelenítése sorbarendezéshez"""
@@ -43,39 +45,39 @@ class Kontakt(Csomo):
 
     @adatok.setter
     def adatok(self, kontakt):
-        self._adatok["szemely"] = kontakt.szemely
-        self._adatok["szervezet"] = kontakt.szervezet
+        self._adatok["szemelyazonosito"] = kontakt.szemelyazonosito
+        self._adatok["szervezetazonosito"] = kontakt.szervezetazonosito
         self._adatok["megjegyzes"] = kontakt.megjegyzes
 
     @property
-    def szemely(self) -> int:
+    def szemelyazonosito(self) -> int:
         return self._adatok.get("szemelyazonosito")
 
     @property
-    def szervezet(self) -> int:
+    def szervezetazonosito(self) -> int:
         return self._adatok.get("szervezetazonosito")
 
-    def szemely_(self) -> Szemely:
+    def szemely(self) -> Szemely:
         """A kontakt személyi adatai."""
-        print(self._db, self.szemely)
-        return Szemely.azonositobol(self._db, "szemely", self.szemely)
+        return Szemely.azonositobol(self._db, "szemely", self.szemelyazonosito)
 
-    def szervezet_(self) -> Szervezet:
+    def szervezet(self) -> Szervezet:
         """A kontakt szervezeti adatai."""
-        return Szervezet.azonositobol(self._db, "szervezet", self.szervezet)
+        return Szervezet.azonositobol\
+            (self._db, "szervezet", self.szervezetazonosito)
 
     def listanezet(self) -> str:
         """Kontakt szöveges megjelenítése kiválasztáshoz (pl. Combobox)."""
         if self._ceg_elol:
             return "{ceg}{nev}".\
-                format(ceg=Csomo.formazo(self.szervezet_().listanezet(),
+                format(ceg=Csomo.formazo(self.szervezet().listanezet(),
                        zarojel="",
                        elvalasztojel=": ",
                        hatul=True),
-                       nev=self.szemely_().listanezet())
+                       nev=self.szemely().listanezet())
         else:
             return "{nev}{ceg}".\
-                format(nev=self.szemely_().listanezet(),
-                       ceg=Csomo.formazo(self.szervezet_().listanezet(),
+                format(nev=self.szemely().listanezet(),
+                       ceg=Csomo.formazo(self.szervezet().listanezet(),
                        zarojel="",
                        elvalasztojel=" / "))
