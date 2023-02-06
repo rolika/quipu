@@ -22,20 +22,18 @@ class CsomoTest(unittest.TestCase):
                                      megjegyzes="bácsi")
         self._mintaceg = Szervezet(rovidnev="Cég Kft.",
                                    teljesnev="Cég Ipari és Szolgáltató Kft.")
-
-    def test_kontakt(self):
         self._mintaszemely.azonosito = self._mintaszemely.ment()
         self._mintaceg.azonosito = self._mintaceg.ment()
 
-        kontakt = Kontakt(szemelyazonosito=self._mintaszemely.azonosito,
+        self._kontakt = Kontakt(szemelyazonosito=self._mintaszemely.azonosito,
                           szervezetazonosito=self._mintaceg.azonosito)
-        kontakt.azonosito = kontakt.ment()
+        self._kontakt.azonosito = self._kontakt.ment()
 
-        telefon = Telefon(kontaktazonosito=kontakt.azonosito,
+        self._telefon = Telefon(kontaktazonosito=self._kontakt.azonosito,
                           telefonszam="+56-42-565 88 99")
-        email = Email(kontaktazonosito=kontakt.azonosito,
+        self._email = Email(kontaktazonosito=self._kontakt.azonosito,
                       emailcim="drminta@ceg.hu")
-        cim = Cim(kontaktazonosito=kontakt.azonosito,
+        self._cim = Cim(kontaktazonosito=self._kontakt.azonosito,
                   megye="BAZ",
                   iranyitoszam="3245",
                   helyseg="Város",
@@ -45,26 +43,28 @@ class CsomoTest(unittest.TestCase):
                   honlap="www.ceg.hu",
                   megjegyzes="nahát")
 
-        telefon.azonosito = telefon.ment()
-        email.azonosito = email.ment()
-        cim.azonosito = cim.ment()
+        self._telefon.azonosito = self._telefon.ment()
+        self._email.azonosito = self._email.ment()
+        self._cim.azonosito = self._cim.ment()
 
+    def test_kontakt(self):
         becenev = Szemely.azonositobol\
             ("kontakt", "szemely", self._mintaszemely.azonosito).becenev
         cegnev = Szervezet.azonositobol\
             ("kontakt", "szervezet", self._mintaceg.azonosito).rovidnev
         telefonszam = Telefon.azonositobol\
-            ("kontakt", "telefon", telefon.azonosito).telefonszam
+            ("kontakt", "telefon", self._telefon.azonosito).telefonszam
         emailcim = Email.azonositobol\
-            ("kontakt", "email", email.azonosito).emailcim
-        irszam = Cim.azonositobol("kontakt", "cim", cim.azonosito).iranyitoszam
-
-        self._mintaszemely.torol()
-        self._mintaceg.torol()
-        kontakt.torol()
-        telefon.torol()
-        email.torol()
-        cim.torol()
+            ("kontakt", "email", self._email.azonosito).emailcim
+        irszam = Cim.azonositobol("kontakt", "cim", self._cim.azonosito).iranyitoszam
 
         self.assertEqual(becenev+cegnev+telefonszam+emailcim+irszam,
                          "AlibáCég Kft.+56-42-565 88 99drminta@ceg.hu3245")
+    
+    def tearDown(self) -> None:
+        self._mintaszemely.torol()
+        self._mintaceg.torol()
+        self._kontakt.torol()
+        self._telefon.torol()
+        self._email.torol()
+        self._cim.torol()
