@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 
 from code.konnektor import Konnektor
+from code.hibakezeles import MeglevoCsomoError
 
 
 class Csomo:
@@ -114,7 +115,7 @@ class Csomo:
         assert self._db
         assert self._tabla
         if self.meglevo():
-            return False
+            raise MeglevoCsomoError
         idobelyeg = datetime.now().strftime("%Y-%m-%d %H:%m:%S")
         self._adatok["modositva"] = idobelyeg
         if self.azonosito:  # módosítás: True vagy False

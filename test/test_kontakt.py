@@ -10,6 +10,7 @@ from code.csomok.kontakt import Kontakt
 from code.csomok.telefon import Telefon
 from code.csomok.e_mail import Email
 from code.csomok.cim import Cim
+from code.hibakezeles import MeglevoCsomoError
 
 
 class CsomoTest(unittest.TestCase):
@@ -57,7 +58,6 @@ class CsomoTest(unittest.TestCase):
             ("kontakt", "email", self._email.azonosito).emailcim
         irszam = Cim.azonositobol\
             ("kontakt", "cim", self._cim.azonosito).iranyitoszam
-
         self.assertEqual(becenev+cegnev+telefonszam+emailcim+irszam,
                          "AlibáCég Kft.+56-42-565 88 99drminta@ceg.hu3245")
 
@@ -68,7 +68,19 @@ class CsomoTest(unittest.TestCase):
                           becenev="Alibá",
                           nem="férfi",
                           megjegyzes="bácsi")
-        self.assertFalse(ugyanaz.ment())
+        with self.assertRaises(MeglevoCsomoError):
+            ugyanaz.ment()
+
+    def test_kulonbozo(self):
+        kulonbozo = Szemely(elotag="Dr.",
+                            vezeteknev="Minta",
+                            keresztnev="Aladár",
+                            becenev="Alibá",
+                            nem="férfi",
+                            megjegyzes="bácsika")
+        kulonbozo.azonosito = kulonbozo.ment()  # ezt el kell mentenie
+        siker = kulonbozo.torol()  # és törölnie is tudni kell
+        self.assertTrue(siker)
 
     def tearDown(self) -> None:
         self._mintaszemely.torol()
