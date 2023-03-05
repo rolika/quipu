@@ -18,15 +18,21 @@ class Konnektor(dict):
         with open(pathlib.Path("data/sql_create.json")) as f:
             self._db_struktura = json.load(f)
         with open(pathlib.Path("data/sql_default.json")) as f:
-            alapertelmezett_oszlopok = json.load(f)
+            self._alapertelmezett_oszlopok = json.load(f)
 
         for db_nev in self._db_struktura:
             print("Kapcsolódás adatbázishoz:", db_nev)
             self[db_nev] = Tamer(db_path / (db_nev+".db"))
             for tabla, oszlop in self._db_struktura[db_nev].items():
                 if tabla != "_attach_":
-                    oszlop.update(alapertelmezett_oszlopok)
+                    oszlop.update(self._alapertelmezett_oszlopok)
                     self[db_nev].create(tabla, **oszlop)
+
+    @property
+    def alap_oszlopok(self):
+        alap = dict(self._alapertelmezett_oszlopok)
+        del alap["megjegyzes"]  # elvileg ez nem tud KeyError-t dobni
+        return alap.keys()
 
 #tesztelés
 if __name__ == "__main__":

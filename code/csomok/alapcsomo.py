@@ -48,7 +48,7 @@ class Csomo:
         self._adatok = dict()
         self._db = None
         self._tabla = None
-    
+
     @classmethod
     def azonositobol(cls, db, tabla, azonosito):
         """Azonosító alapján előkeríti a csomót az adatbázisból."""
@@ -70,10 +70,8 @@ class Csomo:
         raise NotImplementedError
 
     def __eq__(self, masik) -> bool:
-        """A csomó azonos egy másikkal, ha azonos az SQL PRIMARY KEY-ük.
-        Kell a None-check, mert None == None True-t ad."""
-        return False if self.azonosito is None\
-            else self.azonosito == masik.azonosito
+        """A csomó azonos egy másikkal, ha minden jellemző értékük azonos."""
+        return self.ertekek == masik.ertekek
 
     @property
     def azonosito(self) -> int:
@@ -95,19 +93,28 @@ class Csomo:
         """A csomóhoz fűzött megjegyzés beállítása kívülről."""
         self._adatok["megjegyzes"] = megjegyzes
 
+    @property
+    def ertekek(self):
+        """A csomó minden adata, kivéve azonosító, gyakoriság, létrehozva,
+        módosítva. Összehasonlításhoz."""
+        return {kulcs: ertek for kulcs, ertek in self._adatok.items()\
+                if kulcs not in Csomo.kon.alap_oszlopok}
+
     def listanezet(self) -> str:
         """Csomó szöveges megjelenítése kiválasztáshoz (pl. Combobox)."""
         raise NotImplementedError
 
     def meglevo(self) -> bool:
         """Ellenőrzi, hogy a csomó szerepel-e az adatbázisban."""
-        talalat = self.keres(**self._adatok).fetchone()
+        talalat = self.keres(**self.ertekek).fetchone()
         return True if talalat else False
 
     def ment(self) -> bool:
         """Menti vagy módosítja a csomó adatait."""
         assert self._db
         assert self._tabla
+        if self.meglevo():
+            return False
         idobelyeg = datetime.now().strftime("%Y-%m-%d %H:%m:%S")
         self._adatok["modositva"] = idobelyeg
         if self.azonosito:  # módosítás: True vagy False

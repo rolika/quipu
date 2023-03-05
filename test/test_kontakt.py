@@ -60,7 +60,16 @@ class CsomoTest(unittest.TestCase):
 
         self.assertEqual(becenev+cegnev+telefonszam+emailcim+irszam,
                          "AlibáCég Kft.+56-42-565 88 99drminta@ceg.hu3245")
-    
+
+    def test_meglevo(self):
+        ugyanaz = Szemely(elotag="Dr.",
+                          vezeteknev="Minta",
+                          keresztnev="Aladár",
+                          becenev="Alibá",
+                          nem="férfi",
+                          megjegyzes="bácsi")
+        self.assertFalse(ugyanaz.ment())
+
     def tearDown(self) -> None:
         self._mintaszemely.torol()
         self._mintaceg.torol()
